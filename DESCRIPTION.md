@@ -1,0 +1,1 @@
+MAXIMUS GLOBAL TRANSPORT LINK - Uganda cargo transport app connecting clients with trucks, Equity Till 031801 for escrow payments, Mbale to Namanve coffee routes, 15% single truck commission 10% bulk, mobile money and bank payouts

@@ -1,0 +1,10 @@
+{
+  "name": "MAXIMUS GLOBAL TRANSPORT LINK",
+  "description": "MAXIMUS GLOBAL TRANSPORT LINK - Uganda coffee and cargo transport, Equity Till 031801, Mbale to Namanve, 15% single truck 10% bulk",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
