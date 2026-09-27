@@ -17,6 +17,7 @@ import {
 import { UserRole, Currency, Language } from '../types';
 import { formatMoney } from '../services/currency';
 import { t, SUPPORTED_LANGUAGES } from '../services/i18n';
+import { Logo } from './Logo';
 
 interface NavbarProps {
   currentRole: UserRole;
@@ -78,21 +79,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => onTabChange('dashboard')} 
             className="flex items-center gap-2.5 text-left group focus:outline-none"
           >
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 flex items-center justify-center shadow-md shadow-amber-950/40 text-slate-950">
-              <span className="font-extrabold text-xl tracking-tighter flex items-center">
-                M
-                <Truck className="w-4 h-4 -ml-0.5 text-slate-950 stroke-[2.5]" />
-              </span>
-            </div>
+            <Logo size={40} className="w-10 h-10 shadow-md shadow-amber-950/40" />
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-xl font-extrabold tracking-tight text-white group-hover:text-amber-400 transition-colors">
                   MAXIMUS
                 </span>
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF8C00]"></span>
               </div>
-              <p className="text-[10px] tracking-wide text-slate-400 uppercase font-medium">
-                {t('tagline', language)}
+              <p className="text-[10px] tracking-wider text-slate-400 uppercase font-semibold">
+                GLOBAL TRANSPORT LINK
               </p>
             </div>
           </button>
