@@ -70,7 +70,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-40 bg-[#0B192C] text-white border-b border-slate-800 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+      <div className="flex justify-between flex-wrap gap-2 px-2 max-w-[100vw] overflow-hidden min-h-16 py-2 items-center mx-auto max-w-7xl">
         
         {/* Zone 1: Brand Mark */}
         <div className="flex items-center gap-3 shrink-0">
@@ -153,7 +153,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Zone 3: Actions & Controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
           
           {/* Offline Mode Switcher */}
           <button
