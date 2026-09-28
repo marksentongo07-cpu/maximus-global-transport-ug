@@ -42,6 +42,7 @@ import { EquityTillBanner } from '../Payment/EquityTillBanner';
 import { DriverPayoutSettingsModal } from './DriverPayoutSettingsModal';
 import { AdminDriverPayoutModal } from '../Admin/AdminDriverPayoutModal';
 import { SafeBodaTrustPromptModal } from '../Modals/SafeBodaTrustPromptModal';
+import { gpsTrackingService, GpsLocationPing } from '../../services/gpsTrackingService';
 
 interface TransporterDashboardProps {
   transporter: Transporter;
@@ -96,6 +97,13 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
   const [showTrustGateModal, setShowTrustGateModal] = useState(false);
   const [selectedJobForBid, setSelectedJobForBid] = useState<Job | null>(null);
 
+  // Live GPS Tracking State (Low Accuracy, 30s moving / 2m stopped, offline queueing)
+  const [isGpsActive, setIsGpsActive] = useState<boolean>(true);
+  const [offlineQueueCount, setOfflineQueueCount] = useState<number>(0);
+  const [lastGpsPing, setLastGpsPing] = useState<GpsLocationPing | null>(null);
+  const [isFlushingQueue, setIsFlushingQueue] = useState<boolean>(false);
+  const [simStepIndex, setSimStepIndex] = useState<number>(0);
+
   const handleBidClick = (job: Job) => {
     if (transporter.kycStatus !== 'verified') {
       setSelectedJobForBid(job);
@@ -117,6 +125,65 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
   const myAssignedJobs = allJobs.filter(
     (j) => j.assignedTransporterId === transporter.id || j.offers.some(o => o.transporterId === transporter.id)
   );
+
+  const activeInTransitJob = myAssignedJobs.find(j => j.status === 'in_transit') || myAssignedJobs[0];
+
+  React.useEffect(() => {
+    const unsubQueue = gpsTrackingService.subscribeOfflineQueue(setOfflineQueueCount);
+    const unsubLoc = gpsTrackingService.subscribeLocation(setLastGpsPing);
+
+    if (isGpsActive && activeInTransitJob) {
+      gpsTrackingService.startTracking({
+        jobId: activeInTransitJob.id,
+        transporterId: transporter.id,
+        driverName: transporter.name,
+        phone: transporter.phone,
+        numberPlate: transporter.vehicles[0]?.plateNumber || 'UBL 892M',
+        initialStatus: 'delivering',
+      });
+    }
+
+    return () => {
+      unsubQueue();
+      unsubLoc();
+    };
+  }, [isGpsActive, activeInTransitJob?.id, transporter.id, transporter.name, transporter.phone]);
+
+  const handleSimulateHighwayStep = async (jobId: string) => {
+    const corridorWaypoints = [
+      { lat: 0.4479, lng: 33.2026, speed: 58, loc: 'Jinja Nile Bridge' },
+      { lat: 0.4120, lng: 33.0500, speed: 64, loc: 'Mabira Forest Road' },
+      { lat: 0.3950, lng: 32.8800, speed: 52, loc: 'Lugazi Town Junction' },
+      { lat: 0.3544, lng: 32.7523, speed: 46, loc: 'Mukono Bypass' },
+      { lat: 0.3600, lng: 32.6650, speed: 38, loc: 'Namanve Industrial ICD' },
+      { lat: 0.3476, lng: 32.5825, speed: 28, loc: 'Nakawa Kampala Core' },
+    ];
+
+    const nextIdx = (simStepIndex + 1) % corridorWaypoints.length;
+    setSimStepIndex(nextIdx);
+    const targetWp = corridorWaypoints[nextIdx];
+
+    await gpsTrackingService.simulateCorridorPing({
+      jobId,
+      transporterId: transporter.id,
+      driverName: transporter.name,
+      phone: transporter.phone,
+      numberPlate: transporter.vehicles[0]?.plateNumber || 'UBL 892M',
+      lat: targetWp.lat,
+      lng: targetWp.lng,
+      speed: targetWp.speed,
+      status: 'delivering',
+      lastSeenLocationName: targetWp.loc,
+    });
+
+    onSimulateGpsProgress(jobId);
+  };
+
+  const handleFlushOfflineQueue = async () => {
+    setIsFlushingQueue(true);
+    await gpsTrackingService.flushOfflineQueue();
+    setIsFlushingQueue(false);
+  };
 
   // Compute distance from transporter current location to each ICD
   const icdDistances = useMemo(() => {
@@ -502,11 +569,11 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
 
                     {/* Step 3: Advance GPS Telemetry */}
                     <button
-                      onClick={() => onSimulateGpsProgress(job.id)}
+                      onClick={() => handleSimulateHighwayStep(job.id)}
                       disabled={job.status !== 'in_transit'}
                       className="p-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-300 text-xs font-bold hover:bg-amber-500/20 transition-all text-center disabled:opacity-40"
                     >
-                      <div className="text-[10px] font-normal opacity-70">GPS Ping</div>
+                      <div className="text-[10px] font-normal opacity-70">GPS Ping (30s)</div>
                       <div>{t('stepUpdateGps', language)}</div>
                     </button>
 
@@ -523,6 +590,77 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
                       <div>{t('stepCollectSignature', language)}</div>
                     </button>
 
+                  </div>
+
+                  {/* Live GPS Telemetry Card for Driver (Battery & Data Saver Mode) */}
+                  <div className="p-3.5 bg-slate-900 border border-white/10 rounded-xl space-y-2.5 text-xs">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Radio className={`w-4 h-4 ${isGpsActive ? 'text-emerald-400 animate-pulse' : 'text-slate-500'}`} />
+                        <span className="font-bold text-white">
+                          {isGpsActive ? 'Live GPS Broadcast: ACTIVE' : 'GPS Broadcast: PAUSED'}
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                          Low Data Mode
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsGpsActive(!isGpsActive)}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors ${
+                            isGpsActive ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-emerald-500 text-slate-950'
+                          }`}
+                        >
+                          {isGpsActive ? 'Pause GPS' : 'Resume GPS'}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-slate-950 p-2.5 rounded-lg text-[11px]">
+                      <div>
+                        <span className="text-white/50 block text-[10px]">Cadence Throttling:</span>
+                        <strong className="text-white">30s moving / 2m stopped</strong>
+                      </div>
+                      <div>
+                        <span className="text-white/50 block text-[10px]">Battery / Data Mode:</span>
+                        <strong className="text-emerald-400">enableHighAccuracy: false</strong>
+                      </div>
+                      <div>
+                        <span className="text-white/50 block text-[10px]">Offline Deadzone Queue:</span>
+                        <div className="flex items-center gap-1.5">
+                          <strong className={offlineQueueCount > 0 ? 'text-amber-400' : 'text-white'}>
+                            {offlineQueueCount} points queued
+                          </strong>
+                          {offlineQueueCount > 0 && (
+                            <button
+                              type="button"
+                              onClick={handleFlushOfflineQueue}
+                              disabled={isFlushingQueue}
+                              className="px-1.5 py-0.5 bg-amber-500/20 text-amber-300 rounded text-[9px] font-bold hover:bg-amber-500/30"
+                            >
+                              {isFlushingQueue ? 'Syncing...' : 'Sync'}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Manual Highway Step Simulation Button for 2-Phone Testing */}
+                    <div className="pt-1 flex flex-wrap items-center justify-between gap-2 border-t border-white/5">
+                      <span className="text-[11px] text-white/60">
+                        Testing with 2 phones? Tap to drive along corridor and watch admin laptop update:
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleSimulateHighwayStep(job.id)}
+                        className="px-3.5 py-1.5 bg-orange-500 hover:bg-orange-400 text-black font-bold rounded-lg text-xs flex items-center gap-1.5 shadow-md shrink-0 transition-transform active:scale-95"
+                      >
+                        <Navigation className="w-3.5 h-3.5 text-black" />
+                        <span>Simulate Highway Drive 🚛</span>
+                      </button>
+                    </div>
                   </div>
 
                 </div>

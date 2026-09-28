@@ -160,8 +160,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
             }`}
           >
-            <Satellite className="w-4 h-4 shrink-0" />
-            <span>GPS</span>
+            <Satellite className="w-4 h-4 shrink-0 text-amber-400" />
+            <span className="flex items-center gap-1.5">
+              <span>Live GPS Map</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+            </span>
           </button>
 
           <button 
@@ -447,8 +450,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               : 'text-white/60 hover:text-white px-3 py-1.5'
           }`}
         >
-          <Satellite className="w-3.5 h-3.5" />
-          <span>GPS</span>
+          <Satellite className="w-3.5 h-3.5 text-amber-400" />
+          <span>Live GPS Map</span>
         </button>
         <button 
           onClick={() => onTabChange('services')} 

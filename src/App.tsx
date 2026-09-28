@@ -283,22 +283,54 @@ export default function App() {
     addNotification(`Trip Status Updated`, `Shipment #${jobId} status is now ${newStatus.replace('_', ' ').toUpperCase()}`);
   };
 
-  const handleSimulateGps = (jobId: string) => {
+  const handleSimulateGps = async (jobId: string) => {
+    const waypoints = [
+      { lat: 0.4479, lng: 33.2026, loc: 'Jinja Nile Bridge', speed: 58 },
+      { lat: 0.4120, lng: 33.0500, loc: 'Mabira Forest Road', speed: 64 },
+      { lat: 0.3950, lng: 32.8800, loc: 'Lugazi Highway', speed: 52 },
+      { lat: 0.3544, lng: 32.7523, loc: 'Mukono Bypass', speed: 46 },
+      { lat: 0.3600, lng: 32.6650, loc: 'Namanve Industrial ICD', speed: 38 },
+      { lat: 0.3476, lng: 32.5825, loc: 'Nakawa Kampala Core', speed: 28 },
+    ];
+
+    let chosenWp = waypoints[0];
+
     setJobs(prev => prev.map(j => {
       if (j.id === jobId && j.currentGps) {
         const nextProgress = Math.min(95, j.currentGps.progressPercent + 20);
+        const wpIdx = Math.min(waypoints.length - 1, Math.floor((nextProgress / 100) * waypoints.length));
+        chosenWp = waypoints[wpIdx];
         return {
           ...j,
           currentGps: {
-            ...j.currentGps,
+            lat: chosenWp.lat,
+            lng: chosenWp.lng,
             progressPercent: nextProgress,
-            lastUpdated: `Just now (GPS Waypoint Mile ${nextProgress}%)`,
+            lastUpdated: `Just now (${chosenWp.loc} · ${chosenWp.speed} km/h)`,
           }
         };
       }
       return j;
     }));
-    addNotification('GPS Route Ping', `Driver advancing along corridor. Telemetry refreshed.`);
+
+    try {
+      await fetch('/api/location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobId,
+          lat: chosenWp.lat,
+          lng: chosenWp.lng,
+          speed: chosenWp.speed,
+          status: 'delivering',
+          lastSeenLocationName: chosenWp.loc,
+        }),
+      });
+    } catch {
+      // offline fallback
+    }
+
+    addNotification('GPS Route Ping', `Driver advancing along corridor (${chosenWp.loc}). Telemetry refreshed.`);
   };
 
   // Escrow funding success
@@ -730,7 +762,7 @@ export default function App() {
 
             <LiveTransportMap
               transporters={transporters}
-              activeJob={trackingJob}
+              activeJob={currentRole === 'client' ? trackingJob : null}
               language={language}
               onSelectTransporter={(t) => setInspectKYCTransporter(t)}
               onDirectBook={(t) => {

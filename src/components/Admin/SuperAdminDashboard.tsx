@@ -52,6 +52,7 @@ import {
   CreditCard
 } from 'lucide-react';
 import { AdminDriverPayoutModal } from './AdminDriverPayoutModal';
+import { LeafletLiveFleetMap } from '../Map/LeafletLiveFleetMap';
 
 interface SuperAdminDashboardProps {
   allJobs: Job[];
@@ -84,7 +85,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
   onConfirmPODByAdmin,
   onExecuteDriverPayout,
 }) => {
-  const [activeAdminTab, setActiveAdminTab] = useState<'revenue' | 'analytics' | 'escrow' | 'payouts' | 'users' | 'disputes'>('revenue');
+  const [activeAdminTab, setActiveAdminTab] = useState<'map' | 'revenue' | 'analytics' | 'escrow' | 'payouts' | 'users' | 'disputes'>('map');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPayoutJob, setSelectedPayoutJob] = useState<Job | null>(null);
   const [showPayoutModal, setShowPayoutModal] = useState(false);
@@ -293,6 +294,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div className="flex items-center gap-2 p-1.5 bg-[#1a2a3f] border border-white/10 rounded-full shadow-inner overflow-x-auto max-w-full">
           {[
+            { id: 'map', label: 'Live Fleet GPS Map (All Trucks)' },
             { id: 'revenue', label: t('revenueAnalytics', language) },
             { id: 'analytics', label: t('corridorAnalytics', language) },
             { id: 'payouts', label: `Driver Payouts & PODs (${allJobs.filter(j => j.proofOfDelivery || j.status === 'delivered').length})` },
@@ -309,6 +311,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                   : 'text-white/60 hover:text-white'
               }`}
             >
+              {tab.id === 'map' && <Truck className="w-3.5 h-3.5" />}
               {tab.id === 'revenue' && <BarChart3 className="w-3.5 h-3.5" />}
               {tab.id === 'payouts' && <Receipt className="w-3.5 h-3.5" />}
               {tab.label}
@@ -316,6 +319,16 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Tab: LIVE FLEET GPS MAP (Super Admin Full Fleet Radar) */}
+      {activeAdminTab === 'map' && (
+        <div className="space-y-4">
+          <LeafletLiveFleetMap
+            fullScreenMode={true}
+            language={language}
+          />
+        </div>
+      )}
 
       {/* Tab: REVENUE ANALYTICS (Recharts Powered - Confidential Administration Access Only) */}
       {activeAdminTab === 'revenue' && (

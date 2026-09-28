@@ -17,8 +17,11 @@ import {
   CheckCircle2, 
   AlertCircle,
   Eye,
-  Plus
+  Plus,
+  LocateFixed,
+  X
 } from 'lucide-react';
+import { LeafletLiveFleetMap } from '../Map/LeafletLiveFleetMap';
 
 interface ClientDashboardProps {
   jobs: Job[];
@@ -50,6 +53,7 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
   const [ratingJob, setRatingJob] = useState<Job | null>(null);
   const [starCount, setStarCount] = useState<number>(5);
   const [reviewComment, setReviewComment] = useState('');
+  const [trackingMapJobId, setTrackingMapJobId] = useState<string | null>(null);
 
   const activeShipments = jobs.filter(j => j.status === 'in_transit' || j.status === 'loaded' || j.status === 'booked');
   const openNegotiatingJobs = jobs.filter(j => j.status === 'open' || j.status === 'negotiating' || j.status === 'escrow_pending');
@@ -270,15 +274,28 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
 
               {/* Live GPS Telemetry Bar (if in transit) */}
               {job.currentGps && job.status === 'in_transit' && (
-                <div className="p-4 bg-slate-900/80 border border-white/10 rounded-xl space-y-2">
-                  <div className="flex items-center justify-between text-xs">
+                <div className="p-4 bg-slate-900/80 border border-white/10 rounded-xl space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                     <span className="font-bold text-orange-400 flex items-center gap-1.5">
                       <Navigation className="w-4 h-4 animate-spin text-orange-400" />
                       {t('liveTelemetry', language)}: {job.currentGps.lastUpdated}
                     </span>
-                    <span className="font-mono font-bold text-white">
-                      {job.currentGps.progressPercent}% Completed
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono font-bold text-white">
+                        {job.currentGps.progressPercent}% Route Completed
+                      </span>
+                      <button
+                        onClick={() => setTrackingMapJobId(trackingMapJobId === job.id ? null : job.id)}
+                        className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all shadow-md ${
+                          trackingMapJobId === job.id
+                            ? 'bg-rose-500 text-white'
+                            : 'bg-orange-500 hover:bg-orange-400 text-black'
+                        }`}
+                      >
+                        <LocateFixed className="w-3.5 h-3.5" />
+                        <span>{trackingMapJobId === job.id ? 'Close Live Map' : 'Track My Truck on Live Map 🚛'}</span>
+                      </button>
+                    </div>
                   </div>
                   {/* Progress Bar */}
                   <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
@@ -287,6 +304,16 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
                       style={{ width: `${job.currentGps.progressPercent}%` }}
                     />
                   </div>
+
+                  {/* Expanded Client Leaflet Map (Limited to this job's truck) */}
+                  {trackingMapJobId === job.id && (
+                    <div className="pt-2">
+                      <LeafletLiveFleetMap
+                        clientJobId={job.id}
+                        language={language}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 
