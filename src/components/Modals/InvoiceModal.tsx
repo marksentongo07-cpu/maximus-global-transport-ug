@@ -1,6 +1,7 @@
 import React from 'react';
 import { Job, Currency } from '../../types';
 import { formatMoney } from '../../services/currency';
+import { Logo } from '../Logo';
 import { Printer, Download, CheckCircle2, ShieldCheck, X, Truck } from 'lucide-react';
 
 interface InvoiceModalProps {
@@ -53,10 +54,8 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({ job, currency, onClo
           {/* Header */}
           <div className="flex justify-between items-start border-b border-slate-200 pb-6">
             <div>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-slate-950 font-black text-lg">
-                  M
-                </div>
+              <div className="flex items-center gap-2.5">
+                <Logo size={36} className="w-9 h-9 shadow-sm" />
                 <div>
                   <h1 className="text-xl font-extrabold tracking-tight text-slate-900">MAXIMUS</h1>
                   <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">

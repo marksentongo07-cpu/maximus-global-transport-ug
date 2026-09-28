@@ -20,6 +20,7 @@ import { t } from './services/i18n';
 import { formatMoney } from './services/currency';
 import { getStoredICDs, saveStoredICDs } from './services/icdService';
 import { Navbar } from './components/Navbar';
+import { Logo } from './components/Logo';
 import { LiveTransportMap } from './components/Map/LiveTransportMap';
 import { ClientDashboard } from './components/Client/ClientDashboard';
 import { TransporterDashboard } from './components/Transporter/TransporterDashboard';
@@ -664,9 +665,7 @@ export default function App() {
       <footer className="border-t border-slate-800 bg-[#0B192C] text-slate-400 text-xs py-6 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs">
-              M
-            </div>
+            <Logo size={24} className="w-6 h-6 shadow-sm" />
             <span className="font-bold text-white">MAXIMUS</span>
             <span className="text-slate-500">·</span>
             <span>{t('footerPlatformDesc', language)}</span>
