@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { 
+  Shield,
+  Warehouse,
+  Satellite,
   Truck, 
+  AlertTriangle,
   Bell, 
   ShieldCheck, 
   Wifi, 
@@ -10,7 +14,6 @@ import {
   Globe, 
   UserCircle2,
   CheckCircle2,
-  AlertTriangle,
   FileText,
   Check
 } from 'lucide-react';
@@ -78,7 +81,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const currentLangObj = SUPPORTED_LANGUAGES.find(l => l.code === language) || SUPPORTED_LANGUAGES[0];
 
   return (
-    <header className="sticky top-0 z-[100] relative isolate bg-[#0B192C] text-white border-b border-slate-800 shadow-md">
+    <header className="sticky top-0 z-[100] relative isolate bg-gradient-to-r from-[#0f1c2e] to-[#1a2a3f] text-white border-b border-white/10 shadow-xl">
       {/* Backdrop for closing dropdowns on click outside */}
       {isAnyMenuOpen && (
         <div 
@@ -88,103 +91,124 @@ export const Navbar: React.FC<NavbarProps> = ({
         />
       )}
 
-      <div className="flex justify-between flex-wrap gap-2 px-2 max-w-[100vw] min-h-16 py-2 items-center mx-auto max-w-7xl relative">
+      {/* Header Container: increased padding py-4 px-6 */}
+      <div className="flex justify-between items-center flex-wrap gap-4 px-4 sm:px-6 py-4 max-w-[100vw] min-h-16 mx-auto max-w-7xl relative">
         
-        {/* Zone 1: Brand Mark */}
+        {/* Zone 1: Brand Mark with subtle gradient backdrop */}
         <div className="flex items-center gap-3 shrink-0">
           <button 
             onClick={() => onTabChange('dashboard')} 
-            className="flex items-center gap-2.5 text-left group focus:outline-none"
+            className="flex items-center gap-3 text-left group focus:outline-none"
           >
-            <Logo size={40} className="w-10 h-10 shadow-md shadow-amber-950/40" />
+            <Logo size={40} className="w-10 h-10 shadow-lg shadow-black/40 rounded-xl" />
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xl font-extrabold tracking-tight text-white group-hover:text-amber-400 transition-colors">
+                <span className="text-[18px] font-bold tracking-tight text-white group-hover:text-orange-400 transition-colors">
                   MAXIMUS
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#FF8C00]"></span>
               </div>
-              <p className="text-[10px] tracking-wider text-slate-400 uppercase font-semibold">
+              <p className="text-[10px] tracking-[0.08em] text-slate-400 uppercase font-semibold">
                 GLOBAL TRANSPORT LINK
               </p>
             </div>
           </button>
         </div>
 
-        {/* Zone 2: Navigation Links (Text Links with subtle hover) */}
-        <nav className="relative z-10 hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300">
+        {/* Zone 2: Navigation Tabs - Icons added, active bg-orange-500 text-black rounded-full px-5 py-2 font-bold, inactive text-white/60, 8px gap */}
+        <nav className="relative z-10 hidden lg:flex items-center gap-[8px] text-[14px]">
           <button 
             onClick={() => onTabChange('dashboard')}
-            className={`transition-colors hover:text-white ${activeTab === 'dashboard' ? 'text-amber-400 font-semibold border-b-2 border-amber-400 pb-1' : 'text-slate-300'}`}
+            className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+              activeTab === 'dashboard' 
+                ? 'bg-orange-500 text-black rounded-full px-5 py-2 font-bold shadow-md' 
+                : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
+            }`}
           >
-            {currentRole === 'client' 
-              ? t('shipmentsAndLoads', language) 
-              : currentRole === 'transporter' 
-              ? t('driverConsole', language) 
-              : t('managementOverview', language)}
+            <Shield className="w-4 h-4 shrink-0" />
+            <span>
+              {currentRole === 'client' 
+                ? t('shipmentsAndLoads', language) 
+                : currentRole === 'transporter' 
+                ? t('driverConsole', language) 
+                : 'Admin'}
+            </span>
           </button>
 
           <button 
             onClick={() => onTabChange('icds')}
-            className={`transition-colors hover:text-white flex items-center gap-1.5 ${activeTab === 'icds' ? 'text-amber-400 font-semibold border-b-2 border-amber-400 pb-1' : 'text-slate-300'}`}
+            className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+              activeTab === 'icds' 
+                ? 'bg-orange-500 text-black rounded-full px-5 py-2 font-bold shadow-md' 
+                : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
+            }`}
           >
-            <span>ICDs &amp; Warehouses</span>
-            <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+            <Warehouse className="w-4 h-4 shrink-0" />
+            <span>ICDs</span>
+            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+              activeTab === 'icds' ? 'bg-black/20 text-black' : 'bg-slate-700 text-white'
+            }`}>
               6 Hubs
             </span>
           </button>
 
           <button 
             onClick={() => onTabChange('map')}
-            className={`transition-colors hover:text-white ${activeTab === 'map' ? 'text-amber-400 font-semibold border-b-2 border-amber-400 pb-1' : 'text-slate-300'}`}
+            className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+              activeTab === 'map' 
+                ? 'bg-orange-500 text-black rounded-full px-5 py-2 font-bold shadow-md' 
+                : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
+            }`}
           >
-            {t('liveGpsRadar', language)}
+            <Satellite className="w-4 h-4 shrink-0" />
+            <span>GPS</span>
           </button>
 
           <button 
             onClick={() => onTabChange('services')}
-            className={`transition-colors hover:text-white ${activeTab === 'services' ? 'text-amber-400 font-semibold border-b-2 border-amber-400 pb-1' : 'text-slate-300'}`}
+            className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+              activeTab === 'services' 
+                ? 'bg-orange-500 text-black rounded-full px-5 py-2 font-bold shadow-md' 
+                : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
+            }`}
           >
-            {t('serviceMarketplace', language)}
+            <Truck className="w-4 h-4 shrink-0" />
+            <span>Service</span>
           </button>
 
           <button 
             onClick={() => onTabChange('disputes')}
-            className={`transition-colors hover:text-white ${activeTab === 'disputes' ? 'text-amber-400 font-semibold border-b-2 border-amber-400 pb-1' : 'text-slate-300'}`}
+            className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+              activeTab === 'disputes' 
+                ? 'bg-orange-500 text-black rounded-full px-5 py-2 font-bold shadow-md' 
+                : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
+            }`}
           >
-            {t('disputeCenter', language)}
-          </button>
-
-          <button 
-            onClick={onOpenLegal}
-            className="text-xs text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-1"
-            title={t('limitationLiability', language)}
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-            {t('legalTerms', language)}
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <span>Dispute</span>
           </button>
         </nav>
 
-        {/* Zone 3: Actions & Controls */}
+        {/* Zone 3: Actions & Controls - reduced orange, slate-700 bg with white text */}
         <div className="flex items-center gap-2 flex-wrap justify-end">
           
           {/* Offline Mode Switcher */}
           <button
             onClick={onToggleOffline}
-            className={`p-2 rounded-lg text-xs flex items-center gap-1.5 transition-colors ${
+            className={`p-2 rounded-xl text-xs flex items-center gap-1.5 transition-colors border border-white/10 ${
               isOffline 
-                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' 
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                ? 'bg-orange-500 text-black font-bold' 
+                : 'bg-slate-700 text-white hover:bg-slate-600'
             }`}
             title={isOffline ? t('offline', language) : t('online', language)}
           >
-            {isOffline ? <WifiOff className="w-4 h-4 text-amber-400" /> : <Wifi className="w-4 h-4" />}
+            {isOffline ? <WifiOff className="w-4 h-4 text-black" /> : <Wifi className="w-4 h-4 text-white" />}
             <span className="hidden xl:inline text-[11px] font-medium">
               {isOffline ? t('offline', language) : t('online', language)}
             </span>
           </button>
 
-          {/* Currency Dropdown */}
+          {/* Currency Dropdown: slate-700 background with white text */}
           <div className={`relative ${showCurrencyMenu ? 'z-[200]' : ''}`}>
             <button
               onClick={() => {
@@ -192,33 +216,33 @@ export const Navbar: React.FC<NavbarProps> = ({
                 closeAllMenus();
                 setShowCurrencyMenu(next);
               }}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700/80 text-xs font-semibold text-amber-400 hover:border-amber-400/50 flex items-center gap-1.5 transition-colors"
+              className="px-3 py-2 rounded-xl bg-slate-700 text-white border border-white/10 text-xs font-semibold hover:bg-slate-600 flex items-center gap-1.5 transition-colors"
             >
-              <Coins className="w-3.5 h-3.5" />
+              <Coins className="w-3.5 h-3.5 text-white/80" />
               <span>{currency}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
+              <ChevronDown className="w-3 h-3 text-white/60" />
             </button>
             {showCurrencyMenu && (
-              <div className="absolute right-0 top-full mt-2 z-[200] w-36 bg-[#1a2332] border border-slate-700 rounded-lg shadow-2xl py-1 text-slate-200">
+              <div className="absolute right-0 top-full mt-2 z-[200] w-40 bg-[#1a2a3f] border border-white/10 rounded-2xl shadow-xl backdrop-blur p-2 text-white">
                 {(['UGX', 'USD', 'EUR', 'KES', 'TZS'] as Currency[]).map((c) => (
                   <button
                     key={c}
                     onClick={() => { onCurrencyChange(c); setShowCurrencyMenu(false); }}
-                    className={`w-full px-3 py-1.5 text-left text-xs flex items-center justify-between hover:bg-slate-800 transition-colors ${
-                      currency === c ? 'text-amber-400 font-bold bg-slate-800/60' : 'text-slate-300'
+                    className={`w-full px-3 py-2 text-left text-xs rounded-xl flex items-center justify-between transition-colors ${
+                      currency === c ? 'bg-orange-500 text-black font-bold' : 'hover:bg-slate-700 text-white/80'
                     }`}
                   >
                     <span>{c}</span>
-                    {c === 'UGX' && <span className="text-[10px] text-slate-400 font-normal">Uganda</span>}
-                    {c === 'KES' && <span className="text-[10px] text-slate-400 font-normal">Kenya</span>}
-                    {c === 'USD' && <span className="text-[10px] text-slate-400 font-normal">Global</span>}
+                    {c === 'UGX' && <span className="text-[10px] text-white/60 font-normal">Uganda</span>}
+                    {c === 'KES' && <span className="text-[10px] text-white/60 font-normal">Kenya</span>}
+                    {c === 'USD' && <span className="text-[10px] text-white/60 font-normal">Global</span>}
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Language Selector Dropdown (English, Luganda, Swahili) */}
+          {/* Language Selector Dropdown: slate-700 background with white text */}
           <div className={`relative ${showLangMenu ? 'z-[200]' : ''}`}>
             <button
               onClick={() => {
@@ -226,17 +250,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                 closeAllMenus();
                 setShowLangMenu(next);
               }}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700/80 text-xs text-slate-200 hover:border-amber-400/50 flex items-center gap-1.5 transition-colors"
+              className="px-3 py-2 rounded-xl bg-slate-700 text-white border border-white/10 text-xs font-semibold hover:bg-slate-600 flex items-center gap-1.5 transition-colors"
               title="Change Language / Kyusa Olulimi / Badilisha Lugha"
             >
-              <Globe className="w-3.5 h-3.5 text-amber-400" />
+              <Globe className="w-3.5 h-3.5 text-white/80" />
               <span className="font-bold text-[11px] uppercase tracking-wider">{language}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
+              <ChevronDown className="w-3 h-3 text-white/60" />
             </button>
 
             {showLangMenu && (
-              <div className="absolute right-0 top-full mt-2 z-[200] w-48 bg-[#1a2332] border border-slate-700 rounded-xl shadow-2xl py-1.5 z-[200] text-slate-200">
-                <div className="px-3 py-1 border-b border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <div className="absolute right-0 top-full mt-2 z-[200] w-52 bg-[#1a2a3f] border border-white/10 rounded-2xl shadow-xl backdrop-blur p-2 text-white">
+                <div className="px-3 py-1.5 border-b border-white/10 text-[10px] font-bold text-white/50 uppercase tracking-wider">
                   Select Language / Lugha
                 </div>
                 {SUPPORTED_LANGUAGES.map((item) => (
@@ -246,16 +270,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onLanguageChange(item.code); 
                       setShowLangMenu(false); 
                     }}
-                    className={`w-full px-3 py-2 text-left text-xs flex items-center justify-between hover:bg-slate-800 transition-colors ${
-                      language === item.code ? 'text-amber-400 font-bold bg-slate-800/70' : 'text-slate-300'
+                    className={`w-full px-3 py-2 text-left text-xs rounded-xl flex items-center justify-between transition-colors mt-1 ${
+                      language === item.code ? 'bg-orange-500 text-black font-bold' : 'hover:bg-slate-700 text-white/80'
                     }`}
                   >
                     <div>
-                      <div className="font-medium text-white">{item.name}</div>
-                      <div className="text-[10px] text-slate-400">{item.localName} · {item.region}</div>
+                      <div className="font-medium">{item.name}</div>
+                      <div className={`text-[10px] ${language === item.code ? 'text-black/70' : 'text-white/50'}`}>
+                        {item.localName} · {item.region}
+                      </div>
                     </div>
                     {language === item.code && (
-                      <Check className="w-4 h-4 text-amber-400" />
+                      <Check className="w-4 h-4 text-black" />
                     )}
                   </button>
                 ))}
@@ -263,7 +289,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
 
-          {/* Notifications Bell */}
+          {/* Notifications Bell: slate-700 background with white text */}
           <div className={`relative ${showNotifDrawer ? 'z-[200]' : ''}`}>
             <button
               onClick={() => {
@@ -272,30 +298,30 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setShowNotifDrawer(next);
                 if (next) onMarkNotificationsRead();
               }}
-              className="relative p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="relative p-2 rounded-xl bg-slate-700 text-white border border-white/10 hover:bg-slate-600 transition-colors"
               title={t('liveAlertsUpdates', language)}
             >
-              <Bell className="w-4 h-4" />
+              <Bell className="w-4 h-4 text-white" />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse" />
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-orange-500 rounded-full animate-pulse" />
               )}
             </button>
 
-            {/* Notification Dropdown Panel */}
+            {/* Notification Dropdown Panel: bg-[#1a2a3f] border border-white/10 rounded-2xl */}
             {showNotifDrawer && (
-              <div className="absolute right-0 top-full mt-2 z-[200] w-80 bg-[#1a2332] border border-slate-700 rounded-xl shadow-2xl py-2 text-slate-200">
-                <div className="px-4 py-2 border-b border-slate-800 flex items-center justify-between">
-                  <span className="text-xs font-bold text-white tracking-wide">{t('liveAlertsUpdates', language)}</span>
-                  <span className="text-[10px] text-slate-400">{notifications.length} {t('events', language)}</span>
+              <div className="absolute right-0 top-full mt-2 z-[200] w-80 bg-[#1a2a3f] border border-white/10 rounded-2xl shadow-xl backdrop-blur p-2 text-white">
+                <div className="px-4 py-2 border-b border-white/10 flex items-center justify-between">
+                  <span className="text-[14px] font-bold text-white tracking-wide">{t('liveAlertsUpdates', language)}</span>
+                  <span className="text-[11px] text-white/60">{notifications.length} {t('events', language)}</span>
                 </div>
-                <div className="max-h-72 overflow-y-auto divide-y divide-slate-800">
+                <div className="max-h-72 overflow-y-auto divide-y divide-white/5">
                   {notifications.map((notif) => (
-                    <div key={notif.id} className="p-3 text-xs hover:bg-slate-800/70 transition-colors">
+                    <div key={notif.id} className="p-3 text-xs hover:bg-slate-700/60 rounded-xl transition-colors">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-semibold text-slate-200">{notif.title}</span>
-                        <span className="text-[10px] text-slate-500">{notif.time}</span>
+                        <span className="font-semibold text-white">{notif.title}</span>
+                        <span className="text-[10px] text-white/40">{notif.time}</span>
                       </div>
-                      <p className="text-[11px] text-slate-400 leading-snug">{notif.desc}</p>
+                      <p className="text-[12px] text-white/70 leading-snug">{notif.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -303,7 +329,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
 
-          {/* Role Switcher */}
+          {/* Role Switcher: slate-700 background with white text */}
           <div className={`relative ${showRoleMenu ? 'z-[200]' : ''}`}>
             <button
               onClick={() => {
@@ -311,9 +337,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 closeAllMenus();
                 setShowRoleMenu(next);
               }}
-              className="flex items-center gap-2 pl-2.5 pr-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-700 text-white border border-white/10 hover:bg-slate-600 transition-colors"
             >
-              <UserCircle2 className="w-4 h-4 text-amber-400" />
+              <UserCircle2 className="w-4 h-4 text-white" />
               <div className="text-left hidden sm:block">
                 <div className="text-[11px] font-bold text-white leading-tight flex items-center gap-1">
                   <span>{currentRole === 'admin' ? t('superAdminOwner', language).split(' ')[0] : currentRole === 'client' ? t('clientAccount', language).split(' ')[0] : t('transporterPortal', language).split(' ')[0]}</span>
@@ -321,18 +347,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Auto Root Super Admin"></span>
                   )}
                 </div>
-                <div className="text-[9px] text-amber-300/80 leading-none">
+                <div className="text-[9px] text-white/60 leading-none">
                   {userEmail === 'marksentongo07@gmail.com' && currentRole === 'admin' ? 'Root Super Admin' : t('switchRole', language)}
                 </div>
               </div>
-              <ChevronDown className="w-3 h-3 text-amber-400" />
+              <ChevronDown className="w-3 h-3 text-white/60" />
             </button>
 
             {showRoleMenu && (
-              <div className="absolute right-0 top-full mt-2 z-[200] w-72 bg-[#1a2332] border border-slate-700 rounded-xl shadow-2xl p-2 text-slate-200">
+              <div className="absolute right-0 top-full mt-2 z-[200] w-72 bg-[#1a2a3f] border border-white/10 rounded-2xl shadow-xl backdrop-blur p-2 text-white">
                 {userEmail === 'marksentongo07@gmail.com' && (
-                  <div className="mb-2 p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs">
-                    <span className="text-[10px] font-extrabold uppercase text-amber-400 block tracking-wider">
+                  <div className="mb-2 p-2 bg-slate-800 border border-white/10 rounded-xl text-xs">
+                    <span className="text-[10px] font-bold uppercase text-white/80 block tracking-wider">
                       Auto Root Super Admin
                     </span>
                     <span className="text-[11px] text-white font-mono break-all font-semibold">
@@ -340,34 +366,34 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </span>
                   </div>
                 )}
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 py-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-white/50 px-3 py-1">
                   {t('activeRole', language)}
                 </div>
                 {(['client', 'transporter', 'admin'] as UserRole[]).map((r) => (
                   <button
                     key={r}
                     onClick={() => { onRoleChange(r); setShowRoleMenu(false); }}
-                    className={`w-full p-2.5 rounded-lg text-left transition-colors flex items-start gap-2.5 ${
-                      currentRole === r ? 'bg-amber-500/20 border border-amber-500/40 text-white' : 'hover:bg-slate-800 text-slate-300'
+                    className={`w-full p-2.5 rounded-xl text-left transition-colors flex items-start gap-2.5 mt-1 ${
+                      currentRole === r ? 'bg-orange-500 text-black font-bold shadow-md' : 'hover:bg-slate-700 text-white/80'
                     }`}
                   >
                     <div className="mt-0.5">
                       {currentRole === r ? (
-                        <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                        <CheckCircle2 className="w-4 h-4 text-black" />
                       ) : (
-                        <div className="w-4 h-4 rounded-full border border-slate-600" />
+                        <div className="w-4 h-4 rounded-full border border-white/30" />
                       )}
                     </div>
                     <div>
-                      <div className="text-xs font-semibold text-white flex items-center gap-1.5">
+                      <div className={`text-xs font-semibold flex items-center gap-1.5 ${currentRole === r ? 'text-black' : 'text-white'}`}>
                         <span>{roleLabels[r].title}</span>
                         {r === 'admin' && userEmail === 'marksentongo07@gmail.com' && (
-                          <span className="text-[9px] px-1 py-0.2 bg-emerald-500/20 text-emerald-400 rounded font-mono">
+                          <span className={`text-[9px] px-1 py-0.2 rounded font-mono ${currentRole === r ? 'bg-black/20 text-black font-bold' : 'bg-emerald-500/20 text-emerald-400'}`}>
                             Auto
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-slate-400">{roleLabels[r].subtitle}</div>
+                      <div className={`text-[11px] ${currentRole === r ? 'text-black/80' : 'text-white/60'}`}>{roleLabels[r].subtitle}</div>
                     </div>
                   </button>
                 ))}
@@ -375,11 +401,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
 
-          {/* Primary Action Button */}
+          {/* Primary Action Button: only active element orange */}
           {currentRole === 'client' && (
             <button
               onClick={onOpenPostJob}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition-colors whitespace-nowrap"
+              className="hidden sm:inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-orange-500 hover:bg-orange-400 text-black font-bold text-xs shadow-md transition-all whitespace-nowrap"
             >
               <span>{t('postCargo', language)}</span>
             </button>
@@ -389,42 +415,67 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       </div>
 
-      {/* Mobile Secondary Tab Strip */}
-      <div className="relative z-10 lg:hidden flex items-center justify-around border-t border-slate-800/80 bg-slate-950/70 px-2 py-2 text-xs overflow-x-auto">
+      {/* Mobile Secondary Tab Strip - Icons, active bg-orange-500 text-black rounded-full, 8px gap */}
+      <div className="relative z-10 lg:hidden flex items-center gap-[8px] border-t border-white/10 bg-[#0f1c2e]/95 px-4 py-2.5 text-xs overflow-x-auto scrollbar-none">
         <button 
           onClick={() => onTabChange('dashboard')} 
-          className={`px-2.5 py-1 rounded-md whitespace-nowrap ${activeTab === 'dashboard' ? 'text-amber-400 bg-slate-800 font-bold' : 'text-slate-400'}`}
+          className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+            activeTab === 'dashboard' 
+              ? 'bg-orange-500 text-black px-4 py-1.5 font-bold shadow-sm' 
+              : 'text-white/60 hover:text-white px-3 py-1.5'
+          }`}
         >
-          {currentRole === 'client' ? t('allLoads', language) : currentRole === 'transporter' ? t('driverConsole', language).split(' ')[0] : 'Admin'}
+          <Shield className="w-3.5 h-3.5" />
+          <span>{currentRole === 'client' ? t('allLoads', language) : currentRole === 'transporter' ? t('driverConsole', language).split(' ')[0] : 'Admin'}</span>
         </button>
         <button 
           onClick={() => onTabChange('icds')} 
-          className={`px-2.5 py-1 rounded-md whitespace-nowrap ${activeTab === 'icds' ? 'text-amber-400 bg-slate-800 font-bold' : 'text-slate-400'}`}
+          className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+            activeTab === 'icds' 
+              ? 'bg-orange-500 text-black px-4 py-1.5 font-bold shadow-sm' 
+              : 'text-white/60 hover:text-white px-3 py-1.5'
+          }`}
         >
-          ICDs
+          <Warehouse className="w-3.5 h-3.5" />
+          <span>ICDs</span>
         </button>
         <button 
           onClick={() => onTabChange('map')} 
-          className={`px-2.5 py-1 rounded-md whitespace-nowrap ${activeTab === 'map' ? 'text-amber-400 bg-slate-800 font-bold' : 'text-slate-400'}`}
+          className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+            activeTab === 'map' 
+              ? 'bg-orange-500 text-black px-4 py-1.5 font-bold shadow-sm' 
+              : 'text-white/60 hover:text-white px-3 py-1.5'
+          }`}
         >
-          {t('liveGpsRadar', language).split(' ')[1] || 'Radar'}
+          <Satellite className="w-3.5 h-3.5" />
+          <span>GPS</span>
         </button>
         <button 
           onClick={() => onTabChange('services')} 
-          className={`px-2.5 py-1 rounded-md whitespace-nowrap ${activeTab === 'services' ? 'text-amber-400 bg-slate-800 font-bold' : 'text-slate-400'}`}
+          className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+            activeTab === 'services' 
+              ? 'bg-orange-500 text-black px-4 py-1.5 font-bold shadow-sm' 
+              : 'text-white/60 hover:text-white px-3 py-1.5'
+          }`}
         >
-          {t('serviceMarketplace', language).split(' ')[0]}
+          <Truck className="w-3.5 h-3.5" />
+          <span>Service</span>
         </button>
         <button 
           onClick={() => onTabChange('disputes')} 
-          className={`px-2.5 py-1 rounded-md whitespace-nowrap ${activeTab === 'disputes' ? 'text-amber-400 bg-slate-800 font-bold' : 'text-slate-400'}`}
+          className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+            activeTab === 'disputes' 
+              ? 'bg-orange-500 text-black px-4 py-1.5 font-bold shadow-sm' 
+              : 'text-white/60 hover:text-white px-3 py-1.5'
+          }`}
         >
-          {t('disputeCenter', language).split(' ')[0]}
+          <AlertTriangle className="w-3.5 h-3.5" />
+          <span>Dispute</span>
         </button>
         {currentRole === 'client' && (
           <button 
             onClick={onOpenPostJob}
-            className="px-2.5 py-1 rounded-md bg-amber-500 text-slate-950 font-bold whitespace-nowrap"
+            className="px-4 py-1.5 rounded-full bg-orange-500 text-black font-bold whitespace-nowrap shrink-0 shadow-sm"
           >
             {t('postCargo', language)}
           </button>

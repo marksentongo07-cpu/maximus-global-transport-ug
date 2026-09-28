@@ -89,20 +89,20 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
     <div className="space-y-6">
       
       {/* Top Banner Stats Card */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-            <Truck className="w-6 h-6" />
+        <div className="bg-[#1a2a3f] border border-white/10 p-5 rounded-2xl shadow-xl backdrop-blur flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-slate-700 border border-white/10 flex items-center justify-center text-white">
+            <Truck className="w-6 h-6 text-white" />
           </div>
           <div>
             <div className="text-2xl font-black text-white font-mono">{activeShipments.length}</div>
-            <div className="text-xs text-slate-400 font-medium">{t('activeShipmentsRoad', language)}</div>
+            <div className="text-[14px] text-white/60 font-medium">{t('activeShipmentsRoad', language)}</div>
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+        <div className="bg-[#1a2a3f] border border-white/10 p-5 rounded-2xl shadow-xl backdrop-blur flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-slate-700 border border-white/10 flex items-center justify-center text-emerald-400">
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
@@ -112,25 +112,25 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
                 currency
               )}
             </div>
-            <div className="text-xs text-slate-400 font-medium">{t('protectedInEscrow', language)}</div>
+            <div className="text-[14px] text-white/60 font-medium">{t('protectedInEscrow', language)}</div>
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-sm flex items-center justify-between">
+        <div className="bg-[#1a2a3f] border border-white/10 p-5 rounded-2xl shadow-xl backdrop-blur flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <div className="w-12 h-12 rounded-xl bg-slate-700 border border-white/10 flex items-center justify-center text-cyan-400">
               <Package className="w-6 h-6" />
             </div>
             <div>
               <div className="text-2xl font-black text-white font-mono">{deliveredJobs.length}</div>
-              <div className="text-xs text-slate-400 font-medium">{t('safeDeliveriesCompleted', language)}</div>
+              <div className="text-[14px] text-white/60 font-medium">{t('safeDeliveriesCompleted', language)}</div>
             </div>
           </div>
           <button
             onClick={onOpenPostJob}
-            className="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-1.5"
+            className="px-5 py-2.5 bg-orange-500 hover:bg-orange-400 text-black font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-black" />
             <span>{t('postLoad', language)}</span>
           </button>
         </div>
@@ -138,13 +138,13 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
       </div>
 
       {/* Filter Tabs & Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
-          <h2 className="text-lg font-bold text-white tracking-tight">{t('cargoHaulageShipments', language)}</h2>
-          <p className="text-xs text-slate-400">{t('monitorNegotiations', language)}</p>
+          <h2 className="text-[18px] font-bold text-white tracking-tight">{t('cargoHaulageShipments', language)}</h2>
+          <p className="text-[14px] text-white/60 leading-6">{t('monitorNegotiations', language)}</p>
         </div>
 
-        <div className="flex items-center gap-1 p-1 bg-slate-900 border border-slate-800 rounded-xl">
+        <div className="flex items-center gap-2 p-1.5 bg-[#1a2a3f] border border-white/10 rounded-full shadow-inner">
           {[
             { id: 'all', label: `${t('allLoads', language)} (${jobs.length})` },
             { id: 'active', label: `${t('inTransit', language)} (${activeShipments.length})` },
@@ -154,10 +154,10 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
             <button
               key={tab.id}
               onClick={() => setFilterTab(tab.id as typeof filterTab)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+              className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all ${
                 filterTab === tab.id
-                  ? 'bg-amber-500 text-slate-950 shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-orange-500 text-black shadow-md'
+                  : 'text-white/60 hover:text-white'
               }`}
             >
               {tab.label}
@@ -167,15 +167,15 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
       </div>
 
       {/* Shipments Cards Grid */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {filteredJobs.length === 0 ? (
-          <div className="text-center py-16 bg-slate-900 border border-slate-800 rounded-2xl">
-            <Package className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-sm font-bold text-white">{t('noCargoFound', language)}</h3>
-            <p className="text-xs text-slate-400 mt-1 mb-4">{t('postNewLoadPrompt', language)}</p>
+          <div className="text-center py-16 bg-[#1a2a3f] border border-white/10 rounded-2xl p-5 shadow-xl backdrop-blur">
+            <Package className="w-12 h-12 text-white/40 mx-auto mb-3" />
+            <h3 className="text-[18px] font-bold text-white">{t('noCargoFound', language)}</h3>
+            <p className="text-[14px] text-white/60 leading-6 mt-1 mb-4">{t('postNewLoadPrompt', language)}</p>
             <button
               onClick={onOpenPostJob}
-              className="px-4 py-2 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl"
+              className="px-6 py-2.5 bg-orange-500 text-black font-bold text-xs rounded-full shadow-md hover:bg-orange-400 transition-all"
             >
               {t('postCargoRequest', language)}
             </button>
@@ -184,16 +184,16 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
           filteredJobs.map((job) => (
             <div
               key={job.id}
-              className="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 shadow-lg transition-all space-y-4"
+              className="bg-[#1a2a3f] border border-white/10 hover:border-white/20 rounded-2xl p-5 shadow-xl backdrop-blur transition-all space-y-4"
             >
               {/* Top row: Status, ID, Date */}
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
                 <div className="flex items-center gap-3 text-xs">
-                  <span className="font-mono font-bold text-amber-400">#{job.id}</span>
-                  <span className="text-slate-500">·</span>
-                  <span className="text-slate-400">{job.category}</span>
-                  <span className="text-slate-500">·</span>
-                  <span className="text-slate-400">Date: {job.pickupDate}</span>
+                  <span className="font-mono font-bold text-white">#{job.id}</span>
+                  <span className="text-white/30">·</span>
+                  <span className="text-white/70">{job.category}</span>
+                  <span className="text-white/30">·</span>
+                  <span className="text-white/70">Date: {job.pickupDate}</span>
                 </div>
                 <div className="text-xs">
                   {getStatusBadge(job.status)}
@@ -205,62 +205,62 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
                 
                 {/* Left: Cargo & Weight */}
                 <div className="space-y-1.5">
-                  <h3 className="text-base font-bold text-white">{job.title}</h3>
-                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{job.cargoDescription}</p>
-                  <div className="flex items-center gap-2 text-xs text-slate-300 pt-1">
-                    <span className="px-2 py-0.5 rounded bg-slate-800 font-mono font-bold text-amber-400">
+                  <h3 className="text-[18px] font-bold text-white">{job.title}</h3>
+                  <p className="text-[14px] text-white/70 line-clamp-2 leading-6">{job.cargoDescription}</p>
+                  <div className="flex items-center gap-2 text-xs text-white/80 pt-1">
+                    <span className="px-2.5 py-1 rounded-md bg-slate-700 font-mono font-bold text-white border border-white/10">
                       {job.weightTons} Tonnes
                     </span>
-                    <span className="text-slate-400">Vehicle: {job.desiredVehicleType.toUpperCase()}</span>
+                    <span className="text-white/60">Vehicle: {job.desiredVehicleType.toUpperCase()}</span>
                   </div>
                 </div>
 
                 {/* Middle: Route & Distance */}
-                <div className="space-y-2 bg-slate-950/70 p-3 rounded-xl border border-slate-800 text-xs">
+                <div className="space-y-2 bg-slate-900/80 p-4 rounded-xl border border-white/5 text-[14px] leading-6">
                   <div className="flex items-start gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                    <MapPin className="w-4 h-4 text-emerald-400 shrink-0 mt-1" />
                     <div>
-                      <span className="text-slate-400 text-[10px]">{t('pickup', language)}:</span>
-                      <div className="font-semibold text-slate-200">{job.pickupLocation.name}</div>
+                      <span className="text-white/50 text-xs block">{t('pickup', language)}:</span>
+                      <div className="font-semibold text-white">{job.pickupLocation.name}</div>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
+                    <MapPin className="w-4 h-4 text-rose-400 shrink-0 mt-1" />
                     <div>
-                      <span className="text-slate-400 text-[10px]">{t('destination', language)}:</span>
-                      <div className="font-semibold text-slate-200">{job.deliveryLocation.name}</div>
+                      <span className="text-white/50 text-xs block">{t('destination', language)}:</span>
+                      <div className="font-semibold text-white">{job.deliveryLocation.name}</div>
                     </div>
                   </div>
 
-                  <div className="pt-1.5 border-t border-slate-800 flex justify-between text-[11px] text-slate-400">
+                  <div className="pt-2 border-t border-white/10 flex justify-between text-xs text-white/60">
                     <span>{t('estDistance', language)}:</span>
-                    <span className="font-mono text-slate-200 font-semibold">{job.estimatedDistanceKm} km</span>
+                    <span className="font-mono text-white font-semibold">{job.estimatedDistanceKm} km</span>
                   </div>
                 </div>
 
                 {/* Right: Pricing & Transporter */}
-                <div className="space-y-2 bg-slate-950/70 p-3 rounded-xl border border-slate-800 text-xs flex flex-col justify-between">
+                <div className="space-y-2 bg-slate-900/80 p-4 rounded-xl border border-white/5 text-xs flex flex-col justify-between">
                   <div>
-                    <div className="text-[10px] text-slate-400">{t('marketBenchmark', language)}:</div>
-                    <div className="text-sm font-bold text-slate-300">{formatMoney(job.marketPriceEstimateUGX, currency)}</div>
+                    <div className="text-[11px] text-white/50">{t('marketBenchmark', language)}:</div>
+                    <div className="text-[16px] font-bold text-white">{formatMoney(job.marketPriceEstimateUGX, currency)}</div>
                     
                     {job.agreedPriceUGX ? (
-                      <div className="mt-1 pt-1 border-t border-slate-800">
-                        <span className="text-[10px] text-amber-400 font-bold">{t('agreedLockedFare', language)}:</span>
-                        <div className="text-base font-extrabold text-amber-400 font-mono">
+                      <div className="mt-1.5 pt-1.5 border-t border-white/10">
+                        <span className="text-[11px] text-white/70 font-bold">{t('agreedLockedFare', language)}:</span>
+                        <div className="text-[18px] font-extrabold text-orange-400 font-mono">
                           {formatMoney(job.agreedPriceUGX, currency)}
                         </div>
                       </div>
                     ) : (
-                      <div className="mt-1 text-[11px] text-slate-400">
+                      <div className="mt-1 text-[12px] text-white/60">
                         {job.offers.length} {t('carrierBidsReceived', language)}
                       </div>
                     )}
                   </div>
 
                   {job.offers[0] && (
-                    <div className="text-[11px] text-slate-300">
+                    <div className="text-[12px] text-white/80 pt-1">
                       {t('carrier', language)}: <span className="font-semibold text-white">{job.offers[0].transporterName}</span>
                     </div>
                   )}
@@ -270,20 +270,20 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
 
               {/* Live GPS Telemetry Bar (if in transit) */}
               {job.currentGps && job.status === 'in_transit' && (
-                <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-2">
+                <div className="p-4 bg-slate-900/80 border border-white/10 rounded-xl space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-amber-400 flex items-center gap-1.5">
-                      <Navigation className="w-4 h-4 animate-spin text-amber-400" />
+                    <span className="font-bold text-orange-400 flex items-center gap-1.5">
+                      <Navigation className="w-4 h-4 animate-spin text-orange-400" />
                       {t('liveTelemetry', language)}: {job.currentGps.lastUpdated}
                     </span>
-                    <span className="font-mono font-bold text-slate-200">
+                    <span className="font-mono font-bold text-white">
                       {job.currentGps.progressPercent}% Completed
                     </span>
                   </div>
                   {/* Progress Bar */}
-                  <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-500"
+                      className="h-full bg-orange-500 rounded-full transition-all duration-500"
                       style={{ width: `${job.currentGps.progressPercent}%` }}
                     />
                   </div>
@@ -291,21 +291,21 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
               )}
 
               {/* Action Buttons Row */}
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
                 
                 {/* Secondary Help / Call Masking */}
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setCallingTransporter(callingTransporter === job.id ? null : job.id)}
-                    className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors"
+                    className="px-3.5 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 border border-white/10 transition-colors"
                   >
-                    <Phone className="w-3.5 h-3.5 text-amber-400" />
+                    <Phone className="w-3.5 h-3.5 text-white/80" />
                     <span>{t('callCarrierMasked', language)}</span>
                   </button>
 
                   <button
                     onClick={() => onOpenDispute(job)}
-                    className="px-2.5 py-1.5 text-slate-400 hover:text-rose-400 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors"
+                    className="px-3 py-2 text-white/60 hover:text-rose-400 rounded-xl text-xs font-medium flex items-center gap-1 transition-colors"
                   >
                     <AlertCircle className="w-3.5 h-3.5" />
                     <span>{t('reportIssue', language)}</span>
@@ -319,9 +319,9 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
                   {(job.status === 'open' || job.status === 'negotiating') && (
                     <button
                       onClick={() => onOpenNegotiation(job)}
-                      className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-1.5"
+                      className="px-5 py-2.5 bg-orange-500 hover:bg-orange-400 text-black font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5"
                     >
-                      <MessageSquare className="w-3.5 h-3.5" />
+                      <MessageSquare className="w-3.5 h-3.5 text-black" />
                       <span>{t('negotiateOffers', language)} ({job.offers.length})</span>
                     </button>
                   )}
@@ -330,9 +330,9 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
                   {job.status === 'escrow_pending' && (
                     <button
                       onClick={() => onOpenEscrow(job)}
-                      className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-1.5"
+                      className="px-5 py-2.5 bg-orange-500 hover:bg-orange-400 text-black font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5"
                     >
-                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <ShieldCheck className="w-3.5 h-3.5 text-black" />
                       <span>{t('depositIntoEscrow', language)}</span>
                     </button>
                   )}
@@ -341,9 +341,9 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
                   {job.status === 'in_transit' && (
                     <button
                       onClick={() => onOpenPOD(job)}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-1.5"
+                      className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-black" />
                       <span>{t('signPodReleaseEscrow', language)}</span>
                     </button>
                   )}
@@ -351,9 +351,9 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
                   {/* Invoice */}
                   <button
                     onClick={() => onOpenInvoice(job)}
-                    className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl border border-slate-700 transition-colors flex items-center gap-1.5"
+                    className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold text-xs rounded-xl border border-white/10 transition-colors flex items-center gap-1.5"
                   >
-                    <FileText className="w-3.5 h-3.5 text-amber-400" />
+                    <FileText className="w-3.5 h-3.5 text-white/80" />
                     <span>{t('invoice', language)}</span>
                   </button>
 
@@ -361,9 +361,9 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
                   {job.status === 'delivered' && !job.review && (
                     <button
                       onClick={() => setRatingJob(job)}
-                      className="px-3 py-2 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/40 font-bold text-xs rounded-xl transition-colors flex items-center gap-1"
+                      className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white border border-white/10 font-bold text-xs rounded-xl transition-colors flex items-center gap-1"
                     >
-                      <Star className="w-3.5 h-3.5 fill-amber-400" />
+                      <Star className="w-3.5 h-3.5 text-orange-400 fill-orange-400" />
                       <span>{t('rateCarrier', language)}</span>
                     </button>
                   )}

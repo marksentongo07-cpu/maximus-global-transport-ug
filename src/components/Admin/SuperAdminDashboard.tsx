@@ -195,13 +195,13 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
       </div>
 
       {/* Top 4 KPI Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* Gross Volume */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        <div className="bg-[#1a2a3f] border border-white/10 p-5 rounded-2xl shadow-xl backdrop-blur space-y-1">
+          <div className="flex items-center justify-between text-white/60 text-xs font-medium">
             <span>{t('grossTransactedVolume', language)}</span>
-            <Coins className="w-4 h-4 text-amber-400" />
+            <Coins className="w-4 h-4 text-white/80" />
           </div>
           <div className="text-2xl font-black text-white font-mono tracking-tight">
             {formatMoney(gtvUGX, currency)}
@@ -213,36 +213,36 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
         </div>
 
         {/* Maximus Commission Revenue (10%) */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        <div className="bg-[#1a2a3f] border border-white/10 p-5 rounded-2xl shadow-xl backdrop-blur space-y-1">
+          <div className="flex items-center justify-between text-white/60 text-xs font-medium">
             <span>{t('platformRevenueTakeRate', language)}</span>
             <TrendingUp className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-black text-emerald-400 font-mono tracking-tight">
             {formatMoney(platformRevenueUGX, currency)}
           </div>
-          <div className="text-[11px] text-slate-400 pt-1">
+          <div className="text-[11px] text-white/50 pt-1">
             Retained facilitator margin
           </div>
         </div>
 
         {/* Escrow Balance Held */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        <div className="bg-[#1a2a3f] border border-white/10 p-5 rounded-2xl shadow-xl backdrop-blur space-y-1">
+          <div className="flex items-center justify-between text-white/60 text-xs font-medium">
             <span>{t('escrowTrustInTransit', language)}</span>
-            <ShieldCheck className="w-4 h-4 text-amber-400" />
+            <ShieldCheck className="w-4 h-4 text-white/80" />
           </div>
-          <div className="text-2xl font-black text-amber-400 font-mono tracking-tight">
+          <div className="text-2xl font-black text-orange-400 font-mono tracking-tight">
             {formatMoney(escrowHeldUGX, currency)}
           </div>
-          <div className="text-[11px] text-slate-400 pt-1">
+          <div className="text-[11px] text-white/50 pt-1">
             Held safely in escrow trust accounts
           </div>
         </div>
 
         {/* Active Fleet on Radar */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
+        <div className="bg-[#1a2a3f] border border-white/10 p-5 rounded-2xl shadow-xl backdrop-blur space-y-1">
+          <div className="flex items-center justify-between text-white/60 text-xs font-medium">
             <span>{t('verifiedFleetTrucks', language)}</span>
             <Truck className="w-4 h-4 text-cyan-400" />
           </div>
@@ -257,8 +257,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
       </div>
 
       {/* Admin Navigation Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
-        <div className="flex items-center gap-1 p-1 bg-slate-900 border border-slate-800 rounded-xl overflow-x-auto max-w-full">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+        <div className="flex items-center gap-2 p-1.5 bg-[#1a2a3f] border border-white/10 rounded-full shadow-inner overflow-x-auto max-w-full">
           {[
             { id: 'revenue', label: t('revenueAnalytics', language) },
             { id: 'analytics', label: t('corridorAnalytics', language) },
@@ -270,14 +270,14 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveAdminTab(tab.id as typeof activeAdminTab)}
-              className={`px-3.5 py-1.5 text-xs font-bold rounded-lg whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+              className={`px-4 py-1.5 text-xs font-bold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${
                 activeAdminTab === tab.id
-                  ? 'bg-amber-500 text-slate-950 shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-orange-500 text-black shadow-md'
+                  : 'text-white/60 hover:text-white'
               }`}
             >
               {tab.id === 'revenue' && <BarChart3 className="w-3.5 h-3.5" />}
-              {tab.id === 'payouts' && <Receipt className="w-3.5 h-3.5 text-slate-950" />}
+              {tab.id === 'payouts' && <Receipt className="w-3.5 h-3.5" />}
               {tab.label}
             </button>
           ))}

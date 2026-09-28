@@ -74,13 +74,13 @@ export const LiveTransportMap: React.FC<LiveTransportMapProps> = ({
   });
 
   return (
-    <div className="relative w-full h-[650px] lg:h-[720px] rounded-2xl overflow-hidden border border-slate-700 bg-slate-900 shadow-xl flex flex-col">
+    <div className="relative w-full h-[650px] lg:h-[720px] rounded-2xl overflow-hidden border border-white/10 bg-[#1a2a3f] shadow-xl backdrop-blur flex flex-col">
       
       {/* Top Filter Bar Controls */}
-      <div className="absolute top-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-2 p-2.5 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl shadow-lg">
+      <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 p-3 bg-[#1a2a3f]/95 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl">
         
         {/* Vehicle Type Filter Buttons */}
-        <div className="flex items-center gap-1 overflow-x-auto py-0.5 max-w-full">
+        <div className="flex items-center gap-2 overflow-x-auto py-0.5 max-w-full scrollbar-none">
           {[
             { id: 'all', label: 'All Fleet' },
             { id: 'fuso', label: 'Fuso 5-10T' },
@@ -92,10 +92,10 @@ export const LiveTransportMap: React.FC<LiveTransportMapProps> = ({
             <button
               key={type.id}
               onClick={() => setSelectedVehicleType(type.id)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-lg whitespace-nowrap transition-colors ${
+              className={`px-4 py-1.5 text-xs font-bold rounded-full whitespace-nowrap transition-all ${
                 selectedVehicleType === type.id
-                  ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  ? 'bg-orange-500 text-black shadow-md'
+                  : 'bg-slate-700 text-white hover:bg-slate-600'
               }`}
             >
               {type.label}
@@ -339,66 +339,65 @@ export const LiveTransportMap: React.FC<LiveTransportMapProps> = ({
 
         {/* Selected ICD Detail Floating Card */}
         {selectedMapICD && (
-          <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 z-30 bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/50 rounded-xl p-4 shadow-2xl text-slate-200">
-            <div className="flex items-start justify-between gap-3 border-b border-slate-800 pb-2">
+          <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 z-30 bg-[#1a2a3f] backdrop-blur-md border border-white/10 rounded-2xl p-5 shadow-2xl text-white">
+            <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/40">
-                  <Building2 className="w-5 h-5" />
+                <div className="p-2.5 bg-slate-700 text-white rounded-xl border border-white/10">
+                  <Building2 className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white">{selectedMapICD.name}</h4>
-                  <div className="text-[11px] text-slate-300 flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-amber-400" />
+                  <h4 className="text-[18px] font-bold text-white">{selectedMapICD.name}</h4>
+                  <div className="text-[12px] text-white/60 flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-white/40" />
                     <span>{selectedMapICD.location}</span>
                   </div>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedMapICD(null)}
-                className="text-slate-400 hover:text-white text-sm"
+                className="text-white/60 hover:text-white text-base"
               >
                 ✕
               </button>
             </div>
 
-            <div className="mt-3 space-y-2 text-xs">
-              <div className="grid grid-cols-2 gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+            <div className="mt-3 space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-2 bg-slate-900/80 p-3 rounded-xl border border-white/5">
                 <div>
-                  <span className="text-[10px] text-slate-400 block">Daily Storage Fee:</span>
-                  <span className="font-bold text-amber-400 font-mono">
+                  <span className="text-[10px] text-white/50 block">Daily Storage Fee:</span>
+                  <span className="font-bold text-orange-400 font-mono text-[14px]">
                     {formatMoney(selectedMapICD.storageFeePerDay)} / Day
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 block">Operating Hours:</span>
-                  <span className="font-semibold text-slate-200 line-clamp-1">{selectedMapICD.operatingHours}</span>
+                  <span className="text-[10px] text-white/50 block">Operating Hours:</span>
+                  <span className="font-semibold text-white line-clamp-1">{selectedMapICD.operatingHours}</span>
                 </div>
               </div>
 
-              <div className="text-[11px] text-slate-300">
-                <span className="text-slate-400">Desk Contact:</span> {selectedMapICD.contact}
+              <div className="text-[12px] text-white/70">
+                <span className="text-white/40">Desk Contact:</span> {selectedMapICD.contact}
               </div>
 
               <div className="pt-2 flex items-center gap-2">
                 <a
                   href={`tel:${selectedMapICD.contact.split('/')[0].trim()}`}
-                  className="flex-1 py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors border border-slate-700"
+                  className="flex-1 py-2.5 px-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors border border-white/10"
                 >
-                  <Phone className="w-3.5 h-3.5 text-amber-400" />
+                  <Phone className="w-3.5 h-3.5 text-white/80" />
                   <span>Call Terminal</span>
                 </a>
                 <button
                   onClick={() => {
                     setSelectedMapICD(null);
                     if (onDirectBook) {
-                      // Trigger booking
                       onDirectBook(transporters[0]);
                     }
                   }}
-                  className="flex-1 py-2 px-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition-colors"
+                  className="flex-1 py-2.5 px-3 bg-orange-500 hover:bg-orange-400 text-black rounded-full text-xs font-bold flex items-center justify-center gap-1.5 shadow-md transition-all"
                 >
                   <span>Book Pickup Here</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3.5 h-3.5 text-black" />
                 </button>
               </div>
             </div>
@@ -407,40 +406,40 @@ export const LiveTransportMap: React.FC<LiveTransportMapProps> = ({
 
         {/* Selected Transporter Detail Floating Card */}
         {selectedTransporter && (
-          <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 z-30 bg-slate-900/95 backdrop-blur-md border border-slate-700 rounded-xl p-4 shadow-2xl text-slate-200">
+          <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 z-30 bg-[#1a2a3f] backdrop-blur-md border border-white/10 rounded-2xl p-5 shadow-2xl text-white">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
                 <img
                   src={selectedTransporter.avatarUrl}
                   alt={selectedTransporter.name}
-                  className="w-12 h-12 rounded-xl object-cover border border-amber-400/50"
+                  className="w-12 h-12 rounded-xl object-cover border border-white/20"
                   referrerPolicy="no-referrer"
                 />
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h4 className="text-sm font-bold text-white">{selectedTransporter.companyName}</h4>
+                    <h4 className="text-[18px] font-bold text-white">{selectedTransporter.companyName}</h4>
                     {selectedTransporter.kycStatus === 'verified' && (
                       <span title="KYC Verified Transporter">
-                        <CheckCircle className="w-4 h-4 text-amber-400" />
+                        <CheckCircle className="w-4 h-4 text-emerald-400" />
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-400">Driver: {selectedTransporter.name}</p>
+                  <p className="text-[12px] text-white/60">Driver: {selectedTransporter.name}</p>
                   <div className="flex items-center gap-2 mt-1 text-xs">
-                    <span className="flex items-center gap-0.5 text-amber-400 font-bold">
-                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <span className="flex items-center gap-0.5 text-orange-400 font-bold">
+                      <Star className="w-3.5 h-3.5 fill-orange-400 text-orange-400" />
                       {selectedTransporter.rating}
                     </span>
-                    <span className="text-slate-500">·</span>
-                    <span className="text-slate-300 font-medium">{selectedTransporter.totalTrips} Safe Trips</span>
-                    <span className="text-slate-500">·</span>
+                    <span className="text-white/30">·</span>
+                    <span className="text-white/80 font-medium">{selectedTransporter.totalTrips} Safe Trips</span>
+                    <span className="text-white/30">·</span>
                     <span className="text-emerald-400 font-semibold">{selectedTransporter.loyaltyPoints} Pts</span>
                   </div>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedTransporter(null)}
-                className="text-slate-400 hover:text-white text-sm"
+                className="text-white/60 hover:text-white text-base"
               >
                 ✕
               </button>

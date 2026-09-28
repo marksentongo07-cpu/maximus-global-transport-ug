@@ -88,22 +88,22 @@ export const ICDsAndWarehousesPage: React.FC<ICDsAndWarehousesPageProps> = ({
     <div className="space-y-6">
       
       {/* Hero Header Section */}
-      <div className="bg-gradient-to-r from-[#0B192C] via-slate-900 to-[#0e213a] border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-200 relative overflow-hidden">
+      <div className="bg-[#1a2a3f] border border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur text-slate-200 relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center gap-1.5">
-                <Building2 className="w-3.5 h-3.5" />
+              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-700 text-white border border-white/10 flex items-center gap-1.5">
+                <Building2 className="w-3.5 h-3.5 text-white/80" />
                 Uganda Port &amp; Dry Terminal Network
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-700 text-emerald-400 border border-white/10">
                 URA Customs Bonded
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-[18px] sm:text-2xl font-bold text-white tracking-tight">
               Inland Container Depots (ICDs) &amp; Bonded Warehouses
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-2xl leading-relaxed">
+            <p className="text-[14px] text-white/70 mt-2 max-w-2xl leading-6">
               Verified clearance hubs connecting maritime container freight from Mombasa &amp; Dar es Salaam to Kampala. 
               Book transporters with automated 5km geofenced dispatch and transparent daily storage fee calculation.
             </p>
@@ -113,9 +113,9 @@ export const ICDsAndWarehousesPage: React.FC<ICDsAndWarehousesPageProps> = ({
             {isAdmin && onOpenManageICDs && (
               <button
                 onClick={onOpenManageICDs}
-                className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-colors whitespace-nowrap"
+                className="px-5 py-2.5 bg-orange-500 hover:bg-orange-400 text-black rounded-full font-bold text-xs flex items-center gap-2 shadow-md transition-all whitespace-nowrap"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4 text-black" />
                 <span>Manage ICDs &amp; Fees</span>
               </button>
             )}
@@ -123,28 +123,28 @@ export const ICDsAndWarehousesPage: React.FC<ICDsAndWarehousesPageProps> = ({
         </div>
 
         {/* Quick KPI Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-slate-800/80">
-          <div className="bg-slate-950/60 p-3 rounded-2xl border border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Registered ICDs:</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/10">
+          <div className="bg-slate-900/80 p-4 rounded-xl border border-white/5">
+            <span className="text-[11px] text-white/50 uppercase font-semibold block">Registered ICDs:</span>
             <span className="text-lg font-black text-white">{icds.length} Hubs Active</span>
           </div>
-          <div className="bg-slate-950/60 p-3 rounded-2xl border border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Total Yard Capacity:</span>
+          <div className="bg-slate-900/80 p-4 rounded-xl border border-white/5">
+            <span className="text-[11px] text-white/50 uppercase font-semibold block">Total Yard Capacity:</span>
             <span className="text-lg font-black text-emerald-400">~{totalTEUCapacity.toLocaleString()} TEUs</span>
           </div>
-          <div className="bg-slate-950/60 p-3 rounded-2xl border border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Base Storage Fee:</span>
-            <span className="text-lg font-black text-amber-400">{formatMoney(50000, currency)} / Day</span>
+          <div className="bg-slate-900/80 p-4 rounded-xl border border-white/5">
+            <span className="text-[11px] text-white/50 uppercase font-semibold block">Base Storage Fee:</span>
+            <span className="text-lg font-black text-orange-400">{formatMoney(50000, currency)} / Day</span>
           </div>
-          <div className="bg-slate-950/60 p-3 rounded-2xl border border-slate-800">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Customs Clearance:</span>
-            <span className="text-lg font-black text-sky-400">100% URA Direct</span>
+          <div className="bg-slate-900/80 p-4 rounded-xl border border-white/5">
+            <span className="text-[11px] text-white/50 uppercase font-semibold block">Customs Clearance:</span>
+            <span className="text-lg font-black text-white">100% URA Direct</span>
           </div>
         </div>
       </div>
 
       {/* SECTION 2: INTERACTIVE ICD STORAGE & DEMURRAGE CALCULATOR */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div className="bg-[#1a2a3f] border border-white/10 rounded-2xl p-5 shadow-xl backdrop-blur space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
@@ -299,38 +299,38 @@ export const ICDsAndWarehousesPage: React.FC<ICDsAndWarehousesPageProps> = ({
       </div>
 
       {/* SECTION 3: DIRECTORY OF UGANDA ICDS */}
-      <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-amber-400" />
+            <h2 className="text-[18px] font-bold text-white tracking-tight flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-orange-400" />
               Uganda Inland Container Depots Directory
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-[14px] text-white/60 leading-6">
               Real GPS locations, operating hours, yard capacities, and geofenced driver radar
             </p>
           </div>
 
           <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+            <Search className="w-4 h-4 text-white/50 absolute left-3 top-2.5" />
             <input
               type="text"
               placeholder="Search ICD name, location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+              className="w-full bg-[#1a2a3f] border border-white/10 rounded-xl pl-9 pr-3.5 py-2 text-xs text-white placeholder-white/40 focus:outline-none focus:border-orange-400"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredICDs.map((icd) => {
             const nearbyTransporters = getTransportersNearICD(icd, transporters, 5);
 
             return (
               <div
                 key={icd.id}
-                className="bg-slate-900 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-5 shadow-lg space-y-4 transition-all flex flex-col justify-between"
+                className="bg-[#1a2a3f] border border-white/10 hover:border-white/20 rounded-2xl p-5 shadow-xl backdrop-blur space-y-4 transition-all flex flex-col justify-between"
               >
                 <div className="space-y-3">
                   
@@ -338,30 +338,30 @@ export const ICDsAndWarehousesPage: React.FC<ICDsAndWarehousesPageProps> = ({
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/30">
-                          <Building2 className="w-4 h-4" />
+                        <span className="p-2 rounded-xl bg-slate-700 text-white border border-white/10">
+                          <Building2 className="w-4 h-4 text-white" />
                         </span>
-                        <h3 className="text-base font-bold text-white">{icd.name}</h3>
+                        <h3 className="text-[18px] font-bold text-white">{icd.name}</h3>
                       </div>
-                      <div className="text-xs text-slate-300 mt-1 flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <div className="text-[14px] text-white/70 mt-1 flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-white/50 shrink-0" />
                         <span>{icd.location}</span>
                       </div>
                     </div>
 
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 whitespace-nowrap">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-slate-700 text-emerald-400 border border-white/10 whitespace-nowrap">
                       {icd.lat.toFixed(4)}, {icd.lng.toFixed(4)}
                     </span>
                   </div>
 
                   {/* Geofence Radar Badge: Transporters within 5km */}
-                  <div className="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+                  <div className="p-3 bg-slate-900/80 rounded-xl border border-white/5 flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <span className="relative flex h-2.5 w-2.5">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                       </span>
-                      <span className="text-slate-300 font-medium">
+                      <span className="text-white/80 font-medium">
                         Geofenced Trucks (5km):
                       </span>
                     </div>
@@ -372,54 +372,54 @@ export const ICDsAndWarehousesPage: React.FC<ICDsAndWarehousesPageProps> = ({
 
                   {/* Description */}
                   {icd.description && (
-                    <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2">
+                    <p className="text-[14px] text-white/70 leading-6 line-clamp-2">
                       {icd.description}
                     </p>
                   )}
 
                   {/* Details Grid */}
-                  <div className="grid grid-cols-2 gap-2 text-xs bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+                  <div className="grid grid-cols-2 gap-2 text-xs bg-slate-900/80 p-3.5 rounded-xl border border-white/5">
                     <div>
-                      <span className="text-[10px] text-slate-400 block">Daily Storage Fee:</span>
-                      <span className="font-bold text-amber-400">{formatMoney(icd.storageFeePerDay, currency)} / Day</span>
+                      <span className="text-[10px] text-white/50 block">Daily Storage Fee:</span>
+                      <span className="font-bold text-orange-400">{formatMoney(icd.storageFeePerDay, currency)} / Day</span>
                     </div>
 
                     <div>
-                      <span className="text-[10px] text-slate-400 block">Operating Hours:</span>
-                      <span className="font-semibold text-slate-200 line-clamp-1">{icd.operatingHours}</span>
+                      <span className="text-[10px] text-white/50 block">Operating Hours:</span>
+                      <span className="font-semibold text-white line-clamp-1">{icd.operatingHours}</span>
                     </div>
 
                     <div>
-                      <span className="text-[10px] text-slate-400 block">Yard Capacity:</span>
-                      <span className="font-semibold text-slate-200">
+                      <span className="text-[10px] text-white/50 block">Yard Capacity:</span>
+                      <span className="font-semibold text-white">
                         {icd.capacityTEU ? `${icd.capacityTEU.toLocaleString()} TEUs` : 'Bulk Yard'}
                       </span>
                     </div>
 
                     <div>
-                      <span className="text-[10px] text-slate-400 block">Contact Desk:</span>
-                      <span className="font-semibold text-slate-200 line-clamp-1">{icd.contact}</span>
+                      <span className="text-[10px] text-white/50 block">Contact Desk:</span>
+                      <span className="font-semibold text-white line-clamp-1">{icd.contact}</span>
                     </div>
                   </div>
 
                 </div>
 
                 {/* Actions */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-800">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
                   <button
                     onClick={() => onViewOnMap(icd)}
-                    className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                    className="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold flex items-center gap-1.5 border border-white/10 transition-colors"
                   >
-                    <Navigation className="w-3.5 h-3.5 text-amber-400" />
+                    <Navigation className="w-3.5 h-3.5 text-white/80" />
                     <span>View on GPS Map</span>
                   </button>
 
                   <button
                     onClick={() => onSelectICDPickup(icd)}
-                    className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-md"
+                    className="px-5 py-2.5 rounded-full bg-orange-500 hover:bg-orange-400 text-black text-xs font-bold flex items-center gap-1.5 transition-all shadow-md"
                   >
                     <span>Post Job from this ICD</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3.5 h-3.5 text-black" />
                   </button>
                 </div>
 

@@ -570,17 +570,17 @@ export default function App() {
 
         {/* TAB 2: LIVE GPS RADAR MAP */}
         {activeTab === 'map' && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl font-bold text-white tracking-tight">
+                <h2 className="text-[18px] font-bold text-white tracking-tight">
                   {t('fleetRadarTitle', language)}
                 </h2>
-                <p className="text-xs text-slate-400">
+                <p className="text-[14px] text-white/60 leading-6">
                   {t('fleetRadarSub', language)}
                 </p>
               </div>
-              <div className="text-xs text-amber-400 font-semibold bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+              <div className="text-xs text-white font-medium bg-slate-700 px-3.5 py-1.5 rounded-full border border-white/10">
                 Centered on Kampala Core · Active Corridors Monitored
               </div>
             </div>
@@ -608,47 +608,47 @@ export default function App() {
 
         {/* TAB 4: DISPUTE CENTER */}
         {activeTab === 'disputes' && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-bold text-white tracking-tight">Maximus Dispute Arbitration Center</h2>
-                <p className="text-xs text-slate-400">
+                <h2 className="text-[18px] font-bold text-white tracking-tight">Maximus Dispute Arbitration Center</h2>
+                <p className="text-[14px] text-white/60 leading-6">
                   Neutral mediation for transit delays, damage claims, and escrow release adjudications
                 </p>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {disputes.map((disp) => (
-                <div key={disp.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-3">
+                <div key={disp.id} className="bg-[#1a2a3f] border border-white/10 rounded-2xl p-5 shadow-xl backdrop-blur space-y-3">
                   <div className="flex justify-between items-start">
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 text-xs">
                         <span className="font-mono font-bold text-rose-400">Case #{disp.id}</span>
-                        <span className="text-slate-400">· Claimant: {disp.openerName}</span>
+                        <span className="text-white/60">· Claimant: {disp.openerName}</span>
                       </div>
-                      <h4 className="text-base font-bold text-white mt-1">{disp.jobTitle}</h4>
+                      <h4 className="text-[18px] font-bold text-white mt-1">{disp.jobTitle}</h4>
                     </div>
-                    <span className="px-2.5 py-1 rounded text-xs font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-slate-700 text-white border border-white/10">
                       {disp.status.replace('_', ' ')}
                     </span>
                   </div>
 
-                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-300">
+                  <div className="bg-slate-900/80 p-4 rounded-xl border border-white/5 text-[14px] leading-6 text-white/80">
                     <strong className="text-rose-300 block mb-1">Issue: {disp.reason}</strong>
                     {disp.description}
                   </div>
 
                   <div className="flex justify-between items-center text-xs pt-1">
-                    <span className="text-amber-400 font-bold">
-                      Escrow At Stake: {disp.amountAtStakeUGX.toLocaleString()} UGX
+                    <span className="text-white font-semibold">
+                      Escrow At Stake: <span className="text-orange-400 font-bold">{disp.amountAtStakeUGX.toLocaleString()} UGX</span>
                     </span>
                     <button
                       onClick={() => {
                         setActiveDisputeRecord(disp);
                         setActiveDisputeJob(null);
                       }}
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg"
+                      className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl border border-white/10 transition-colors"
                     >
                       View Case Evidence
                     </button>

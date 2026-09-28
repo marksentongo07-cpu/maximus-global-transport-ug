@@ -1,11 +1,20 @@
 @import "tailwindcss";
 
 @layer base {
+  html {
+    font-size: 14px;
+    letter-spacing: 0.015em;
+  }
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    color: #0f172a;
-    background-color: #f8fafc;
+    color: #f8fafc;
+    background-color: #070F1A;
     -webkit-font-smoothing: antialiased;
+    letter-spacing: 0.015em;
+    line-height: 1.5;
+  }
+  h1, h2, h3, h4 {
+    letter-spacing: -0.01em;
   }
 }
 
@@ -18,11 +27,19 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #334155;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #475569;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* MOBILE FIX FOR MAXIMUS */
@@ -40,3 +57,4 @@ nav {
   overflow-x: auto!important;
   flex-wrap: wrap!important;
 }
+
