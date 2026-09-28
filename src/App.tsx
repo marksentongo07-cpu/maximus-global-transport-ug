@@ -478,7 +478,7 @@ export default function App() {
       />
 
       {/* Main Viewport Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <main className="relative z-[1] flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
         
         {/* TAB 1: DASHBOARD VIEW (Switches based on active persona) */}
         {activeTab === 'dashboard' && (
