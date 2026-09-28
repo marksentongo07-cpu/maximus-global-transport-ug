@@ -4,13 +4,65 @@ export type Currency = 'UGX' | 'USD' | 'EUR' | 'KES' | 'TZS';
 
 export type Language = 'en' | 'lg' | 'sw' | 'fr';
 
+export type VehicleGroup = 'small_express' | 'medium_truck' | 'heavy_long' | 'specialized' | 'custom';
+
 export type VehicleType = 
-  | 'pickup'          // 1 - 2 Tonnes
-  | 'fuso'            // 5 - 10 Tonnes (standard East Africa workhorse)
-  | 'box_truck'       // 7 - 12 Tonnes enclosed
-  | 'semi_trailer'    // 25 - 40 Tonnes
-  | 'flatbed'         // 20 - 35 Tonnes construction/steel
-  | 'refrigerated';   // 10 - 25 Tonnes cold-chain
+  // GROUP 1 - SMALL & EXPRESS (for parcels, documents, small cargo)
+  | 'saloon_car'          // Saloon Car / Sedan (500kg, urgent documents, small parcels Kampala)
+  | 'hatchback'           // Hatchback / Small Car (700kg)
+  | 'station_wagon'       // Station Wagon (1T, traders Kikuubo)
+  | 'pickup_single'       // Pickup Single Cab (1.5T)
+  | 'pickup_double'       // Pickup Double Cab (1.2T)
+  | 'pickup'              // General Pickup
+  // GROUP 2 - MEDIUM TRUCKS (Uganda local)
+  | 'canter_3t'           // Canter 3T (3-4 tonnes, 14ft body)
+  | 'fuso'                // Fuso 5T / 7T (5-7 tonnes, 20ft body, most popular in UG)
+  | 'fuso_fighter_10t'    // Fuso Fighter 10T (10 tonnes)
+  | 'box_truck'           // Box Body Truck 15T (for fragile goods)
+  | 'refrigerated'        // Refrigerated Truck / Cold Chain (10-25T)
+  // GROUP 3 - HEAVY & LONG DISTANCE
+  | 'semi_trailer_20ft'   // Semi-Trailer 20ft Container (28T, Mombasa-Kampala corridor)
+  | 'semi_trailer_40ft'   // Semi-Trailer 40ft Container (30-35T, Mombasa-Kampala)
+  | 'semi_trailer_40ft_hc'// Semi-Trailer 40ft High Cube
+  | 'semi_trailer'        // Standard Semi-Trailer (25-40T)
+  | 'flatbed'             // Flatbed Trailer 20ft / 40ft (20-35T)
+  | 'lowbed_loader'       // Lowbed Trailer / Low Loader (excavators, heavy machinery)
+  | 'wide_load_truck'     // Wide Load / Abnormal Load Truck (with escort)
+  // GROUP 4 - SPECIALIZED
+  | 'fuel_tanker'         // Fuel Tanker (diesel, petrol)
+  | 'dump_tipper'         // Dump Truck / Tipper (murram, sand)
+  | 'car_carrier'         // Car Carrier / Car Transporter (Mombasa import)
+  | 'boda_boda'           // Motorcycle / Boda Boda (last mile 50kg)
+  | 'van'                 // Van / Mini Van
+  | 'other';              // Custom / Other
+
+export type CargoType = 
+  | 'General Goods'
+  | 'Containers (20ft/40ft)'
+  | 'Wide/Abnormal Load (requires permit)'
+  | 'Perishable/Cold Chain'
+  | 'Fragile'
+  | 'Vehicle/Car'
+  | 'Small Parcel/Document';
+
+export interface ContainerDetails {
+  containerNumber?: string;
+  sealNumber?: string;
+  shippingLine?: 'Maersk' | 'CMA CGM' | 'MSC' | 'PIL' | 'COSCO' | 'Hapag-Lloyd' | 'Other';
+  port?: 'Mombasa Port' | 'Dar es Salaam Port' | 'Entebbe' | 'Other';
+  containerSize?: '20ft' | '40ft' | '40ft HC';
+}
+
+export interface WideLoadDetails {
+  lengthMeters: number;
+  widthMeters: number;
+  heightMeters: number;
+  weightTons: number;
+  uraPermitNeeded: boolean;
+  policeEscortNeeded: boolean;
+  estimatedEscortFeeUGX?: number;
+  uraPermitFeeUGX?: number;
+}
 
 export type JobStatus = 
   | 'open'            // Receiving bids
