@@ -41,6 +41,7 @@ import {
 import { EquityTillBanner } from '../Payment/EquityTillBanner';
 import { DriverPayoutSettingsModal } from './DriverPayoutSettingsModal';
 import { AdminDriverPayoutModal } from '../Admin/AdminDriverPayoutModal';
+import { SafeBodaTrustPromptModal } from '../Modals/SafeBodaTrustPromptModal';
 
 interface TransporterDashboardProps {
   transporter: Transporter;
@@ -60,6 +61,8 @@ interface TransporterDashboardProps {
   onUpdatePayoutDetails?: (details: Transporter['payoutDetails']) => void;
   onConfirmPODByAdmin?: (jobId: string) => void;
   onExecuteDriverPayout?: (jobId: string, payoutData: any) => void;
+  onSwitchToAdminVerify?: () => void;
+  onApproveDriverKYC?: (transporterId: string) => void;
 }
 
 export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
@@ -80,14 +83,27 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
   onUpdatePayoutDetails,
   onConfirmPODByAdmin,
   onExecuteDriverPayout,
+  onSwitchToAdminVerify,
+  onApproveDriverKYC,
 }) => {
-  const [activeTab, setActiveTab] = useState<'loads' | 'active_trips' | 'fleet'>('active_trips');
+  const [activeTab, setActiveTab] = useState<'loads' | 'active_trips' | 'fleet'>('loads');
   const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
   const [showPayoutSettingsModal, setShowPayoutSettingsModal] = useState(false);
   const [selectedPayoutJob, setSelectedPayoutJob] = useState<Job | null>(null);
   const [showPayoutModal, setShowPayoutModal] = useState(false);
   const [selectedProofJob, setSelectedProofJob] = useState<Job | null>(null);
   const [filterICDNearMeOnly, setFilterICDNearMeOnly] = useState<boolean>(false);
+  const [showTrustGateModal, setShowTrustGateModal] = useState(false);
+  const [selectedJobForBid, setSelectedJobForBid] = useState<Job | null>(null);
+
+  const handleBidClick = (job: Job) => {
+    if (transporter.kycStatus !== 'verified') {
+      setSelectedJobForBid(job);
+      setShowTrustGateModal(true);
+      return;
+    }
+    onOpenNegotiation(job);
+  };
   
   // New vehicle form state
   const [vehName, setVehName] = useState('Isuzu Forward 12T Heavy Box');
@@ -842,6 +858,50 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
             </div>
           )}
 
+          {/* SafeBoda Trust Gate Warning Banner (if driver KYC pending) */}
+          {transporter.kycStatus !== 'verified' && (
+            <div className="p-4 bg-gradient-to-r from-amber-500/15 via-[#1a2a3f] to-[#1a2a3f] border border-amber-500/40 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-lg">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-amber-500 text-slate-950 rounded-xl font-black shrink-0">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-extrabold text-amber-300 text-sm">
+                      🛡️ SafeBoda-Style KYC Verification: Pending Super Admin Approval
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/40">
+                      Anti-Scam Gate
+                    </span>
+                  </div>
+                  <span className="text-slate-300 text-[11px] block mt-0.5">
+                    Your National ID, Truck Logbook &amp; Truck Photo have been submitted. Root Super Admin (marksentongo07@gmail.com) verifies in the Admin tab before bidding unlocks.
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={onOpenKYC}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-bold text-xs"
+                >
+                  View My Uploaded KYC
+                </button>
+                {onSwitchToAdminVerify && (
+                  <button
+                    type="button"
+                    onClick={onSwitchToAdminVerify}
+                    className="px-3.5 py-1.5 bg-orange-500 hover:bg-orange-400 text-black font-extrabold rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-orange-500/20"
+                  >
+                    <span>Verify in Admin Tab</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-black" />
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Filter Bar & Controls */}
           <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
             <div className="text-xs text-slate-400">
@@ -966,7 +1026,7 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
                       </button>
 
                       <button
-                        onClick={() => onOpenNegotiation(job)}
+                        onClick={() => handleBidClick(job)}
                         className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-1"
                       >
                         <span>{t('sendBid', language)}</span>
@@ -1206,6 +1266,27 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* SafeBoda Trust Gate Modal when driver tries to bid with pending KYC */}
+      {showTrustGateModal && (
+        <SafeBodaTrustPromptModal
+          transporter={transporter}
+          onClose={() => setShowTrustGateModal(false)}
+          onSwitchToAdminVerify={() => {
+            setShowTrustGateModal(false);
+            onSwitchToAdminVerify?.();
+          }}
+          onFastTrackApprove={() => {
+            setShowTrustGateModal(false);
+            if (onApproveDriverKYC) {
+              onApproveDriverKYC(transporter.id);
+            }
+            if (selectedJobForBid) {
+              onOpenNegotiation(selectedJobForBid);
+            }
+          }}
+        />
       )}
 
     </div>

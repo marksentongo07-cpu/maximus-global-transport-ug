@@ -142,10 +142,43 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
     .reduce((acc, e) => acc + e.totalAmountUGX, 0);
 
   const totalTrucks = transporters.reduce((acc, t) => acc + t.vehicles.reduce((vAcc, v) => vAcc + v.availableUnits, 0), 0);
+  const pendingKYCTransporters = transporters.filter(t => t.kycStatus === 'pending');
 
   return (
     <div className="space-y-6">
       
+      {/* SafeBoda KYC Verification Alert for Pending Transporters */}
+      {pendingKYCTransporters.length > 0 && (
+        <div className="p-4 bg-gradient-to-r from-amber-500/20 via-[#1a2a3f] to-[#1a2a3f] border-2 border-amber-500/50 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-xl animate-pulse">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-amber-500 text-slate-950 rounded-xl font-black shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold text-amber-300 text-sm">
+                  ⚠️ SafeBoda Trust Gate: {pendingKYCTransporters.length} Transporter(s) Awaiting KYC Verification
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-500 text-black">
+                  Action Required
+                </span>
+              </div>
+              <span className="text-slate-300 text-[11px] block mt-0.5">
+                Verify National ID + Truck Logbook + Truck Photo to stop scammers before they can bid on shipper loads.
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onOpenKYC(pendingKYCTransporters[0])}
+            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all"
+          >
+            <Eye className="w-4 h-4" />
+            <span>Verify {pendingKYCTransporters[0].name} Now</span>
+          </button>
+        </div>
+      )}
+
       {/* Management Confidentiality Banner */}
       <div className="bg-gradient-to-r from-slate-900 via-[#0B192C] to-slate-900 border border-amber-500/30 rounded-2xl p-4 shadow-lg flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2.5">
@@ -1027,14 +1060,26 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                   </div>
 
                   {/* Actions */}
-                  <div className="flex justify-between items-center pt-2 border-t border-slate-800 text-xs">
-                    <button
-                      onClick={() => onOpenKYC(t)}
-                      className="text-amber-400 hover:underline font-semibold flex items-center gap-1"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>Inspect KYC Docs</span>
-                    </button>
+                  <div className="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-slate-800 text-xs">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => onOpenKYC(t)}
+                        className="text-amber-400 hover:underline font-semibold flex items-center gap-1"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Inspect KYC Docs</span>
+                      </button>
+
+                      {t.kycStatus === 'pending' && (
+                        <button
+                          onClick={() => onOpenKYC(t)}
+                          className="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-[11px] flex items-center gap-1 shadow-sm"
+                        >
+                          <ShieldCheck className="w-3 h-3" />
+                          <span>Verify Driver (Allow Bidding)</span>
+                        </button>
+                      )}
+                    </div>
 
                     <button
                       onClick={() => onToggleTransporterStatus(t.id)}

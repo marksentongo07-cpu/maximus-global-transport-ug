@@ -53,10 +53,17 @@ export interface Transporter {
   loyaltyPoints: number;
   badges: string[];
   kycStatus: 'verified' | 'pending' | 'rejected';
+  nin?: string;
   kycDocs: {
     drivingLicense: boolean;
     vehicleLogbook: boolean;
     commercialInsurance: boolean;
+    nationalId?: boolean;
+    truckPhoto?: boolean;
+    nationalIdUrl?: string;
+    drivingPermitUrl?: string;
+    logbookUrl?: string;
+    truckPhotoUrl?: string;
     verifiedAt?: string;
   };
   payoutDetails: {

@@ -37,6 +37,10 @@ import { KYCModal } from './components/Modals/KYCModal';
 import { LegalDisclaimerModal } from './components/Modals/LegalDisclaimerModal';
 import { PostJobModal } from './components/Client/PostJobModal';
 import { FuelEfficientRouteModal } from './components/Modals/FuelEfficientRouteModal';
+import { DualHeroCards } from './components/Home/DualHeroCards';
+import { ClientPostCargoModal } from './components/Modals/ClientPostCargoModal';
+import { TransporterRegisterModal } from './components/Modals/TransporterRegisterModal';
+import { TutorialTooltip, TutorialTooltipData } from './components/Common/TutorialTooltip';
 import { 
   ShieldCheck, 
   WifiOff, 
@@ -113,6 +117,9 @@ export default function App() {
   const [activeEcoRouteJob, setActiveEcoRouteJob] = useState<Job | null>(null);
   const [inspectKYCTransporter, setInspectKYCTransporter] = useState<Transporter | null>(null);
   const [showPostJobModal, setShowPostJobModal] = useState(false);
+  const [showClientPostCargoModal, setShowClientPostCargoModal] = useState(false);
+  const [showTransporterRegisterModal, setShowTransporterRegisterModal] = useState(false);
+  const [tutorialTooltip, setTutorialTooltip] = useState<TutorialTooltipData | null>(null);
   const [showLegalModal, setShowLegalModal] = useState(false);
   const [celebrationBanner, setCelebrationBanner] = useState<string | null>(null);
 
@@ -129,6 +136,127 @@ export default function App() {
       read: false,
     };
     setNotifications(prev => [newN, ...prev]);
+  };
+
+  // Handler for Card 1 Client "Post Cargo - Free" submission
+  const handlePostCargoSuccess = (newJob: Job) => {
+    setJobs(prev => [newJob, ...prev]);
+    setCurrentRole('client');
+    setActiveTab('dashboard');
+    setShowClientPostCargoModal(false);
+
+    // Requirement: After registration, show tutorial tooltip:
+    // For Client: "Your cargo posted! Transporters will bid in 5 mins, check bell icon 🔔"
+    setTutorialTooltip({
+      type: 'client',
+      message: 'Your cargo posted! Transporters will bid in 5 mins, check bell icon 🔔',
+      actionText: 'Check Bell Icon 🔔',
+      onAction: () => {
+        // Notification bell ready
+      }
+    });
+
+    addNotification(
+      'Your cargo posted! 🔔',
+      `Transporters will bid on "${newJob.title}" in 5 mins, check bell icon 🔔.`
+    );
+  };
+
+  // Handler for Card 2 Transporter "Find Loads & Bid" registration
+  const handleRegisterTransporter = (tData: {
+    name: string;
+    phone: string;
+    companyName: string;
+    nin: string;
+    truckType: Vehicle['type'];
+    plateNumber: string;
+    drivingPermitFile?: string;
+    nationalIdFile?: string;
+    logbookFile?: string;
+    truckPhotoFile?: string;
+  }) => {
+    const newTransporterId = 'trans-' + Date.now().toString().slice(-4);
+    const newVehId = 'veh-' + Date.now().toString().slice(-4);
+
+    const newTransporter: Transporter = {
+      id: newTransporterId,
+      name: tData.name,
+      companyName: tData.companyName,
+      phone: tData.phone,
+      maskedPhone: tData.phone.replace(/(\d{3})\d{3}(\d{3})/, '$1***$2'),
+      email: tData.name.toLowerCase().replace(/\s+/g, '.') + '@freight.ug',
+      avatarUrl: tData.truckPhotoFile || '/src/assets/images/transporter_profile_1790435633148.jpg',
+      rating: 5.0,
+      totalTrips: 0,
+      loyaltyPoints: 100,
+      badges: ['New Carrier', 'SafeBoda KYC Applicant'],
+      kycStatus: 'pending',
+      nin: tData.nin,
+      kycDocs: {
+        drivingLicense: Boolean(tData.drivingPermitFile),
+        vehicleLogbook: Boolean(tData.logbookFile),
+        commercialInsurance: true,
+        nationalId: Boolean(tData.nationalIdFile),
+        truckPhoto: Boolean(tData.truckPhotoFile),
+        nationalIdUrl: tData.nationalIdFile,
+        drivingPermitUrl: tData.drivingPermitFile,
+        logbookUrl: tData.logbookFile,
+        truckPhotoUrl: tData.truckPhotoFile,
+      },
+      payoutDetails: {
+        mobileMoneyNumber: tData.phone,
+        mobileMoneyNetwork: 'MTN',
+        bankName: 'Stanbic Bank Uganda',
+        bankAccountNumber: '9030018472910',
+        accountName: tData.name,
+      },
+      vehicles: [
+        {
+          id: newVehId,
+          transporterId: newTransporterId,
+          type: tData.truckType,
+          name: `${tData.truckType.replace('_', ' ').toUpperCase()} Commercial Hauler`,
+          plateNumber: tData.plateNumber,
+          capacityTons: 10,
+          availableUnits: 1,
+          currentLocation: {
+            name: 'Kampala Logistics Base',
+            lat: 0.3476,
+            lng: 32.5825,
+          },
+          ratePerKmUGX: 4500,
+          photoUrl: tData.truckPhotoFile || '/src/assets/images/maximus_hero_truck_1790435606454.jpg',
+        }
+      ],
+      isAvailable: true,
+      status: 'active',
+      currentLocation: {
+        lat: 0.3476,
+        lng: 32.5825,
+        address: 'Kampala Central Logistics Base',
+      },
+    };
+
+    setTransporters(prev => [newTransporter, ...prev]);
+    setCurrentRole('transporter');
+    setActiveTab('dashboard');
+    setShowTransporterRegisterModal(false);
+
+    // Requirement: After registration, show tutorial tooltip:
+    // For Transporter: "Welcome! 3 loads near you - tap to bid UGX price"
+    setTutorialTooltip({
+      type: 'transporter',
+      message: 'Welcome! 3 loads near you - tap to bid UGX price',
+      actionText: 'View Loads & Tap to Bid 🚚',
+      onAction: () => {
+        setActiveTab('dashboard');
+      }
+    });
+
+    addNotification(
+      'Welcome to Maximus Freight! 🚚',
+      '3 loads near you - tap to bid UGX price. Super Admin will verify your KYC documents.'
+    );
   };
 
   // Handlers for Job Updates
@@ -455,6 +583,12 @@ export default function App() {
         </div>
       )}
 
+      {/* Tutorial Tooltip for Shippers / Drivers */}
+      <TutorialTooltip
+        data={tutorialTooltip}
+        onClose={() => setTutorialTooltip(null)}
+      />
+
       {/* Main Top Navigation conforming to Top Bar Contract */}
       <Navbar
         currentRole={currentRole}
@@ -469,8 +603,7 @@ export default function App() {
         onToggleOffline={() => setIsOffline(!isOffline)}
         onOpenLegal={() => setShowLegalModal(true)}
         onOpenPostJob={() => {
-          setPreselectedICD(null);
-          setShowPostJobModal(true);
+          setShowClientPostCargoModal(true);
         }}
         notifications={notifications}
         onMarkNotificationsRead={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
@@ -482,16 +615,21 @@ export default function App() {
         
         {/* TAB 1: DASHBOARD VIEW (Switches based on active persona) */}
         {activeTab === 'dashboard' && (
-          <>
+          <div className="space-y-6">
+            
+            {/* 2 Big Cards Side-by-Side: Card 1 (I NEED A TRUCK) + Card 2 (I HAVE A TRUCK) */}
+            <DualHeroCards
+              currency={currency}
+              onPostCargoClick={() => setShowClientPostCargoModal(true)}
+              onFindLoadsClick={() => setShowTransporterRegisterModal(true)}
+            />
+
             {currentRole === 'client' && (
               <ClientDashboard
                 jobs={jobs}
                 currency={currency}
                 language={language}
-                onOpenPostJob={() => {
-                  setPreselectedICD(null);
-                  setShowPostJobModal(true);
-                }}
+                onOpenPostJob={() => setShowClientPostCargoModal(true)}
                 onOpenNegotiation={(j) => setActiveNegotiationJob(j)}
                 onOpenEscrow={(j) => setActiveEscrowJob(j)}
                 onOpenPOD={(j) => setActivePODJob(j)}
@@ -523,6 +661,11 @@ export default function App() {
                 onUpdatePayoutDetails={handleUpdateTransporterPayoutDetails}
                 onConfirmPODByAdmin={handleConfirmPODByAdmin}
                 onExecuteDriverPayout={handleExecuteDriverPayout}
+                onSwitchToAdminVerify={() => {
+                  setCurrentRole('admin');
+                  setActiveTab('dashboard');
+                }}
+                onApproveDriverKYC={(tId) => handleUpdateKYCStatus(tId, 'verified')}
               />
             )}
 
@@ -546,7 +689,7 @@ export default function App() {
                 onExecuteDriverPayout={handleExecuteDriverPayout}
               />
             )}
-          </>
+          </div>
         )}
 
         {/* TAB 2: ICDS & BONDED WAREHOUSES */}
@@ -800,6 +943,24 @@ export default function App() {
           onApplyEcoRoute={(jobId) => {
             addNotification('Eco Route Applied', `Optimized fuel-efficient waypoints loaded into active driver GPS navigation.`);
           }}
+        />
+      )}
+
+      {/* 10. Card 1 - Client Post Cargo Free Modal */}
+      {showClientPostCargoModal && (
+        <ClientPostCargoModal
+          currency={currency}
+          icds={icds}
+          onClose={() => setShowClientPostCargoModal(false)}
+          onSubmitJob={handlePostCargoSuccess}
+        />
+      )}
+
+      {/* 11. Card 2 - Transporter Registration & SafeBoda KYC Modal */}
+      {showTransporterRegisterModal && (
+        <TransporterRegisterModal
+          onClose={() => setShowTransporterRegisterModal(false)}
+          onRegisterTransporter={handleRegisterTransporter}
         />
       )}
 
