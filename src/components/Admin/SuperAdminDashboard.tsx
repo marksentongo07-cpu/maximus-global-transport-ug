@@ -49,7 +49,8 @@ import {
   Building2,
   Smartphone,
   Receipt,
-  CreditCard
+  CreditCard,
+  Scale
 } from 'lucide-react';
 import { AdminDriverPayoutModal } from './AdminDriverPayoutModal';
 import { LeafletLiveFleetMap } from '../Map/LeafletLiveFleetMap';
@@ -225,6 +226,29 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
             <FileSpreadsheet className="w-3.5 h-3.5 text-amber-400" />
             <span>{t('exportManagementAudit', language)}</span>
           </button>
+        </div>
+      </div>
+
+      {/* Free Market Governance Banner: Admin sees all prices but NEVER controls them - only takes 8% of final agreed price */}
+      <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 shrink-0">
+            <Scale className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="font-bold text-white flex items-center gap-2">
+              <span>MAXIMUS Open Market Governance Rule</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                8% Escrow Facilitation Fee
+              </span>
+            </div>
+            <p className="text-slate-300 mt-0.5">
+              Admin monitors all submitted bids, quotes, and market transactions across Uganda, but <strong>NEVER fixes, caps, or controls prices</strong>. Commercial parties negotiate freely. Platform collects exactly 8% commission on the final agreed transacted amount upon successful escrow completion.
+            </p>
+          </div>
+        </div>
+        <div className="text-right shrink-0">
+          <span className="font-mono font-bold text-amber-400 text-sm">8% Fixed Escrow Fee</span>
         </div>
       </div>
 
@@ -436,7 +460,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded-sm bg-amber-400" />
-                  <span className="text-slate-300 font-medium">10% Platform Commission</span>
+                  <span className="text-slate-300 font-medium">8% Platform Commission</span>
                 </div>
               </div>
             </div>
@@ -483,7 +507,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                     formatter={(value: any, name: any) => {
                       const num = Number(value) || 0;
                       if (name === 'gross') return [formatMoney(num, currency), 'Gross Freight Transacted'];
-                      if (name === 'commission') return [formatMoney(num, currency), 'Maximus Commission (10%)'];
+                      if (name === 'commission') return [formatMoney(num, currency), 'Maximus Commission (8%)'];
                       return [value, name];
                     }}
                   />
@@ -678,7 +702,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
             <span>
-              Real-time multi-gateway escrow ledger. Secured through Equity Till 031801. Tiered platform commission: 15% single, 10% bulk.
+              Real-time multi-gateway escrow ledger. Secured through Equity Till 031801. Fixed platform commission: 8% on final agreed transacted amount.
             </span>
             <span className="font-semibold text-amber-400">
               Till Escrow Account: 031801 (Equity Bank Uganda)
@@ -814,10 +838,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                           <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-400">
                             Trip #{job.id} · {job.category} ({job.weightTons}T)
                           </span>
-                          <span className={`px-2 py-0.2 rounded text-[10px] font-bold uppercase border ${
-                            isBulk ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                          }`}>
-                            {isBulk ? '10% Bulk Commission' : '15% Single Shipment'}
+                          <span className="px-2 py-0.2 rounded text-[10px] font-bold uppercase border bg-amber-500/20 text-amber-400 border-amber-500/30">
+                            8% Platform Commission
                           </span>
                         </div>
                         <h4 className="text-base font-bold text-white">{job.title}</h4>

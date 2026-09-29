@@ -128,7 +128,9 @@ function getTruckDivIcon(
   status: 'delivering' | 'empty_returning' | 'stopped', 
   isFollowed: boolean, 
   speed: number,
-  isOffline: boolean
+  isOffline: boolean,
+  vehicleType?: string,
+  cargo?: string
 ) {
   let badgeColor = 'bg-emerald-500 border-emerald-200 text-slate-950 shadow-emerald-500/40';
   let statusText = 'Delivering';
@@ -139,6 +141,23 @@ function getTruckDivIcon(
   } else if (status === 'stopped' || isOffline) {
     badgeColor = 'bg-rose-600 border-rose-200 text-white shadow-rose-600/50 animate-pulse';
     statusText = 'Stopped >30m';
+  }
+
+  // User requirement: Icon different: saloon=car icon, container=container icon, wide load=warning triangle icon
+  let vehicleEmoji = '🚛';
+  const v = (vehicleType || '').toLowerCase();
+  const c = (cargo || '').toLowerCase();
+
+  if (v.includes('saloon') || v.includes('sedan') || v.includes('hatchback') || c.includes('parcel') || c.includes('document')) {
+    vehicleEmoji = '🚗';
+  } else if (v.includes('container') || v.includes('20ft') || v.includes('40ft') || c.includes('container') || c.includes('teu')) {
+    vehicleEmoji = '📦';
+  } else if (v.includes('wide_load') || v.includes('lowbed') || v.includes('abnormal') || c.includes('wide') || c.includes('abnormal') || c.includes('machinery')) {
+    vehicleEmoji = '⚠️';
+  } else if (v.includes('pickup')) {
+    vehicleEmoji = '🛻';
+  } else if (v.includes('boda') || v.includes('motorcycle')) {
+    vehicleEmoji = '🛵';
   }
 
   const pulseEffect = speed > 5
@@ -154,7 +173,7 @@ function getTruckDivIcon(
       ${pulseEffect}
       ${followRing}
       <div class="relative w-10 h-10 rounded-2xl ${badgeColor} border-2 shadow-2xl flex items-center justify-center text-lg transform transition-transform group-hover:scale-125">
-        <span>🚛</span>
+        <span>${vehicleEmoji}</span>
       </div>
       <div class="absolute -bottom-5 left-1/2 -translate-x-1/2 px-1.5 py-0.2 bg-slate-950/95 border border-white/20 rounded text-[9px] font-bold text-white whitespace-nowrap shadow-lg">
         ${speed > 0 ? `${speed} km/h` : 'Stopped'}
@@ -595,7 +614,14 @@ export const LeafletLiveFleetMap: React.FC<LeafletLiveFleetMapProps> = ({
           {/* MOVING TRUCK MARKERS (Requirement 2: Green=delivering, Orange=empty returning, Red=stopped >30 mins) */}
           {filteredTrucks.map((truck) => {
             const isFollowed = followedJobId === truck.jobId;
-            const icon = getTruckDivIcon(truck.status, isFollowed, truck.speed, truck.isOfflineLostNetwork);
+            const icon = getTruckDivIcon(
+              truck.status, 
+              isFollowed, 
+              truck.speed, 
+              truck.isOfflineLostNetwork, 
+              (truck as any).vehicleType, 
+              truck.cargo
+            );
 
             return (
               <Marker

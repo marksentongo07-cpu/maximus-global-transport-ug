@@ -128,6 +128,10 @@ export interface Transporter {
   vehicles: Vehicle[];
   isAvailable: boolean;
   status: 'active' | 'suspended';
+  handles20ftContainer?: boolean;
+  handles40ftContainer?: boolean;
+  hasWideLoadPermit?: boolean;
+  ownedVehicleTypes?: VehicleType[];
   currentLocation: {
     lat: number;
     lng: number;
@@ -147,9 +151,13 @@ export interface JobOffer {
   transporterId: string;
   transporterName: string;
   transporterRating: number;
-  vehicleOffered: string;
+  transporterPhone?: string;
+  transporterDistanceKm?: number; // e.g. "3km away"
+  vehicleOffered: string; // e.g. "Fuso 7T", "Custom: Toyota Wish 1.8 with carrier"
+  customVehicleDetails?: string;
   offeredPriceUGX: number;
   counterPriceUGX?: number;
+  isNegotiable?: boolean;
   status: 'pending' | 'accepted' | 'declined' | 'countered';
   messages: {
     id: string;
@@ -200,12 +208,17 @@ export interface Job {
   };
   estimatedDistanceKm: number;
   marketPriceEstimateUGX: number;
-  adminFeeUGX: number; // Tiered: 15% single, 10% bulk
-  commissionRatePercent?: number; // 15 or 10
+  adminFeeUGX: number; // 8% platform escrow fee
+  commissionRatePercent?: number; // 8%
   shipmentType?: 'single' | 'bulk';
   clientBudgetUGX: number;
+  isNegotiable?: boolean;
   agreedPriceUGX?: number;
-  desiredVehicleType: VehicleType;
+  desiredVehicleType: VehicleType | string;
+  customVehicleType?: string;
+  cargoType?: CargoType;
+  containerDetails?: ContainerDetails;
+  wideLoadDetails?: WideLoadDetails;
   pickupDate: string;
   photoUrl?: string;
   status: JobStatus;

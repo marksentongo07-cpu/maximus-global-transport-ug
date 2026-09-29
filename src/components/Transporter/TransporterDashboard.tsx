@@ -94,6 +94,7 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
   const [showPayoutModal, setShowPayoutModal] = useState(false);
   const [selectedProofJob, setSelectedProofJob] = useState<Job | null>(null);
   const [filterICDNearMeOnly, setFilterICDNearMeOnly] = useState<boolean>(false);
+  const [vehicleFilter, setVehicleFilter] = useState<'all' | '40ft' | '20ft' | 'fuso' | 'saloon' | 'wide_load'>('all');
   const [showTrustGateModal, setShowTrustGateModal] = useState(false);
   const [selectedJobForBid, setSelectedJobForBid] = useState<Job | null>(null);
 
@@ -212,10 +213,10 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
   }, [allJobs, icds, transporter.currentLocation]);
 
   const availableLoads = useMemo(() => {
-    const baseLoads = allJobs.filter((j) => j.status === 'open' || j.status === 'negotiating');
+    let baseLoads = allJobs.filter((j) => j.status === 'open' || j.status === 'negotiating');
 
     if (filterICDNearMeOnly) {
-      return baseLoads.filter((j) => {
+      baseLoads = baseLoads.filter((j) => {
         if (!j.isICDJob && !j.pickupICDId && !j.pickupLocation.name.toLowerCase().includes('icd')) return false;
         const matchedICD = icds.find(i => 
           i.id === j.pickupICDId || 
@@ -229,8 +230,40 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
       });
     }
 
+    if (vehicleFilter === '40ft') {
+      baseLoads = baseLoads.filter(j => 
+        j.desiredVehicleType.includes('40ft') || 
+        j.weightTons >= 25 || 
+        j.cargoType === 'Containers (20ft/40ft)'
+      );
+    } else if (vehicleFilter === '20ft') {
+      baseLoads = baseLoads.filter(j => 
+        j.desiredVehicleType.includes('20ft') || 
+        (j.cargoType === 'Containers (20ft/40ft)' && j.weightTons <= 28)
+      );
+    } else if (vehicleFilter === 'fuso') {
+      baseLoads = baseLoads.filter(j => 
+        j.desiredVehicleType.includes('fuso') || 
+        (j.weightTons >= 4 && j.weightTons <= 12)
+      );
+    } else if (vehicleFilter === 'saloon') {
+      baseLoads = baseLoads.filter(j => 
+        j.desiredVehicleType.includes('saloon') || 
+        j.desiredVehicleType.includes('pickup') || 
+        j.desiredVehicleType.includes('hatchback') || 
+        j.weightTons <= 2 || 
+        j.cargoType === 'Small Parcel/Document'
+      );
+    } else if (vehicleFilter === 'wide_load') {
+      baseLoads = baseLoads.filter(j => 
+        j.desiredVehicleType.includes('wide_load') || 
+        j.desiredVehicleType.includes('lowbed') || 
+        j.cargoType === 'Wide/Abnormal Load (requires permit)'
+      );
+    }
+
     return baseLoads;
-  }, [allJobs, filterICDNearMeOnly, icds, transporter.currentLocation]);
+  }, [allJobs, filterICDNearMeOnly, vehicleFilter, icds, transporter.currentLocation]);
 
   const handleCreateVehicle = (e: React.FormEvent) => {
     e.preventDefault();
@@ -697,9 +730,8 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
                 {/* DRIVER PAYOUT & POD APPROVAL SECTION */}
                 {(() => {
                   const agreedAmount = job.agreedPriceUGX || job.marketPriceEstimateUGX || 1250000;
-                  const isBulk = job.shipmentType === 'bulk' || job.weightTons >= 20;
-                  const commissionRate = isBulk ? 10 : 15;
-                  const commissionFeeUGX = Math.round(agreedAmount * (commissionRate / 100));
+                  const commissionRate = 8;
+                  const commissionFeeUGX = Math.round(agreedAmount * 0.08);
                   const driverPayoutAmountUGX = agreedAmount - commissionFeeUGX;
                   const isMobileMoney = driverPayoutAmountUGX <= 4000000;
                   const pod = job.proofOfDelivery;
@@ -760,10 +792,10 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
 
                         <div className="p-2.5 bg-slate-900 rounded-xl border border-slate-800">
                           <span className="text-[10px] text-slate-400 block">
-                            Tiered Commission ({commissionRate}% {isBulk ? 'Bulk' : 'Single'}):
+                            Maximus Escrow Commission (8%):
                           </span>
                           <span className="font-bold text-emerald-400 font-mono text-sm">-{formatMoney(commissionFeeUGX, currency)}</span>
-                          <span className="text-[9px] text-slate-500 block">Maximus Platform Fee</span>
+                          <span className="text-[9px] text-slate-500 block">Platform Facilitation</span>
                         </div>
 
                         <div className="p-2.5 bg-amber-500/10 rounded-xl border border-amber-500/30">
@@ -1041,37 +1073,65 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
           )}
 
           {/* Filter Bar & Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
-            <div className="text-xs text-slate-400">
-              {t('availableLoadsDesc', language)} ({availableLoads.length} loads)
+          <div className="space-y-2 pt-1">
+            <div className="flex flex-wrap items-center justify-between gap-2.5">
+              <div className="text-xs text-slate-400">
+                {t('availableLoadsDesc', language)} ({availableLoads.length} loads matching criteria)
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setFilterICDNearMeOnly(!filterICDNearMeOnly)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm ${
+                    filterICDNearMeOnly
+                      ? 'bg-emerald-500 text-slate-950 shadow-emerald-500/20'
+                      : 'bg-slate-900 border border-slate-700 text-slate-300 hover:border-amber-400/50'
+                  }`}
+                >
+                  <Filter className="w-3.5 h-3.5" />
+                  <span>Jobs from ICDs near me (≤5km)</span>
+                  {filterICDNearMeOnly && (
+                    <span className="ml-1 px-1.5 py-0.2 bg-slate-950 text-emerald-400 rounded-full text-[10px]">
+                      Active
+                    </span>
+                  )}
+                </button>
+
+                {filterICDNearMeOnly && (
+                  <button
+                    onClick={() => setFilterICDNearMeOnly(false)}
+                    className="text-xs text-slate-400 hover:text-white underline"
+                  >
+                    Clear ICD Filter
+                  </button>
+                )}
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setFilterICDNearMeOnly(!filterICDNearMeOnly)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm ${
-                  filterICDNearMeOnly
-                    ? 'bg-emerald-500 text-slate-950 shadow-emerald-500/20'
-                    : 'bg-slate-900 border border-slate-700 text-slate-300 hover:border-amber-400/50'
-                }`}
-              >
-                <Filter className="w-3.5 h-3.5" />
-                <span>Jobs from ICDs near me (≤5km)</span>
-                {filterICDNearMeOnly && (
-                  <span className="ml-1 px-1.5 py-0.2 bg-slate-950 text-emerald-400 rounded-full text-[10px]">
-                    Active
-                  </span>
-                )}
-              </button>
-
-              {filterICDNearMeOnly && (
+            {/* Vehicle Capability Quick Filters */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+              <span className="text-[11px] font-bold text-white/50 shrink-0">Filter by Truck:</span>
+              {[
+                { id: 'all', label: 'All Loads' },
+                { id: '40ft', label: '🚛 I have 40ft trailer' },
+                { id: '20ft', label: '🚢 I have 20ft container trailer' },
+                { id: 'fuso', label: '🚚 I have Fuso (5-10T)' },
+                { id: 'saloon', label: '🚗 I have Saloon Car / Express' },
+                { id: 'wide_load', label: '⚠️ Wide Load / Lowbed' },
+              ].map((pill) => (
                 <button
-                  onClick={() => setFilterICDNearMeOnly(false)}
-                  className="text-xs text-slate-400 hover:text-white underline"
+                  key={pill.id}
+                  type="button"
+                  onClick={() => setVehicleFilter(pill.id as any)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                    vehicleFilter === pill.id
+                      ? 'bg-orange-500 text-black shadow-md'
+                      : 'bg-slate-900 border border-slate-700 text-slate-300 hover:border-white/30'
+                  }`}
                 >
-                  Clear Filter
+                  {pill.label}
                 </button>
-              )}
+              ))}
             </div>
           </div>
 
@@ -1128,6 +1188,26 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
                       ~{job.estimatedDistanceKm} km
                     </span>
                   </div>
+
+                  {/* Specification Display: Client Offer | Vehicle | Cargo */}
+                  <div className="p-2.5 bg-slate-950/90 rounded-xl border border-orange-500/30 text-xs space-y-1">
+                    <div className="text-orange-400 font-bold flex items-center gap-1.5 flex-wrap">
+                      <span>Client Offer: {formatMoney(job.clientBudgetUGX, currency)} ({job.isNegotiable !== false ? 'negotiable' : 'fixed'})</span>
+                      <span className="text-white/40">|</span>
+                      <span>Vehicle: {job.customVehicleType ? `${job.customVehicleType} (Custom)` : `${job.desiredVehicleType.toUpperCase()} or similar`}</span>
+                      <span className="text-white/40">|</span>
+                      <span>Cargo: {job.category} {job.weightTons}T</span>
+                    </div>
+                  </div>
+
+                  {/* Bid Card Ribbon (if bids submitted) */}
+                  {job.offers.length > 0 && (
+                    <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs space-y-1">
+                      <div className="font-semibold text-emerald-300">
+                        💬 <strong>{job.offers[0].transporterName}</strong> bid {formatMoney(job.offers[0].counterPriceUGX || job.offers[0].offeredPriceUGX, currency)} for {job.weightTons}T {job.category} — {job.offers[0].customVehicleDetails || job.offers[0].vehicleOffered || 'Custom truck available'}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs space-y-1">
                     <div className="text-slate-300 line-clamp-1">

@@ -40,6 +40,7 @@ import { FuelEfficientRouteModal } from './components/Modals/FuelEfficientRouteM
 import { DualHeroCards } from './components/Home/DualHeroCards';
 import { ClientPostCargoModal } from './components/Modals/ClientPostCargoModal';
 import { TransporterRegisterModal } from './components/Modals/TransporterRegisterModal';
+import { PricingGuidePage } from './components/Pricing/PricingGuidePage';
 import { TutorialTooltip, TutorialTooltipData } from './components/Common/TutorialTooltip';
 import { 
   ShieldCheck, 
@@ -770,6 +771,16 @@ export default function App() {
               }}
             />
           </div>
+        )}
+
+        {/* TAB: PRICING GUIDE & FREE MARKET */}
+        {activeTab === 'pricing' && (
+          <PricingGuidePage
+            currency={currency}
+            language={language}
+            onOpenPostCargo={() => setShowPostJobModal(true)}
+            onOpenRegisterTransporter={() => setShowTransporterRegisterModal(true)}
+          />
         )}
 
         {/* TAB 3: SERVICES MARKETPLACE MODULE */}

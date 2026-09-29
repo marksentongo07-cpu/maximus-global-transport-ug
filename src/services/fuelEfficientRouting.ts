@@ -11,7 +11,7 @@ export interface RouteWaypoint {
 export interface FuelEfficientRouteResult {
   originName: string;
   destinationName: string;
-  vehicleType: VehicleType;
+  vehicleType: VehicleType | string;
   emissionType: 'DIESEL' | 'GASOLINE' | 'HYBRID' | 'ELECTRIC';
   
   // Standard (Fastest) Route
@@ -50,7 +50,7 @@ export interface FuelEfficientRouteResult {
 export interface CalculateFuelEfficientRouteParams {
   origin: { lat: number; lng: number; name?: string };
   destination: { lat: number; lng: number; name?: string };
-  vehicleType: VehicleType;
+  vehicleType: VehicleType | string;
   cargoWeightTons?: number;
   emissionType?: 'DIESEL' | 'GASOLINE' | 'HYBRID' | 'ELECTRIC';
 }
@@ -59,13 +59,42 @@ export interface CalculateFuelEfficientRouteParams {
 export const DIESEL_PRICE_PER_LITER_UGX = 4500;
 
 // Base fuel consumption in Liters per 100km by vehicle type
-const BASE_LITERS_PER_100KM: Record<VehicleType, number> = {
-  pickup: 9.5,         // Toyota Hilux / Isuzu D-Max
-  fuso: 22.0,          // Fuso Fighter 8-10 Tonnes
-  box_truck: 26.0,     // 10-12 Tonne enclosed
-  semi_trailer: 36.0,  // Scania/Actros 35-40 Tonnes
-  flatbed: 34.0,       // 30 Tonnes construction
-  refrigerated: 38.0,  // Reefer (with continuous compressor engine)
+const BASE_LITERS_PER_100KM: Record<string, number> = {
+  // Group 1 - Small & Express
+  saloon_car: 7.5,
+  hatchback: 6.8,
+  station_wagon: 8.5,
+  pickup_single_cab: 9.5,
+  pickup_double_cab: 10.0,
+  pickup: 9.5,
+
+  // Group 2 - Medium Trucks
+  canter_3t: 14.0,
+  fuso_5t_7t: 21.0,
+  fuso: 22.0,
+  fuso_fighter_10t: 24.0,
+  box_truck_15t: 27.0,
+  box_truck: 26.0,
+  refrigerated_truck: 38.0,
+  refrigerated: 38.0,
+
+  // Group 3 - Heavy & Long Distance
+  semi_trailer_20ft: 33.0,
+  semi_trailer_40ft: 36.0,
+  semi_trailer_40ft_hc: 37.0,
+  semi_trailer: 36.0,
+  flatbed_trailer: 34.0,
+  flatbed: 34.0,
+  lowbed_trailer: 42.0,
+  wide_load_truck: 45.0,
+
+  // Group 4 - Specialized
+  fuel_tanker: 36.0,
+  dump_tipper: 28.0,
+  car_carrier: 35.0,
+  boda_boda: 3.2,
+  van_mini_van: 9.8,
+  other: 22.0,
 };
 
 /**

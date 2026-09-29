@@ -208,14 +208,43 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 
                 {/* Left: Cargo & Weight */}
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <h3 className="text-[18px] font-bold text-white">{job.title}</h3>
-                  <p className="text-[14px] text-white/70 line-clamp-2 leading-6">{job.cargoDescription}</p>
+                  
+                  {/* Specification Display: Client Offer | Vehicle | Cargo */}
+                  <div className="p-2.5 bg-slate-900/90 rounded-xl border border-orange-500/30 text-xs space-y-1">
+                    <div className="text-orange-400 font-bold flex items-center gap-1.5 flex-wrap">
+                      <span>Client Offer: {formatMoney(job.clientBudgetUGX, currency)} ({job.isNegotiable !== false ? 'negotiable' : 'fixed'})</span>
+                      <span className="text-white/40">|</span>
+                      <span>Vehicle: {job.customVehicleType ? `${job.customVehicleType} (Custom)` : `${job.desiredVehicleType.toUpperCase()} or similar`}</span>
+                      <span className="text-white/40">|</span>
+                      <span>Cargo: {job.category} {job.weightTons}T</span>
+                    </div>
+                  </div>
+
+                  <p className="text-[13px] text-white/70 line-clamp-2 leading-5">{job.cargoDescription}</p>
+
+                  {/* Bid Card Ribbon (if bids received) */}
+                  {job.offers.length > 0 && (
+                    <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs space-y-1">
+                      <div className="font-semibold text-emerald-300 flex items-center justify-between">
+                        <span>
+                          💬 <strong>{job.offers[0].transporterName}</strong> bid {formatMoney(job.offers[0].counterPriceUGX || job.offers[0].offeredPriceUGX, currency)} for {job.weightTons}T {job.category} — {job.offers[0].customVehicleDetails || job.offers[0].vehicleOffered || 'Custom truck available'}
+                        </span>
+                        {job.offers.length > 1 && (
+                          <span className="text-[10px] text-orange-400 font-bold ml-2">
+                            +{job.offers.length - 1} more bids
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-2 text-xs text-white/80 pt-1">
                     <span className="px-2.5 py-1 rounded-md bg-slate-700 font-mono font-bold text-white border border-white/10">
                       {job.weightTons} Tonnes
                     </span>
-                    <span className="text-white/60">Vehicle: {job.desiredVehicleType.toUpperCase()}</span>
+                    <span className="text-white/60">Desired: {job.desiredVehicleType.toUpperCase()}</span>
                   </div>
                 </div>
 

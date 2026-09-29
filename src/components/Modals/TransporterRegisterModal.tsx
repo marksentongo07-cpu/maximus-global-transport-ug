@@ -146,21 +146,53 @@ export const TransporterRegisterModal: React.FC<TransporterRegisterModalProps> =
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Truck Type */}
-              <div>
+              <div className="sm:col-span-2">
                 <label className="text-[11px] font-bold text-white/70 block mb-1">
-                  Truck Type:
+                  What vehicle do you own?
                 </label>
                 <select
                   value={truckType}
-                  onChange={(e) => setTruckType(e.target.value as VehicleType)}
+                  onChange={(e) => setTruckType(e.target.value as any)}
                   className="w-full bg-[#1a2a3f] border border-white/10 rounded-xl px-3 py-2 text-xs font-medium text-white focus:outline-none focus:border-orange-400"
                 >
-                  <option value="fuso">Isuzu Fuso (5 - 10 Tonnes) - Standard Workhorse</option>
-                  <option value="semi_trailer">Semi-Trailer Articulated (25 - 40 Tonnes)</option>
-                  <option value="flatbed">Heavy Duty Flatbed (20 - 35 Tonnes)</option>
-                  <option value="box_truck">Enclosed Heavy Box Truck (7 - 12 Tonnes)</option>
-                  <option value="pickup">Hilux / Heavy Duty Pickup (1 - 2 Tonnes)</option>
-                  <option value="refrigerated">Refrigerated Cold Chain Truck (10 - 25 Tonnes)</option>
+                  <optgroup label="GROUP 1 - Small & Express (Parcels, Documents, Small Cargo)">
+                    <option value="saloon_car">🚗 Saloon Car / Sedan (500kg, urgent documents Kampala)</option>
+                    <option value="hatchback">🚗 Hatchback / Small Car (700kg)</option>
+                    <option value="station_wagon">🚙 Station Wagon (1T, traders Kikuubo)</option>
+                    <option value="pickup_single">🛻 Pickup Single Cab (1.5T)</option>
+                    <option value="pickup_double">🛻 Pickup Double Cab (1.2T)</option>
+                    <option value="pickup">🛻 Standard Pickup</option>
+                  </optgroup>
+
+                  <optgroup label="GROUP 2 - Medium Trucks (Uganda Local)">
+                    <option value="canter_3t">🚚 Canter 3T (3-4 tonnes, 14ft body)</option>
+                    <option value="fuso">🚛 Fuso 5T / 7T (5-7 tonnes, 20ft body, most popular in UG)</option>
+                    <option value="fuso_fighter_10t">🚛 Fuso Fighter 10T (10 tonnes)</option>
+                    <option value="box_truck">📦 Box Body Truck 15T (for fragile goods)</option>
+                    <option value="refrigerated">❄️ Refrigerated Truck / Cold Chain (dairy, meat, fish)</option>
+                  </optgroup>
+
+                  <optgroup label="GROUP 3 - Heavy & Long Distance (Containers & Wide Load)">
+                    <option value="semi_trailer_20ft">🚢 Semi-Trailer 20ft Container (28T, Mombasa-Kampala)</option>
+                    <option value="semi_trailer_40ft">🚢 Semi-Trailer 40ft Container (30-35T, Mombasa-Kampala)</option>
+                    <option value="semi_trailer_40ft_hc">🚢 Semi-Trailer 40ft High Cube</option>
+                    <option value="semi_trailer">🚛 Standard Semi-Trailer (25-40T)</option>
+                    <option value="flatbed">🏗️ Flatbed Trailer 20ft / 40ft (containers & steel)</option>
+                    <option value="lowbed_loader">🚜 Lowbed Trailer / Low Loader (excavators, heavy machinery)</option>
+                    <option value="wide_load_truck">⚠️ Wide Load / Abnormal Load Truck (with escort)</option>
+                  </optgroup>
+
+                  <optgroup label="GROUP 4 - Specialized">
+                    <option value="fuel_tanker">⛽ Fuel Tanker (diesel, petrol)</option>
+                    <option value="dump_tipper">🪨 Dump Truck / Tipper (murram, sand)</option>
+                    <option value="car_carrier">🚗 Car Carrier / Transporter (Mombasa import)</option>
+                    <option value="boda_boda">🛵 Motorcycle / Boda Boda (last mile 50kg)</option>
+                    <option value="van">🚐 Van / Mini Van</option>
+                  </optgroup>
+
+                  <optgroup label="Custom / Other">
+                    <option value="other">✨ Other / Custom - Type your own</option>
+                  </optgroup>
                 </select>
               </div>
 

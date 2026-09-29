@@ -114,8 +114,8 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
 
     const finalMarketEstimate = priceQuote.totalMarketEstimateUGX + storageCalc.totalStorageFeeUGX;
     const finalClientBudget = priceQuote.negotiationStartingPriceUGX + storageCalc.totalStorageFeeUGX;
-    const commissionRate = shipmentType === 'bulk' ? 10 : 15;
-    const finalAdminFee = Math.round(finalMarketEstimate * (commissionRate / 100));
+    const commissionRate = 8;
+    const finalAdminFee = Math.round(finalMarketEstimate * 0.08);
 
     const newJob: Job = {
       id: 'job-ug-' + Date.now().toString().slice(-4),
@@ -360,15 +360,47 @@ export const PostJobModal: React.FC<PostJobModalProps> = ({
               </label>
               <select
                 value={vehicleType}
-                onChange={(e) => setVehicleType(e.target.value as VehicleType)}
+                onChange={(e) => setVehicleType(e.target.value as any)}
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-400"
               >
-                <option value="pickup">Pickup (1 - 2 Tonnes)</option>
-                <option value="fuso">Fuso Tipper/Box (5 - 10 Tonnes)</option>
-                <option value="box_truck">Box Truck (7 - 12 Tonnes)</option>
-                <option value="semi_trailer">Semi-Trailer (25 - 40 Tonnes)</option>
-                <option value="flatbed">Flatbed (20 - 35 Tonnes)</option>
-                <option value="refrigerated">Refrigerated Reefer (10 - 25 Tonnes)</option>
+                <optgroup label="GROUP 1 - Small & Express (Parcels, Documents, Small Cargo)">
+                  <option value="saloon_car">🚗 Saloon Car / Sedan (500kg, urgent documents Kampala)</option>
+                  <option value="hatchback">🚗 Hatchback / Small Car (700kg)</option>
+                  <option value="station_wagon">🚙 Station Wagon (1T, traders Kikuubo)</option>
+                  <option value="pickup_single">🛻 Pickup Single Cab (1.5T)</option>
+                  <option value="pickup_double">🛻 Pickup Double Cab (1.2T)</option>
+                  <option value="pickup">🛻 Standard Pickup</option>
+                </optgroup>
+
+                <optgroup label="GROUP 2 - Medium Trucks (Uganda Local)">
+                  <option value="canter_3t">🚚 Canter 3T (3-4 tonnes, 14ft body)</option>
+                  <option value="fuso">🚛 Fuso 5T / 7T (5-7 tonnes, 20ft body, most popular in UG)</option>
+                  <option value="fuso_fighter_10t">🚛 Fuso Fighter 10T (10 tonnes)</option>
+                  <option value="box_truck">📦 Box Body Truck 15T (for fragile goods)</option>
+                  <option value="refrigerated">❄️ Refrigerated Truck / Cold Chain (dairy, meat, fish)</option>
+                </optgroup>
+
+                <optgroup label="GROUP 3 - Heavy & Long Distance (Containers & Wide Load)">
+                  <option value="semi_trailer_20ft">🚢 Semi-Trailer 20ft Container (28T, Mombasa-Kampala)</option>
+                  <option value="semi_trailer_40ft">🚢 Semi-Trailer 40ft Container (30-35T, Mombasa-Kampala)</option>
+                  <option value="semi_trailer_40ft_hc">🚢 Semi-Trailer 40ft High Cube</option>
+                  <option value="semi_trailer">🚛 Standard Semi-Trailer (25-40T)</option>
+                  <option value="flatbed">🏗️ Flatbed Trailer 20ft / 40ft (containers & steel)</option>
+                  <option value="lowbed_loader">🚜 Lowbed Trailer / Low Loader (excavators, heavy machinery)</option>
+                  <option value="wide_load_truck">⚠️ Wide Load / Abnormal Load Truck (with escort)</option>
+                </optgroup>
+
+                <optgroup label="GROUP 4 - Specialized">
+                  <option value="fuel_tanker">⛽ Fuel Tanker (diesel, petrol)</option>
+                  <option value="dump_tipper">🪨 Dump Truck / Tipper (murram, sand)</option>
+                  <option value="car_carrier">🚗 Car Carrier / Transporter (Mombasa import)</option>
+                  <option value="boda_boda">🛵 Motorcycle / Boda Boda (last mile 50kg)</option>
+                  <option value="van">🚐 Van / Mini Van</option>
+                </optgroup>
+
+                <optgroup label="Custom / Other">
+                  <option value="other">✨ Other / Custom - Type your own</option>
+                </optgroup>
               </select>
             </div>
 

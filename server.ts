@@ -286,6 +286,8 @@ interface LiveTruckLocation {
   lastSeenLocationName: string;
   lastUpdate: number; // ms timestamp
   trail: BreadcrumbPoint[];
+  vehicleType?: string;
+  cargoType?: string;
 }
 
 // Initial Uganda fleet: 12 moving, 3 idle, 950k UGX in escrow

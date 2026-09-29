@@ -168,6 +168,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           <button 
+            onClick={() => onTabChange('pricing')}
+            className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+              activeTab === 'pricing' 
+                ? 'bg-orange-500 text-black rounded-full px-5 py-2 font-bold shadow-md' 
+                : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
+            }`}
+          >
+            <Coins className="w-4 h-4 shrink-0 text-amber-400" />
+            <span>Pricing</span>
+          </button>
+
+          <button 
             onClick={() => onTabChange('services')}
             className={`transition-all whitespace-nowrap flex items-center gap-2 ${
               activeTab === 'services' 
@@ -452,6 +464,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <Satellite className="w-3.5 h-3.5 text-amber-400" />
           <span>Live GPS Map</span>
+        </button>
+        <button 
+          onClick={() => onTabChange('pricing')} 
+          className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+            activeTab === 'pricing' 
+              ? 'bg-orange-500 text-black px-4 py-1.5 font-bold shadow-sm' 
+              : 'text-white/60 hover:text-white px-3 py-1.5'
+          }`}
+        >
+          <Coins className="w-3.5 h-3.5 text-amber-400" />
+          <span>Pricing</span>
         </button>
         <button 
           onClick={() => onTabChange('services')} 
