@@ -12,7 +12,7 @@ export const INITIAL_TRANSPORTERS: Transporter[] = [
     rating: 4.9,
     totalTrips: 142,
     loyaltyPoints: 3450,
-    badges: ['First Safe Delivery', 'Gold Carrier', 'Top Rated 5.0', '100% On-Time Record'],
+    badges: ['Vault Secured Delivery', 'Gold Carrier', 'Top Rated 5.0', '100% On-Time Record'],
     kycStatus: 'verified',
     kycDocs: {
       drivingLicense: true,
@@ -80,7 +80,7 @@ export const INITIAL_TRANSPORTERS: Transporter[] = [
     rating: 4.8,
     totalTrips: 87,
     loyaltyPoints: 2180,
-    badges: ['Cold Chain Specialist', 'Safe Delivery Master', 'Verified Transporter'],
+    badges: ['Cold Chain Specialist', 'Vault Secured Delivery Master', 'Verified Transporter'],
     kycStatus: 'verified',
     kycDocs: {
       drivingLicense: true,
@@ -147,7 +147,7 @@ export const INITIAL_TRANSPORTERS: Transporter[] = [
     rating: 4.7,
     totalTrips: 64,
     loyaltyPoints: 1600,
-    badges: ['Cross-Border Hauler', 'First Safe Delivery'],
+    badges: ['Cross-Border Hauler', 'Vault Secured Delivery'],
     kycStatus: 'verified',
     kycDocs: {
       drivingLicense: true,
@@ -199,7 +199,7 @@ export const INITIAL_TRANSPORTERS: Transporter[] = [
     rating: 4.6,
     totalTrips: 45,
     loyaltyPoints: 1100,
-    badges: ['First Safe Delivery'],
+    badges: ['Vault Secured Delivery'],
     kycStatus: 'pending',
     kycDocs: {
       drivingLicense: true,

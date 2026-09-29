@@ -37,8 +37,8 @@ export const SafeBodaTrustPromptModal: React.FC<SafeBodaTrustPromptModalProps> =
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-base font-bold text-white">SafeBoda-Grade Trust Verification</span>
-                <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                <span className="text-base font-bold text-white">Bank-Grade Trust Verification</span>
+                <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase bg-purple-500/20 text-[#b388ff] border border-purple-500/40">
                   Required
                 </span>
               </div>
@@ -58,13 +58,13 @@ export const SafeBodaTrustPromptModal: React.FC<SafeBodaTrustPromptModalProps> =
         {/* Content */}
         <div className="p-5 sm:p-6 space-y-4 text-xs">
           
-          <div className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-1.5">
-            <div className="font-bold text-amber-300 text-sm flex items-center gap-1.5">
+          <div className="p-3.5 bg-purple-500/10 border border-purple-500/30 rounded-xl space-y-1.5">
+            <div className="font-bold text-[#b388ff] text-sm flex items-center gap-1.5">
               <Lock className="w-4 h-4 text-amber-400" />
               <span>KYC Verification Pending for {transporter.name}</span>
             </div>
-            <p className="text-amber-200/90 leading-relaxed text-[12px]">
-              Just like SafeBoda, Maximus enforces 100% statutory driver vetting before any bids can be placed. This stops scammers, prevents freight hijackings, and guarantees high client trust.
+            <p className="text-slate-200 leading-relaxed text-[12px]">
+              With Bank-Grade Enterprise Verification, Maximus enforces 100% statutory driver &amp; fleet vetting before any bids can be placed. This stops scammers, prevents freight hijackings, and guarantees high client trust.
             </p>
           </div>
 

@@ -291,7 +291,7 @@ export const ServicesMarketplace: React.FC<ServicesMarketplaceProps> = ({
                     <span className="font-bold text-white">{formatMoney(selectedProvider.hourlyRateUGX, currency)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Maximus Escrow Protection:</span>
+                    <span>Maximus TrustVault Protection:</span>
                     <span className="text-emerald-400 font-semibold">Active</span>
                   </div>
                 </div>

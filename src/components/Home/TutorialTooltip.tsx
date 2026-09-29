@@ -62,7 +62,7 @@ export const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
             <p className="text-[12px] text-white/70 mt-0.5">
               {isClient
                 ? 'Real-time quotes are streaming into your Escrow negotiation hub.'
-                : 'SafeBoda-grade verification: Submit bids while Super Admin verifies your uploaded URA Logbook & National ID.'}
+                : 'Bank-Grade verification: Submit bids while Super Admin verifies your uploaded URA Logbook & National ID.'}
             </p>
           </div>
         </div>

@@ -102,13 +102,13 @@ export const TransporterRegisterModal: React.FC<TransporterRegisterModalProps> =
                 <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-orange-500/20 text-orange-400 border border-orange-500/30">
                   Card 2 · Transporter Onboarding
                 </span>
-                <span className="text-[11px] text-amber-300 font-semibold flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                  SafeBoda Trust Protocol
+                <span className="text-[11px] text-[#b388ff] font-semibold flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#b388ff]" />
+                  Bank-Grade Trust Protocol
                 </span>
               </div>
               <h3 className="text-xl font-bold text-white mt-0.5">I Have a Truck - Find Loads &amp; Bid</h3>
-              <p className="text-xs text-white/60">Register your vehicle &amp; upload SafeBoda-style KYC to access direct loads.</p>
+              <p className="text-xs text-white/60">Register your vehicle &amp; upload Bank-Grade KYC to access direct loads.</p>
             </div>
           </div>
 
@@ -124,13 +124,13 @@ export const TransporterRegisterModal: React.FC<TransporterRegisterModalProps> =
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-5">
           
-          {/* SafeBoda Trust Notification Banner */}
-          <div className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-start gap-3 text-xs text-amber-200">
-            <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400 shrink-0 mt-0.5">
+          {/* Bank-Grade Trust Notification Banner */}
+          <div className="p-3.5 bg-purple-500/10 border border-purple-500/30 rounded-xl flex items-start gap-3 text-xs text-purple-200">
+            <div className="p-1.5 rounded-lg bg-purple-500/20 text-[#b388ff] shrink-0 mt-0.5">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
-              <strong className="text-amber-300 font-bold block">SafeBoda-Grade Trust Verification Required</strong>
+              <strong className="text-purple-300 font-bold block">Bank-Grade Trust Verification Required</strong>
               <span>
                 To stop scammers, cargo theft, and build unshakeable client trust, Super Admin Mark Sentongo verifies your <strong>National ID + Truck Logbook + Truck Photo</strong> in the Admin Tab before you can place bids.
               </span>
@@ -246,12 +246,12 @@ export const TransporterRegisterModal: React.FC<TransporterRegisterModalProps> =
             </div>
           </div>
 
-          {/* Section 2: SafeBoda KYC Uploads (National ID + Truck Logbook + Photo of truck + Driving Permit) */}
+          {/* Section 2: Bank-Grade KYC Uploads (National ID + Truck Logbook + Photo of truck + Driving Permit) */}
           <div className="bg-[#0f1c2e] p-4 rounded-xl border border-white/10 space-y-3.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-orange-400" />
-                2. Mandatory SafeBoda KYC Trust Documents
+                2. Mandatory Bank-Grade KYC Trust Documents
               </span>
               <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                 Anti-Scammer Defense
@@ -410,7 +410,7 @@ export const TransporterRegisterModal: React.FC<TransporterRegisterModalProps> =
           <div className="pt-2 flex items-center justify-between border-t border-white/10">
             <div className="text-[11px] text-white/50 flex items-center gap-1">
               <Lock className="w-3.5 h-3.5 text-emerald-400" />
-              <span>SafeBoda-level encryption</span>
+              <span>Bank-Grade encryption</span>
             </div>
 
             <div className="flex items-center gap-3">

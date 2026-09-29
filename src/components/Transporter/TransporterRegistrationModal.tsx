@@ -127,7 +127,7 @@ export const TransporterRegistrationModal: React.FC<TransporterRegistrationModal
       rating: 5.0,
       totalTrips: 0,
       loyaltyPoints: 100,
-      badges: ['New Carrier', 'SafeBoda Verified Candidate'],
+      badges: ['New Carrier', 'Bank-Grade Verified Candidate'],
       kycStatus: 'pending',
       nin: nin.toUpperCase(),
       handles20ftContainer: canHandle20ft,
@@ -179,8 +179,8 @@ export const TransporterRegistrationModal: React.FC<TransporterRegistrationModal
             <div>
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 <span>Transporter Registration &amp; Vehicle Capabilities</span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] bg-orange-500 text-black font-extrabold uppercase">
-                  SafeBoda Trust
+                <span className="px-2 py-0.5 rounded-full text-[10px] bg-purple-500/20 text-[#b388ff] border border-purple-500/40 font-extrabold uppercase">
+                  Bank-Grade KYC
                 </span>
               </h3>
               <p className="text-xs text-white/60">
@@ -371,7 +371,7 @@ export const TransporterRegistrationModal: React.FC<TransporterRegistrationModal
             </div>
           </div>
 
-          {/* Section: SafeBoda Trust Documents */}
+          {/* Section: Bank-Grade Trust Documents */}
           <div className="bg-[#0f1c2e] p-4 rounded-xl border border-white/10 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center gap-1.5">

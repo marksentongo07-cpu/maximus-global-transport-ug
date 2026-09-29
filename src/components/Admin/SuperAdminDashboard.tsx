@@ -149,19 +149,19 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
   return (
     <div className="space-y-6">
       
-      {/* SafeBoda KYC Verification Alert for Pending Transporters */}
+      {/* Bank-Grade KYC Verification Alert for Pending Transporters */}
       {pendingKYCTransporters.length > 0 && (
-        <div className="p-4 bg-gradient-to-r from-amber-500/20 via-[#1a2a3f] to-[#1a2a3f] border-2 border-amber-500/50 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-xl animate-pulse">
+        <div className="p-4 bg-gradient-to-r from-purple-500/20 via-[#1a2a3f] to-[#1a2a3f] border-2 border-purple-500/50 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-xl animate-pulse">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-amber-500 text-slate-950 rounded-xl font-black shrink-0">
+            <div className="p-2.5 bg-[#6A0DAD] text-white rounded-xl font-black shrink-0 shadow-lg shadow-purple-900/50">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-amber-300 text-sm">
-                  ⚠️ SafeBoda Trust Gate: {pendingKYCTransporters.length} Transporter(s) Awaiting KYC Verification
+                <span className="font-extrabold text-[#b388ff] text-sm">
+                  ⚠️ Bank-Grade Trust Gate: {pendingKYCTransporters.length} Transporter(s) Awaiting Enterprise KYC Verification
                 </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-500 text-black">
+                <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-purple-500 text-white">
                   Action Required
                 </span>
               </div>
@@ -432,10 +432,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                 <ShieldCheck className="w-4 h-4 text-amber-400" />
               </div>
               <div className="text-xl font-black text-amber-400 font-mono">
-                10.0% Fixed
+                8.0% Fixed
               </div>
               <div className="text-[10px] text-emerald-400 font-semibold">
-                100% Escrow safe settlement rate
+                100% TrustVault settlement rate
               </div>
             </div>
 

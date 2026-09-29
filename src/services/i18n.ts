@@ -139,15 +139,15 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     trailingCommission: 'Trailing 6-Mo Commission',
     avgCommissionLoad: 'Avg Commission / Load',
     takeRate: 'Platform Take-Rate',
-    escrowSettlementRate: '100% Escrow safe settlement rate',
+    escrowSettlementRate: '100% TrustVault settlement rate',
     monthlyGrossVsCommission: 'Monthly Gross Volume vs. Maximus Net Commission (6-Month Trend)',
     grossVolume: 'Gross Transacted Volume',
-    platformCommission: '10% Platform Commission',
+    platformCommission: '8% Platform Commission',
     paymentGatewayDistribution: 'Payment Settlement Gateway Distribution',
     topCorridors: 'Top Grossing Freight Corridors',
     corridor: 'Freight Corridor',
     volumeTransacted: 'Volume Transacted',
-    maximusFeeEarned: 'Maximus 10% Fee',
+    maximusFeeEarned: 'Maximus 8% Fee',
     liveAuditNote: 'Live automated escrow transaction reconciliation with central ledger',
 
     // Radar / Map

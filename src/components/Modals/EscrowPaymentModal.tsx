@@ -85,7 +85,7 @@ export const EscrowPaymentModal: React.FC<EscrowPaymentModalProps> = ({
             </div>
             <div>
               <h3 className="text-base font-bold text-white">Maximus Safe Escrow Checkout</h3>
-              <p className="text-xs text-slate-400">Funds held securely until verified safe delivery</p>
+              <p className="text-xs text-slate-400">Funds held securely in TrustVault until verified Vault Secured Delivery</p>
             </div>
           </div>
           <button

@@ -458,7 +458,7 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
               Rate Transporter Performance
             </h3>
             <p className="text-xs text-slate-400">
-              Your rating establishes carrier trust badges and awards safe delivery loyalty points.
+              Your rating establishes carrier trust badges and awards Vault Secured Delivery loyalty points.
             </p>
 
             <div className="flex items-center justify-center gap-2 py-2">

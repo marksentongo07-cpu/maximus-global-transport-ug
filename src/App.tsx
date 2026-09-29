@@ -101,7 +101,7 @@ export default function App() {
     },
     {
       id: 'notif-3',
-      title: 'Safe Delivery Confirmed #job-ug-103',
+      title: 'Vault Secured Delivery Confirmed #job-ug-103',
       desc: 'Sarah Nakitende completed 12T Dairy run. 2,115,000 UGX escrow released.',
       time: '2h ago',
       read: true,
@@ -190,7 +190,7 @@ export default function App() {
       rating: 5.0,
       totalTrips: 0,
       loyaltyPoints: 100,
-      badges: ['New Carrier', 'SafeBoda KYC Applicant'],
+      badges: ['New Carrier', 'Bank-Grade KYC Applicant'],
       kycStatus: 'pending',
       nin: tData.nin,
       kycDocs: {
@@ -999,7 +999,7 @@ export default function App() {
         />
       )}
 
-      {/* 11. Card 2 - Transporter Registration & SafeBoda KYC Modal */}
+      {/* 11. Card 2 - Transporter Registration & Bank-Grade KYC Modal */}
       {showTransporterRegisterModal && (
         <TransporterRegisterModal
           onClose={() => setShowTransporterRegisterModal(false)}

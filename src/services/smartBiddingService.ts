@@ -265,7 +265,7 @@ export function generateLocalSmartBiddingAnalysis(
     ? `Nsaba tulung’amye ku ${balancedPrice.toLocaleString()} UGX. Tuwa obukuumi bw’emmwanyi/ebyamaguzi n'okutuusa ku ssaawa nga bwe twalaga.`
     : isSw
     ? `Napendekeza kiwango cha ushindani cha UGX ${balancedPrice.toLocaleString()} kinachojumuisha ulinzi kamili, bima na ufuatiliaji wa satelaiti.`
-    : `Greetings. Based on verified historical corridor rates and our 100% on-time record, I offer ${balancedPrice.toLocaleString()} UGX all-inclusive with Maximus Escrow protection. Ready for dispatch on schedule.`;
+    : `Greetings. Based on verified historical corridor rates and our 100% on-time record, I offer ${balancedPrice.toLocaleString()} UGX all-inclusive with Maximus TrustVault protection. Ready for dispatch on schedule.`;
 
   const premiumMsg = isLg
     ? `Bwe kiba ekyetaagisa mangu n'obukuumi obw'enjawulo, tulina ebyuma eby'omulembe ku ${premiumPrice.toLocaleString()} UGX.`

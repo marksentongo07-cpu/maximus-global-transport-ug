@@ -239,7 +239,7 @@ export const ProofOfDeliveryModal: React.FC<ProofOfDeliveryModalProps> = ({
           <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-2.5 text-xs text-amber-300">
             <Award className="w-5 h-5 text-amber-400 shrink-0" />
             <div>
-              <span className="font-bold">Transporter Reward:</span> Confirmed delivery triggers +150 Loyalty Points and Safe Delivery Badge for this transporter!
+              <span className="font-bold">Transporter Reward:</span> Confirmed delivery triggers +150 Loyalty Points and Vault Secured Delivery Badge for this transporter!
             </div>
           </div>
 

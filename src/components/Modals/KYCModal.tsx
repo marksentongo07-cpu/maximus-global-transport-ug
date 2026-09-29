@@ -41,8 +41,8 @@ export const KYCModal: React.FC<KYCModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-base font-bold text-white">SafeBoda-Grade KYC Audit</span>
-                <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                <span className="text-base font-bold text-white">Bank-Grade KYC Audit</span>
+                <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase bg-purple-500/20 text-[#b388ff] border border-purple-500/40">
                   Trust Vault
                 </span>
               </div>
@@ -67,7 +67,7 @@ export const KYCModal: React.FC<KYCModalProps> = ({
                 {isVerified ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span>SafeBoda Trust Approved (Bidding Enabled)</span>
+                    <span>Bank-Grade Trust Approved (Bidding Enabled)</span>
                   </>
                 ) : (
                   <>
@@ -99,7 +99,7 @@ export const KYCModal: React.FC<KYCModalProps> = ({
             </span>
           </div>
 
-          {/* 4 Mandatory Carrier Documents Required for SafeBoda Trust */}
+          {/* 4 Mandatory Carrier Documents Required for Bank-Grade Trust */}
           <div className="space-y-2.5">
             <div className="font-bold text-white flex items-center justify-between">
               <span>Mandatory Anti-Fraud Documents:</span>
@@ -178,7 +178,7 @@ export const KYCModal: React.FC<KYCModalProps> = ({
             <div className="text-[11px] text-white/70">
               <span className="font-bold text-white block">Inspection Unit: {transporter.vehicles[0]?.name || 'Mitsubishi Fuso Fighter'}</span>
               <span>Plate: <strong className="text-orange-400 font-mono">{transporter.vehicles[0]?.plateNumber || 'UBD 842K'}</strong></span>
-              <span className="block text-[10px] text-white/50">SafeBoda trust standard stops cargo theft &amp; scammers</span>
+              <span className="block text-[10px] text-white/50">Bank-Grade trust standard stops cargo theft &amp; scammers</span>
             </div>
           </div>
 

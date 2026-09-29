@@ -1028,19 +1028,19 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
             </div>
           )}
 
-          {/* SafeBoda Trust Gate Warning Banner (if driver KYC pending) */}
+          {/* Bank-Grade Trust Gate Warning Banner (if driver KYC pending) */}
           {transporter.kycStatus !== 'verified' && (
-            <div className="p-4 bg-gradient-to-r from-amber-500/15 via-[#1a2a3f] to-[#1a2a3f] border border-amber-500/40 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-lg">
+            <div className="p-4 bg-gradient-to-r from-purple-500/15 via-[#1a2a3f] to-[#1a2a3f] border border-purple-500/40 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-lg">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-amber-500 text-slate-950 rounded-xl font-black shrink-0">
+                <div className="p-2.5 bg-[#6A0DAD] text-white rounded-xl font-black shrink-0 shadow-lg shadow-purple-900/50">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-amber-300 text-sm">
-                      🛡️ SafeBoda-Style KYC Verification: Pending Super Admin Approval
+                    <span className="font-extrabold text-[#b388ff] text-sm">
+                      🛡️ Bank-Grade Enterprise KYC Verification: Pending Super Admin Approval
                     </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/40">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-purple-500/20 text-[#b388ff] border border-purple-500/40">
                       Anti-Scam Gate
                     </span>
                   </div>
@@ -1486,7 +1486,7 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
         </div>
       )}
 
-      {/* SafeBoda Trust Gate Modal when driver tries to bid with pending KYC */}
+      {/* Bank-Grade Trust Gate Modal when driver tries to bid with pending KYC */}
       {showTrustGateModal && (
         <SafeBodaTrustPromptModal
           transporter={transporter}

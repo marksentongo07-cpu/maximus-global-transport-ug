@@ -2,6 +2,7 @@ import React from 'react';
 import { 
   Package, 
   Truck, 
+  Container,
   ShieldCheck, 
   Coins, 
   ArrowRight, 
@@ -54,7 +55,7 @@ export const DualHeroCards: React.FC<DualHeroCardsProps> = ({
                 <span>I NEED A TRUCK</span>
               </h2>
               <p className="text-[14px] text-white/70 leading-6 mt-1.5">
-                Ship cargo anywhere across Uganda &amp; East Africa. Receive verified transporter bids within 5 minutes with guaranteed escrow protection.
+                Ship cargo anywhere across Uganda &amp; East Africa. Receive verified transporter bids within 5 minutes with guaranteed TrustVault protection.
               </p>
             </div>
 
@@ -77,7 +78,7 @@ export const DualHeroCards: React.FC<DualHeroCardsProps> = ({
               </div>
 
               <div className="bg-[#0f1c2e]/80 border border-white/5 rounded-xl p-2.5">
-                <div className="text-[11px] text-white/50 uppercase font-semibold">SafeBoda Trust</div>
+                <div className="text-[11px] text-white/50 uppercase font-semibold">Bank-Grade Trust</div>
                 <div className="text-xs font-bold text-white mt-0.5 flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
                   NIN &amp; Logbook
@@ -103,75 +104,95 @@ export const DualHeroCards: React.FC<DualHeroCardsProps> = ({
           </div>
         </div>
 
-        {/* CARD 2: I HAVE A TRUCK (Transporter) */}
-        <div className="group relative bg-[#1a2a3f] border border-white/10 hover:border-orange-500/50 rounded-2xl p-6 sm:p-7 shadow-xl backdrop-blur flex flex-col justify-between transition-all duration-300 overflow-hidden">
-          {/* Subtle Ambient Background Gradient */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20 group-hover:bg-orange-500/20 transition-all" />
-          
+        {/* CARD 2: FLEET PARTNER (Transporter) */}
+        <div 
+          className="group relative rounded-2xl p-6 sm:p-7 backdrop-blur flex flex-col justify-between transition-all duration-300 overflow-hidden bg-gradient-to-br from-[#0A1931] via-[#0D1E3A] to-[#121824] border border-[rgba(201,168,106,0.2)] hover:border-[rgba(201,168,106,0.4)]"
+          style={{
+            boxShadow: '0 8px 32px rgba(106,13,173,0.12)',
+          }}
+        >
+          {/* Subtle Ambient Background Gradient with Purple & Gold Accents */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#6A0DAD]/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20 group-hover:bg-[#6A0DAD]/20 transition-all" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#C9A86A]/5 rounded-full blur-2xl pointer-events-none -ml-10 -mb-10" />
+
           <div className="relative z-10 space-y-4">
-            {/* Top Badge & Identifier */}
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                <Truck className="w-3.5 h-3.5 text-orange-400" />
-                <span>Card 2 · Transporter &amp; Fleet</span>
+            {/* Top Badges */}
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[#0A1931] text-[#C9A86A] border border-[#C9A86A]/30 shadow-sm">
+                <Container className="w-3.5 h-3.5 text-[#C9A86A]" />
+                <span>FLEET PARTNER</span>
               </span>
-              <span className="text-[11px] font-semibold text-amber-300 flex items-center gap-1 bg-amber-500/15 px-2 py-0.5 rounded-full border border-amber-500/30">
-                <ShieldCheck className="w-3 h-3 text-amber-400" />
-                SafeBoda-Grade KYC
+
+              <span className="text-[11px] font-semibold flex items-center gap-1.5 px-3 py-1 rounded-full bg-[rgba(106,13,173,0.15)] text-[#b388ff] border border-[#6A0DAD]/40 shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#6A0DAD] animate-pulse"></span>
+                <ShieldCheck className="w-3.5 h-3.5 text-[#b388ff]" />
+                <span>Bank-Grade KYC</span>
               </span>
             </div>
 
             {/* Card Title & Headline */}
             <div>
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2">
+              <h2 className="text-2xl sm:text-3xl font-[800] text-[#F8FAFC] tracking-[1px] flex items-center gap-2">
                 <span>I HAVE A TRUCK</span>
               </h2>
-              <p className="text-[14px] text-white/70 leading-6 mt-1.5">
-                Keep your trucks moving. Bid on active freight loads across Uganda, get instant escrow protection, and guaranteed payouts to your Mobile Money or Bank.
+              <p className="text-[14px] text-white/80 leading-6 mt-1.5 font-normal">
+                Keep your fleet earning. Bid on verified freight across Uganda - Mombasa to Gulu - secured by TrustVault, with guaranteed settlement to Mobile Money or Bank. From saloon to 40ft container.
               </p>
             </div>
 
-            {/* Key Value Highlights */}
+            {/* Bottom 3 Tabs: LIVE LOADS | TrustVault SETTLEMENT | VERIFIED ID - with purple underline active state */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2">
-              <div className="bg-[#0f1c2e]/80 border border-white/5 rounded-xl p-2.5">
-                <div className="text-[11px] text-white/50 uppercase font-semibold">Active Loads</div>
-                <div className="text-xs font-bold text-white mt-0.5 flex items-center gap-1">
-                  <Navigation className="w-3.5 h-3.5 text-orange-400" />
-                  3+ Loads Near You
+              <div className="bg-[#0A1931]/90 border border-white/5 rounded-xl p-3 relative group/tab hover:border-[#6A0DAD]/40 transition-colors">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#C9A86A] flex items-center gap-1">
+                  <Navigation className="w-3.5 h-3.5 text-[#C9A86A]" />
+                  <span>LIVE LOADS</span>
                 </div>
+                <div className="text-xs font-bold text-white mt-1">
+                  12+ Active Corridors
+                </div>
+                {/* Purple underline active state */}
+                <div className="mt-2.5 h-[2px] w-full bg-[#6A0DAD] rounded-full shadow-[0_0_8px_rgba(106,13,173,0.6)]"></div>
               </div>
 
-              <div className="bg-[#0f1c2e]/80 border border-white/5 rounded-xl p-2.5">
-                <div className="text-[11px] text-white/50 uppercase font-semibold">Safe Settlement</div>
-                <div className="text-xs font-bold text-white mt-0.5 flex items-center gap-1">
-                  <Coins className="w-3.5 h-3.5 text-emerald-400" />
-                  Till 031801
+              <div className="bg-[#0A1931]/90 border border-white/5 rounded-xl p-3 relative group/tab hover:border-[#6A0DAD]/40 transition-colors">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#C9A86A] flex items-center gap-1">
+                  <Coins className="w-3.5 h-3.5 text-[#C9A86A]" />
+                  <span>TrustVault SETTLEMENT</span>
                 </div>
+                <div className="text-xs font-bold text-white mt-1">
+                  Guaranteed Payout
+                </div>
+                {/* Purple underline active state */}
+                <div className="mt-2.5 h-[2px] w-full bg-[#6A0DAD] rounded-full shadow-[0_0_8px_rgba(106,13,173,0.6)]"></div>
               </div>
 
-              <div className="bg-[#0f1c2e]/80 border border-white/5 rounded-xl p-2.5">
-                <div className="text-[11px] text-white/50 uppercase font-semibold">Verification</div>
-                <div className="text-xs font-bold text-white mt-0.5 flex items-center gap-1">
-                  <FileCheck className="w-3.5 h-3.5 text-amber-400" />
-                  ID + Logbook
+              <div className="bg-[#0A1931]/90 border border-white/5 rounded-xl p-3 relative group/tab hover:border-[#6A0DAD]/40 transition-colors">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#C9A86A] flex items-center gap-1">
+                  <FileCheck className="w-3.5 h-3.5 text-[#C9A86A]" />
+                  <span>VERIFIED ID</span>
                 </div>
+                <div className="text-xs font-bold text-white mt-1">
+                  Logbook + NIN
+                </div>
+                {/* Purple underline active state */}
+                <div className="mt-2.5 h-[2px] w-full bg-[#6A0DAD] rounded-full shadow-[0_0_8px_rgba(106,13,173,0.6)]"></div>
               </div>
             </div>
           </div>
 
           {/* Action Button Area */}
-          <div className="relative z-10 pt-6 mt-4 border-t border-white/10">
+          <div className="relative z-10 pt-6 mt-4 border-t border-[rgba(201,168,106,0.15)]">
             <button
               type="button"
               onClick={onFindLoadsClick}
-              className="w-full py-4 px-6 bg-orange-500 hover:bg-orange-400 active:scale-[0.99] text-black font-extrabold rounded-xl shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2.5 text-base transition-all group-hover:shadow-orange-500/40"
+              className="w-full py-4 px-6 bg-gradient-to-r from-[#C9A86A] via-[#dfba73] to-[#C9A86A] hover:brightness-105 active:scale-[0.99] text-[#0A1931] font-[800] rounded-xl shadow-lg shadow-[#C9A86A]/20 flex items-center justify-center gap-2.5 text-base transition-all group-hover:shadow-[0_4px_24px_rgba(106,13,173,0.25)]"
             >
-              <Truck className="w-5 h-5 text-black" />
+              <Container className="w-5 h-5 text-[#0A1931]" />
               <span>Find Loads &amp; Bid</span>
-              <ArrowRight className="w-5 h-5 text-black group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-5 h-5 text-[#0A1931] group-hover:translate-x-1 transition-transform" />
             </button>
-            <p className="text-[11px] text-white/50 text-center mt-2">
-              Register truck type, number plate &amp; NIN with SafeBoda KYC to unlock bidding.
+            <p className="text-[11px] text-white/60 text-center mt-2">
+              From saloon cars to 40ft container haulers — verified with Bank-Grade KYC.
             </p>
           </div>
         </div>
