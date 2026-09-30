@@ -15,7 +15,8 @@ import {
   UserCircle2,
   CheckCircle2,
   FileText,
-  Check
+  Check,
+  Package
 } from 'lucide-react';
 import { UserRole, Currency, Language } from '../types';
 import { formatMoney } from '../services/currency';
@@ -115,93 +116,110 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
 
-        {/* Zone 2: Navigation Tabs - Icons added, active bg-orange-500 text-black rounded-full px-5 py-2 font-bold, inactive text-white/60, 8px gap */}
+        {/* Zone 2: Navigation Tabs - Strictly filtered per user role */}
         <nav className="relative z-10 hidden lg:flex items-center gap-[8px] text-[14px]">
-          <button 
-            onClick={() => onTabChange('dashboard')}
-            className={`transition-all whitespace-nowrap flex items-center gap-2 ${
-              activeTab === 'dashboard' 
-                ? 'bg-orange-500 text-black rounded-full px-5 py-2 font-bold shadow-md' 
-                : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
-            }`}
-          >
-            <Shield className="w-4 h-4 shrink-0" />
-            <span>
-              {currentRole === 'client' 
-                ? t('shipmentsAndLoads', language) 
-                : currentRole === 'transporter' 
-                ? t('driverConsole', language) 
-                : 'Admin'}
-            </span>
-          </button>
+          {currentRole === 'client' ? (
+            /* CLIENT SEES ONLY: GPS Radar (his truck only) | My Jobs | Post Cargo | Disputes */
+            <>
+              <button 
+                onClick={() => onTabChange('gps_radar')}
+                className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === 'gps_radar' || activeTab === 'map'
+                    ? 'bg-[#C9A86A] text-[#0A1931] rounded-full px-5 py-2 font-bold shadow-md' 
+                    : 'text-white/70 hover:text-white rounded-full px-4 py-2 font-medium'
+                }`}
+              >
+                <Satellite className="w-4 h-4 shrink-0 text-amber-400" />
+                <span>GPS Radar (My Truck Only)</span>
+              </button>
 
-          <button 
-            onClick={() => onTabChange('icds')}
-            className={`transition-all whitespace-nowrap flex items-center gap-2 ${
-              activeTab === 'icds' 
-                ? 'bg-orange-500 text-black rounded-full px-5 py-2 font-bold shadow-md' 
-                : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
-            }`}
-          >
-            <Warehouse className="w-4 h-4 shrink-0" />
-            <span>ICDs</span>
-            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-              activeTab === 'icds' ? 'bg-black/20 text-black' : 'bg-slate-700 text-white'
-            }`}>
-              6 Hubs
-            </span>
-          </button>
+              <button 
+                onClick={() => onTabChange('dashboard')}
+                className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === 'dashboard' || activeTab === 'my_jobs'
+                    ? 'bg-[#C9A86A] text-[#0A1931] rounded-full px-5 py-2 font-bold shadow-md' 
+                    : 'text-white/70 hover:text-white rounded-full px-4 py-2 font-medium'
+                }`}
+              >
+                <Shield className="w-4 h-4 shrink-0" />
+                <span>My Jobs</span>
+              </button>
 
-          <button 
-            onClick={() => onTabChange('map')}
-            className={`transition-all whitespace-nowrap flex items-center gap-2 ${
-              activeTab === 'map' 
-                ? 'bg-orange-500 text-black rounded-full px-5 py-2 font-bold shadow-md' 
-                : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
-            }`}
-          >
-            <Satellite className="w-4 h-4 shrink-0 text-amber-400" />
-            <span className="flex items-center gap-1.5">
-              <span>Live GPS Map</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-            </span>
-          </button>
+              <button 
+                onClick={onOpenPostJob}
+                className="transition-all whitespace-nowrap flex items-center gap-2 bg-gradient-to-r from-[#C9A86A] to-[#a88748] hover:from-[#d6b77c] hover:to-[#b79653] text-[#0A1931] rounded-full px-5 py-2 font-extrabold shadow-md shadow-[#C9A86A]/20"
+              >
+                <Package className="w-4 h-4 shrink-0" />
+                <span>Post Cargo</span>
+              </button>
 
-          <button 
-            onClick={() => onTabChange('pricing')}
-            className={`transition-all whitespace-nowrap flex items-center gap-2 ${
-              activeTab === 'pricing' 
-                ? 'bg-orange-500 text-black rounded-full px-5 py-2 font-bold shadow-md' 
-                : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
-            }`}
-          >
-            <Coins className="w-4 h-4 shrink-0 text-amber-400" />
-            <span>Pricing</span>
-          </button>
+              <button 
+                onClick={() => onTabChange('disputes')}
+                className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === 'disputes' 
+                    ? 'bg-[#C9A86A] text-[#0A1931] rounded-full px-5 py-2 font-bold shadow-md' 
+                    : 'text-white/70 hover:text-white rounded-full px-4 py-2 font-medium'
+                }`}
+              >
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>Disputes</span>
+              </button>
+            </>
+          ) : (
+            /* TRANSPORTER SEES ONLY: Available Loads | My Bids | GPS Tracking | Disputes */
+            <>
+              <button 
+                onClick={() => onTabChange('dashboard')}
+                className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === 'dashboard' || activeTab === 'available_loads'
+                    ? 'bg-[#C9A86A] text-[#0A1931] rounded-full px-5 py-2 font-bold shadow-md' 
+                    : 'text-white/70 hover:text-white rounded-full px-4 py-2 font-medium'
+                }`}
+              >
+                <Shield className="w-4 h-4 shrink-0" />
+                <span>Available Loads</span>
+              </button>
 
-          <button 
-            onClick={() => onTabChange('services')}
-            className={`transition-all whitespace-nowrap flex items-center gap-2 ${
-              activeTab === 'services' 
-                ? 'bg-orange-500 text-black rounded-full px-5 py-2 font-bold shadow-md' 
-                : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
-            }`}
-          >
-            <Truck className="w-4 h-4 shrink-0" />
-            <span>Service</span>
-          </button>
+              <button 
+                onClick={() => onTabChange('my_bids')}
+                className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === 'my_bids' 
+                    ? 'bg-[#C9A86A] text-[#0A1931] rounded-full px-5 py-2 font-bold shadow-md' 
+                    : 'text-white/70 hover:text-white rounded-full px-4 py-2 font-medium'
+                }`}
+              >
+                <Coins className="w-4 h-4 shrink-0 text-amber-400" />
+                <span>My Bids</span>
+              </button>
 
-          <button 
-            onClick={() => onTabChange('disputes')}
-            className={`transition-all whitespace-nowrap flex items-center gap-2 ${
-              activeTab === 'disputes' 
-                ? 'bg-orange-500 text-black rounded-full px-5 py-2 font-bold shadow-md' 
-                : 'text-white/60 hover:text-white rounded-full px-4 py-2 font-medium'
-            }`}
-          >
-            <AlertTriangle className="w-4 h-4 shrink-0" />
-            <span>Dispute</span>
-          </button>
+              <button 
+                onClick={() => onTabChange('gps_tracking')}
+                className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === 'gps_tracking' || activeTab === 'map'
+                    ? 'bg-[#C9A86A] text-[#0A1931] rounded-full px-5 py-2 font-bold shadow-md' 
+                    : 'text-white/70 hover:text-white rounded-full px-4 py-2 font-medium'
+                }`}
+              >
+                <Satellite className="w-4 h-4 shrink-0 text-amber-400" />
+                <span className="flex items-center gap-1.5">
+                  <span>GPS Tracking</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                </span>
+              </button>
+
+              <button 
+                onClick={() => onTabChange('disputes')}
+                className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === 'disputes' 
+                    ? 'bg-[#C9A86A] text-[#0A1931] rounded-full px-5 py-2 font-bold shadow-md' 
+                    : 'text-white/70 hover:text-white rounded-full px-4 py-2 font-medium'
+                }`}
+              >
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>Disputes</span>
+              </button>
+            </>
+          )}
         </nav>
 
         {/* Zone 3: Actions & Controls - reduced orange, slate-700 bg with white text */}
@@ -357,13 +375,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               <UserCircle2 className="w-4 h-4 text-white" />
               <div className="text-left hidden sm:block">
                 <div className="text-[11px] font-bold text-white leading-tight flex items-center gap-1">
-                  <span>{currentRole === 'admin' ? t('superAdminOwner', language).split(' ')[0] : currentRole === 'client' ? t('clientAccount', language).split(' ')[0] : t('transporterPortal', language).split(' ')[0]}</span>
-                  {userEmail === 'marksentongo07@gmail.com' && currentRole === 'admin' && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Auto Root Super Admin"></span>
-                  )}
+                  <span>{currentRole === 'client' ? t('clientAccount', language).split(' ')[0] : t('transporterPortal', language).split(' ')[0]}</span>
                 </div>
                 <div className="text-[9px] text-white/60 leading-none">
-                  {userEmail === 'marksentongo07@gmail.com' && currentRole === 'admin' ? 'Root Super Admin' : t('switchRole', language)}
+                  {t('switchRole', language)}
                 </div>
               </div>
               <ChevronDown className="w-3 h-3 text-white/60" />
@@ -371,44 +386,29 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {showRoleMenu && (
               <div className="absolute right-0 top-full mt-2 z-[200] w-72 bg-[#1a2a3f] border border-white/10 rounded-2xl shadow-xl backdrop-blur p-2 text-white">
-                {userEmail === 'marksentongo07@gmail.com' && (
-                  <div className="mb-2 p-2 bg-slate-800 border border-white/10 rounded-xl text-xs">
-                    <span className="text-[10px] font-bold uppercase text-white/80 block tracking-wider">
-                      Auto Root Super Admin
-                    </span>
-                    <span className="text-[11px] text-white font-mono break-all font-semibold">
-                      {userEmail}
-                    </span>
-                  </div>
-                )}
                 <div className="text-[10px] font-bold uppercase tracking-wider text-white/50 px-3 py-1">
                   {t('activeRole', language)}
                 </div>
-                {(['client', 'transporter', 'admin'] as UserRole[]).map((r) => (
+                {(['client', 'transporter'] as UserRole[]).map((r) => (
                   <button
                     key={r}
                     onClick={() => { onRoleChange(r); setShowRoleMenu(false); }}
                     className={`w-full p-2.5 rounded-xl text-left transition-colors flex items-start gap-2.5 mt-1 ${
-                      currentRole === r ? 'bg-orange-500 text-black font-bold shadow-md' : 'hover:bg-slate-700 text-white/80'
+                      currentRole === r ? 'bg-[#C9A86A] text-[#0A1931] font-bold shadow-md' : 'hover:bg-slate-700 text-white/80'
                     }`}
                   >
                     <div className="mt-0.5">
                       {currentRole === r ? (
-                        <CheckCircle2 className="w-4 h-4 text-black" />
+                        <CheckCircle2 className="w-4 h-4 text-[#0A1931]" />
                       ) : (
                         <div className="w-4 h-4 rounded-full border border-white/30" />
                       )}
                     </div>
                     <div>
-                      <div className={`text-xs font-semibold flex items-center gap-1.5 ${currentRole === r ? 'text-black' : 'text-white'}`}>
+                      <div className={`text-xs font-semibold flex items-center gap-1.5 ${currentRole === r ? 'text-[#0A1931]' : 'text-white'}`}>
                         <span>{roleLabels[r].title}</span>
-                        {r === 'admin' && userEmail === 'marksentongo07@gmail.com' && (
-                          <span className={`text-[9px] px-1 py-0.2 rounded font-mono ${currentRole === r ? 'bg-black/20 text-black font-bold' : 'bg-emerald-500/20 text-emerald-400'}`}>
-                            Auto
-                          </span>
-                        )}
                       </div>
-                      <div className={`text-[11px] ${currentRole === r ? 'text-black/80' : 'text-white/60'}`}>{roleLabels[r].subtitle}</div>
+                      <div className={`text-[11px] ${currentRole === r ? 'text-[#0A1931]/80' : 'text-white/60'}`}>{roleLabels[r].subtitle}</div>
                     </div>
                   </button>
                 ))}
@@ -420,91 +420,112 @@ export const Navbar: React.FC<NavbarProps> = ({
           {currentRole === 'client' && (
             <button
               onClick={onOpenPostJob}
-              className="hidden sm:inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-orange-500 hover:bg-orange-400 text-black font-bold text-xs shadow-md transition-all whitespace-nowrap"
+              className="hidden sm:inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-gradient-to-r from-[#C9A86A] to-[#a88748] hover:from-[#d6b77c] hover:to-[#b79653] text-[#0A1931] font-extrabold text-xs shadow-md shadow-[#C9A86A]/20 transition-all whitespace-nowrap"
             >
+              <Package className="w-4 h-4" />
               <span>{t('postCargo', language)}</span>
             </button>
           )}
-
         </div>
-
       </div>
 
-      {/* Mobile Secondary Tab Strip - Icons, active bg-orange-500 text-black rounded-full, 8px gap */}
+      {/* Mobile Secondary Tab Strip - Strictly Role Based */}
       <div className="relative z-10 lg:hidden flex items-center gap-[8px] border-t border-white/10 bg-[#0f1c2e]/95 px-4 py-2.5 text-xs overflow-x-auto scrollbar-none">
-        <button 
-          onClick={() => onTabChange('dashboard')} 
-          className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
-            activeTab === 'dashboard' 
-              ? 'bg-orange-500 text-black px-4 py-1.5 font-bold shadow-sm' 
-              : 'text-white/60 hover:text-white px-3 py-1.5'
-          }`}
-        >
-          <Shield className="w-3.5 h-3.5" />
-          <span>{currentRole === 'client' ? t('allLoads', language) : currentRole === 'transporter' ? t('driverConsole', language).split(' ')[0] : 'Admin'}</span>
-        </button>
-        <button 
-          onClick={() => onTabChange('icds')} 
-          className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
-            activeTab === 'icds' 
-              ? 'bg-orange-500 text-black px-4 py-1.5 font-bold shadow-sm' 
-              : 'text-white/60 hover:text-white px-3 py-1.5'
-          }`}
-        >
-          <Warehouse className="w-3.5 h-3.5" />
-          <span>ICDs</span>
-        </button>
-        <button 
-          onClick={() => onTabChange('map')} 
-          className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
-            activeTab === 'map' 
-              ? 'bg-orange-500 text-black px-4 py-1.5 font-bold shadow-sm' 
-              : 'text-white/60 hover:text-white px-3 py-1.5'
-          }`}
-        >
-          <Satellite className="w-3.5 h-3.5 text-amber-400" />
-          <span>Live GPS Map</span>
-        </button>
-        <button 
-          onClick={() => onTabChange('pricing')} 
-          className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
-            activeTab === 'pricing' 
-              ? 'bg-orange-500 text-black px-4 py-1.5 font-bold shadow-sm' 
-              : 'text-white/60 hover:text-white px-3 py-1.5'
-          }`}
-        >
-          <Coins className="w-3.5 h-3.5 text-amber-400" />
-          <span>Pricing</span>
-        </button>
-        <button 
-          onClick={() => onTabChange('services')} 
-          className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
-            activeTab === 'services' 
-              ? 'bg-orange-500 text-black px-4 py-1.5 font-bold shadow-sm' 
-              : 'text-white/60 hover:text-white px-3 py-1.5'
-          }`}
-        >
-          <Truck className="w-3.5 h-3.5" />
-          <span>Service</span>
-        </button>
-        <button 
-          onClick={() => onTabChange('disputes')} 
-          className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
-            activeTab === 'disputes' 
-              ? 'bg-orange-500 text-black px-4 py-1.5 font-bold shadow-sm' 
-              : 'text-white/60 hover:text-white px-3 py-1.5'
-          }`}
-        >
-          <AlertTriangle className="w-3.5 h-3.5" />
-          <span>Dispute</span>
-        </button>
-        {currentRole === 'client' && (
-          <button 
-            onClick={onOpenPostJob}
-            className="px-4 py-1.5 rounded-full bg-orange-500 text-black font-bold whitespace-nowrap shrink-0 shadow-sm"
-          >
-            {t('postCargo', language)}
-          </button>
+        {currentRole === 'client' ? (
+          <>
+            <button 
+              onClick={() => onTabChange('gps_radar')} 
+              className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+                activeTab === 'gps_radar' || activeTab === 'map'
+                  ? 'bg-[#C9A86A] text-[#0A1931] px-4 py-1.5 font-bold shadow-sm' 
+                  : 'text-white/70 hover:text-white px-3 py-1.5'
+              }`}
+            >
+              <Satellite className="w-3.5 h-3.5 text-amber-400" />
+              <span>GPS Radar</span>
+            </button>
+
+            <button 
+              onClick={() => onTabChange('dashboard')} 
+              className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+                activeTab === 'dashboard' || activeTab === 'my_jobs'
+                  ? 'bg-[#C9A86A] text-[#0A1931] px-4 py-1.5 font-bold shadow-sm' 
+                  : 'text-white/70 hover:text-white px-3 py-1.5'
+              }`}
+            >
+              <Shield className="w-3.5 h-3.5" />
+              <span>My Jobs</span>
+            </button>
+
+            <button 
+              onClick={onOpenPostJob}
+              className="px-4 py-1.5 rounded-full bg-gradient-to-r from-[#C9A86A] to-[#a88748] text-[#0A1931] font-bold whitespace-nowrap shrink-0 shadow-sm"
+            >
+              Post Cargo
+            </button>
+
+            <button 
+              onClick={() => onTabChange('disputes')} 
+              className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+                activeTab === 'disputes' 
+                  ? 'bg-[#C9A86A] text-[#0A1931] px-4 py-1.5 font-bold shadow-sm' 
+                  : 'text-white/70 hover:text-white px-3 py-1.5'
+              }`}
+            >
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>Disputes</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <button 
+              onClick={() => onTabChange('dashboard')} 
+              className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+                activeTab === 'dashboard' || activeTab === 'available_loads'
+                  ? 'bg-[#C9A86A] text-[#0A1931] px-4 py-1.5 font-bold shadow-sm' 
+                  : 'text-white/70 hover:text-white px-3 py-1.5'
+              }`}
+            >
+              <Shield className="w-3.5 h-3.5" />
+              <span>Available Loads</span>
+            </button>
+
+            <button 
+              onClick={() => onTabChange('my_bids')} 
+              className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+                activeTab === 'my_bids' 
+                  ? 'bg-[#C9A86A] text-[#0A1931] px-4 py-1.5 font-bold shadow-sm' 
+                  : 'text-white/70 hover:text-white px-3 py-1.5'
+              }`}
+            >
+              <Coins className="w-3.5 h-3.5 text-amber-400" />
+              <span>My Bids</span>
+            </button>
+
+            <button 
+              onClick={() => onTabChange('gps_tracking')} 
+              className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+                activeTab === 'gps_tracking' || activeTab === 'map'
+                  ? 'bg-[#C9A86A] text-[#0A1931] px-4 py-1.5 font-bold shadow-sm' 
+                  : 'text-white/70 hover:text-white px-3 py-1.5'
+              }`}
+            >
+              <Satellite className="w-3.5 h-3.5 text-amber-400" />
+              <span>GPS Tracking</span>
+            </button>
+
+            <button 
+              onClick={() => onTabChange('disputes')} 
+              className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+                activeTab === 'disputes' 
+                  ? 'bg-[#C9A86A] text-[#0A1931] px-4 py-1.5 font-bold shadow-sm' 
+                  : 'text-white/70 hover:text-white px-3 py-1.5'
+              }`}
+            >
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>Disputes</span>
+            </button>
+          </>
         )}
       </div>
     </header>

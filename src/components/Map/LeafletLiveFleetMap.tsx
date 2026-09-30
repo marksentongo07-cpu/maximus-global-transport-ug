@@ -29,7 +29,8 @@ import {
   Maximize2,
   RefreshCw,
   Zap,
-  MapPin
+  MapPin,
+  Globe
 } from 'lucide-react';
 import { formatMoney } from '../../services/currency';
 import { Language } from '../../types';
@@ -347,14 +348,32 @@ export const LeafletLiveFleetMap: React.FC<LeafletLiveFleetMapProps> = ({
           {/* Quick Action Buttons */}
           <div className="flex flex-wrap items-center gap-2">
             
-            {/* Center on My Fleet Button */}
+            {/* Center on Uganda Corridor (Default zoom 8) */}
             <button
-              onClick={handleCenterOnFleet}
+              onClick={() => {
+                setFollowedJobId(null);
+                setMapCenter([0.3476, 32.5825]);
+                setMapZoom(8);
+              }}
               className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/10 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-md"
-              title="Center map on Kampala Core (lat 0.3476, lng 32.5825)"
+              title="Default Uganda Corridor (lat 0.3476, lng 32.5825, zoom 8)"
             >
               <Compass className="w-3.5 h-3.5 text-orange-400" />
-              <span>Center on my fleet</span>
+              <span>Uganda Corridor</span>
+            </button>
+
+            {/* Worldwide View Button */}
+            <button
+              onClick={() => {
+                setFollowedJobId(null);
+                setMapCenter([15, 55]);
+                setMapZoom(3);
+              }}
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-md"
+              title="Worldwide View (Guangzhou, Mombasa, Kampala, Dubai)"
+            >
+              <Globe className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Worldwide View</span>
             </button>
 
             {/* Follow Truck Toggle */}

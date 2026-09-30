@@ -41,6 +41,7 @@ import { DualHeroCards } from './components/Home/DualHeroCards';
 import { ClientPostCargoModal } from './components/Modals/ClientPostCargoModal';
 import { TransporterRegisterModal } from './components/Modals/TransporterRegisterModal';
 import { PricingGuidePage } from './components/Pricing/PricingGuidePage';
+import { SecureAdminPortal } from './components/Admin/SecureAdminPortal';
 import { TutorialTooltip, TutorialTooltipData } from './components/Common/TutorialTooltip';
 import { 
   ShieldCheck, 
@@ -62,19 +63,60 @@ export default function App() {
     return () => window.removeEventListener('gmp-quota-exceeded', handleQuota);
   }, []);
 
-  // User Identification & Automatic Super Admin Rule
-  const CURRENT_USER_EMAIL = 'marksentongo07@gmail.com';
-  const isSuperAdminEmail = (email: string) => email.trim().toLowerCase() === 'marksentongo07@gmail.com';
-
-  // Application Global States - Automatically activate Super Admin for marksentongo07@gmail.com
-  const [currentUserEmail] = useState<string>(CURRENT_USER_EMAIL);
-  const [currentRole, setCurrentRole] = useState<UserRole>(() => {
-    return isSuperAdminEmail(CURRENT_USER_EMAIL) ? 'admin' : 'client';
+  // Secret Route & Server-Verified Super Admin State
+  const [isAdminPortalActive, setIsAdminPortalActive] = useState<boolean>(() => {
+    return typeof window !== 'undefined' && window.location.pathname.startsWith('/maximus-admin-2026-secure');
   });
+  const [isServerSuperAdmin, setIsServerSuperAdmin] = useState<boolean>(false);
+
+  // Default persona for regular users is client
+  const [currentUserEmail] = useState<string>('marksentongo07@gmail.com');
+  const [currentRole, setCurrentRole] = useState<UserRole>('client');
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [currency, setCurrency] = useState<Currency>('UGX');
   const [language, setLanguage] = useState<Language>('en');
   const [isOffline, setIsOffline] = useState(false);
+
+  // Check URL pathname and server-side authentication from httpOnly cookie
+  useEffect(() => {
+    const path = window.location.pathname;
+    // Block & redirect old admin routes to root "/"
+    if (
+      path === '/admin' || 
+      path.startsWith('/admin/') || 
+      path === '/super-admin' || 
+      path.startsWith('/super-admin/') || 
+      path === '/dashboard' || 
+      path.startsWith('/dashboard/')
+    ) {
+      window.history.replaceState({}, '', '/');
+    } else if (path.startsWith('/maximus-admin-2026-secure')) {
+      setIsAdminPortalActive(true);
+    }
+
+    const handlePopState = () => {
+      if (window.location.pathname.startsWith('/maximus-admin-2026-secure')) {
+        setIsAdminPortalActive(true);
+      } else {
+        setIsAdminPortalActive(false);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+
+    // Verify role server-side via /api/auth/me (never rely solely on client state)
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.authenticated && data.role === 'super_admin') {
+          setIsServerSuperAdmin(true);
+        } else {
+          setIsServerSuperAdmin(false);
+        }
+      })
+      .catch(() => setIsServerSuperAdmin(false));
+
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Entities
   const [icds, setIcds] = useState<ICD[]>(() => getStoredICDs());
@@ -577,6 +619,26 @@ export default function App() {
     addNotification('ICD Registry Updated', `Updated storage rates and GPS parameters for ${updated.length} ICDs.`);
   };
 
+  // If on the secret admin route /maximus-admin-2026-secure, render the Secure Admin Lockdown Portal
+  if (isAdminPortalActive) {
+    return (
+      <SecureAdminPortal
+        jobs={jobs}
+        transporters={transporters}
+        escrows={escrows}
+        disputes={disputes}
+        currency={currency}
+        language={language}
+        onCurrencyChange={setCurrency}
+        onInspectTransporter={(t) => setInspectKYCTransporter(t)}
+        onExitPortal={() => {
+          setIsAdminPortalActive(false);
+          window.history.replaceState({}, '', '/');
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#070F1A] text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950">
       
@@ -646,8 +708,10 @@ export default function App() {
       {/* Main Viewport Content */}
       <main className="relative z-[1] flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
         
-        {/* TAB 1: DASHBOARD VIEW (Switches based on active persona) */}
-        {activeTab === 'dashboard' && (
+        {/* TABS: STRICTLY CONTROLLED PER PERSONA (Client sees GPS Radar, My Jobs, Post Cargo, Disputes; Transporter sees Available Loads, My Bids, GPS Tracking, Disputes) */}
+
+        {/* 1. DASHBOARD / JOBS VIEW */}
+        {(activeTab === 'dashboard' || activeTab === 'my_jobs' || activeTab === 'available_loads' || activeTab === 'my_bids') && (
           <div className="space-y-6">
             
             {/* 2 Big Cards Side-by-Side: Card 1 (I NEED A TRUCK) + Card 2 (I HAVE A TRUCK) */}
@@ -682,7 +746,7 @@ export default function App() {
                 currency={currency}
                 language={language}
                 icds={icds}
-                userEmail={currentUserEmail}
+                userEmail="fleet@maximus.ug"
                 onUpdateJobStatus={handleUpdateJobStatus}
                 onSimulateGpsProgress={handleSimulateGps}
                 onOpenNegotiation={(j) => setActiveNegotiationJob(j)}
@@ -694,70 +758,29 @@ export default function App() {
                 onUpdatePayoutDetails={handleUpdateTransporterPayoutDetails}
                 onConfirmPODByAdmin={handleConfirmPODByAdmin}
                 onExecuteDriverPayout={handleExecuteDriverPayout}
-                onSwitchToAdminVerify={() => {
-                  setCurrentRole('admin');
-                  setActiveTab('dashboard');
-                }}
+                onSwitchToAdminVerify={() => {}}
                 onApproveDriverKYC={(tId) => handleUpdateKYCStatus(tId, 'verified')}
-              />
-            )}
-
-            {currentRole === 'admin' && (
-              <SuperAdminDashboard
-                allJobs={jobs}
-                transporters={transporters}
-                escrows={escrows}
-                disputes={disputes}
-                currency={currency}
-                language={language}
-                userEmail={currentUserEmail}
-                onOpenManageICDs={() => setShowManageICDsModal(true)}
-                onToggleTransporterStatus={handleToggleTransporterStatus}
-                onOpenKYC={(t) => setInspectKYCTransporter(t)}
-                onOpenDispute={(d) => {
-                  setActiveDisputeRecord(d);
-                  setActiveDisputeJob(null);
-                }}
-                onConfirmPODByAdmin={handleConfirmPODByAdmin}
-                onExecuteDriverPayout={handleExecuteDriverPayout}
               />
             )}
           </div>
         )}
 
-        {/* TAB 2: ICDS & BONDED WAREHOUSES */}
-        {activeTab === 'icds' && (
-          <ICDsAndWarehousesPage
-            icds={icds}
-            transporters={transporters}
-            currency={currency}
-            language={language}
-            isAdmin={currentRole === 'admin' || isSuperAdminEmail(currentUserEmail)}
-            onOpenManageICDs={() => setShowManageICDsModal(true)}
-            onSelectICDPickup={(icd) => {
-              setPreselectedICD(icd);
-              setShowPostJobModal(true);
-            }}
-            onViewOnMap={(icd) => {
-              setActiveTab('map');
-            }}
-          />
-        )}
-
-        {/* TAB 2: LIVE GPS RADAR MAP */}
-        {activeTab === 'map' && (
+        {/* 2. GPS RADAR (CLIENT: HIS TRUCK ONLY) OR GPS TRACKING (TRANSPORTER) */}
+        {(activeTab === 'gps_radar' || activeTab === 'gps_tracking' || activeTab === 'map') && (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-[18px] font-bold text-white tracking-tight">
-                  {t('fleetRadarTitle', language)}
+                  {currentRole === 'client' ? 'GPS Radar — Consignment Telemetry' : 'Transporter Corridor GPS Tracking'}
                 </h2>
                 <p className="text-[14px] text-white/60 leading-6">
-                  {t('fleetRadarSub', language)}
+                  {currentRole === 'client' 
+                    ? 'Dedicated live satellite tracking for your active shipment only.' 
+                    : 'Real-time navigation and breadcrumb updates along East African transit corridors.'}
                 </p>
               </div>
               <div className="text-xs text-white font-medium bg-slate-700 px-3.5 py-1.5 rounded-full border border-white/10">
-                Centered on Kampala Core · Active Corridors Monitored
+                {currentRole === 'client' ? 'Authorized Consignment Tracking' : 'Fleet Telemetry Active'}
               </div>
             </div>
 
@@ -766,33 +789,14 @@ export default function App() {
               activeJob={currentRole === 'client' ? trackingJob : null}
               language={language}
               onSelectTransporter={(t) => setInspectKYCTransporter(t)}
-              onDirectBook={(t) => {
-                setShowPostJobModal(true);
+              onDirectBook={() => {
+                setShowClientPostCargoModal(true);
               }}
             />
           </div>
         )}
 
-        {/* TAB: PRICING GUIDE & FREE MARKET */}
-        {activeTab === 'pricing' && (
-          <PricingGuidePage
-            currency={currency}
-            language={language}
-            onOpenPostCargo={() => setShowPostJobModal(true)}
-            onOpenRegisterTransporter={() => setShowTransporterRegisterModal(true)}
-          />
-        )}
-
-        {/* TAB 3: SERVICES MARKETPLACE MODULE */}
-        {activeTab === 'services' && (
-          <ServicesMarketplace
-            currency={currency}
-            language={language}
-            onSelectHaulageCore={() => setActiveTab('dashboard')}
-          />
-        )}
-
-        {/* TAB 4: DISPUTE CENTER */}
+        {/* 3. DISPUTE ARBITRATION CENTER */}
         {activeTab === 'disputes' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -819,7 +823,6 @@ export default function App() {
                       {disp.status.replace('_', ' ')}
                     </span>
                   </div>
-
                   <div className="bg-slate-900/80 p-4 rounded-xl border border-white/5 text-[14px] leading-6 text-white/80">
                     <strong className="text-rose-300 block mb-1">Issue: {disp.reason}</strong>
                     {disp.description}
@@ -860,9 +863,6 @@ export default function App() {
           <div className="flex items-center gap-5 text-slate-400">
             <button onClick={() => setShowLegalModal(true)} className="hover:text-amber-400 transition-colors">
               {t('limitationLiability', language)}
-            </button>
-            <button onClick={() => setActiveTab('services')} className="hover:text-amber-400 transition-colors">
-              {t('serviceMarketplace', language)}
             </button>
             <button onClick={() => setActiveTab('disputes')} className="hover:text-amber-400 transition-colors">
               {t('disputeCenter', language)}
