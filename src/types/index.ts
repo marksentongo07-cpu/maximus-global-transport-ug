@@ -199,13 +199,16 @@ export interface Job {
     address: string;
     lat: number;
     lng: number;
+    country?: string;
   };
   deliveryLocation: {
     name: string;
     address: string;
     lat: number;
     lng: number;
+    country?: string;
   };
+  isInternational?: boolean;
   estimatedDistanceKm: number;
   marketPriceEstimateUGX: number;
   adminFeeUGX: number; // 8% platform escrow fee

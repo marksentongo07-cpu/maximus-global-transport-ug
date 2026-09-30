@@ -211,22 +211,262 @@ app.use('/api/admin', (req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+// -------------------------------------------------------------
+// DYNAMIC PLATFORM SETTINGS & COMMISSION TABLE
+// -------------------------------------------------------------
+interface PlatformSettings {
+  commission_percent: number; // Domestic 1-20%, default 8%
+  international_commission: number; // International 1-20%, default 12%
+  updated_by: string;
+  updated_at: string;
+}
+
+let platformSettings: PlatformSettings = {
+  commission_percent: 8,
+  international_commission: 12,
+  updated_by: 'mark@maximus.ug',
+  updated_at: new Date().toISOString(),
+};
+
+// In-memory live bids status store for admin control
+let adminLiveBids = [
+  {
+    cargoId: 'CRG-UG-101',
+    client: 'Uganda Grain Traders Ltd',
+    pickupCountry: 'Uganda (Mbale)',
+    dropLocation: 'Namanve ICD, Kampala',
+    lowestBidUGX: 1150000,
+    highestBidUGX: 1400000,
+    bidCount: 5,
+    status: 'ACTIVE_BIDDING',
+    assignedTransporter: null as string | null,
+    isInternational: false,
+  },
+  {
+    cargoId: 'CRG-INT-802',
+    client: 'AfriTrade Imports LLC',
+    pickupCountry: 'China (Guangzhou Port)',
+    dropLocation: 'Gulu Northern Hub, Uganda',
+    lowestBidUGX: 18500000, // or USD equivalent ~ $4,850
+    highestBidUGX: 22000000,
+    bidCount: 4,
+    status: 'ACTIVE_BIDDING',
+    assignedTransporter: null as string | null,
+    isInternational: true,
+  },
+  {
+    cargoId: 'CRG-UG-102',
+    client: 'Roko Construction',
+    pickupCountry: 'Uganda (Jinja Works)',
+    dropLocation: 'Bwebajja Hospital Project, Entebbe Corridor',
+    lowestBidUGX: 1550000,
+    highestBidUGX: 2000000,
+    bidCount: 3,
+    status: 'COUNTER_OFFER',
+    assignedTransporter: 'Moses Ochen',
+    isInternational: false,
+  },
+  {
+    cargoId: 'CRG-INT-805',
+    client: 'Dubai-Kampala Direct Merchants',
+    pickupCountry: 'UAE (Dubai Jebel Ali)',
+    dropLocation: 'Kampala City ICD',
+    lowestBidUGX: 14200000,
+    highestBidUGX: 16500000,
+    bidCount: 6,
+    status: 'READY_TO_ASSIGN',
+    assignedTransporter: null as string | null,
+    isInternational: true,
+  },
+  {
+    cargoId: 'CRG-KE-304',
+    client: 'Mombasa Oil Depot Ltd',
+    pickupCountry: 'Kenya (Mombasa Port)',
+    dropLocation: 'Tororo Depot, Uganda',
+    lowestBidUGX: 8900000,
+    highestBidUGX: 9800000,
+    bidCount: 2,
+    status: 'ASSIGNED',
+    assignedTransporter: 'Ronald Kato (Spedag Partner)',
+    isInternational: true,
+  }
+];
+
+// In-memory Fleet KYC Review store
+let adminFleetKyc = [
+  {
+    id: 'kyc-01',
+    transporterId: 'trans-003',
+    transporterName: 'Denis Mukasa',
+    phone: '+256 754 112 900',
+    numberPlate: 'UBG 512P',
+    vehicleType: '30T Lowbed Trailer',
+    nin: 'CM840291048GHA',
+    ninVerified: false,
+    logbookNumber: 'URA-LB-2024-991',
+    logbookVerified: false,
+    uploadedAt: '15 mins ago',
+    status: 'PENDING_APPROVAL',
+  },
+  {
+    id: 'kyc-02',
+    transporterId: 'trans-005',
+    transporterName: 'Moses Ochen',
+    phone: '+256 782 994 321',
+    numberPlate: 'UBD 441L',
+    vehicleType: '28T Semi-Trailer',
+    nin: 'CM910442018JKA',
+    ninVerified: true,
+    logbookNumber: 'URA-LB-2023-412',
+    logbookVerified: true,
+    uploadedAt: 'Yesterday',
+    status: 'APPROVED',
+  },
+  {
+    id: 'kyc-03',
+    transporterId: 'trans-008',
+    transporterName: 'Patrick Okello',
+    phone: '+256 772 109 845',
+    numberPlate: 'UBL 318K',
+    vehicleType: '10T Box Body Fuso',
+    nin: 'CM790184912LPA',
+    ninVerified: false,
+    logbookNumber: 'URA-LB-2025-108',
+    logbookVerified: false,
+    uploadedAt: '1 hour ago',
+    status: 'PENDING_APPROVAL',
+  }
+];
+
+// Public settings endpoint (for Checkout & Client Post Cargo calculation)
+app.get('/api/settings', (_req: Request, res: Response) => {
+  return res.json(platformSettings);
+});
+
 // Protected Super Admin Endpoints
+app.get('/api/admin/settings', (_req: Request, res: Response) => {
+  return res.json(platformSettings);
+});
+
+app.post('/api/admin/settings', (req: Request, res: Response) => {
+  try {
+    const { commission_percent, international_commission } = req.body;
+    
+    if (commission_percent !== undefined) {
+      const c = Number(commission_percent);
+      if (isNaN(c) || c < 1 || c > 20) {
+        return res.status(400).json({ error: 'Domestic commission must be between 1% and 20%.' });
+      }
+      platformSettings.commission_percent = Math.round(c * 10) / 10;
+    }
+
+    if (international_commission !== undefined) {
+      const ic = Number(international_commission);
+      if (isNaN(ic) || ic < 1 || ic > 20) {
+        return res.status(400).json({ error: 'International commission must be between 1% and 20%.' });
+      }
+      platformSettings.international_commission = Math.round(ic * 10) / 10;
+    }
+
+    platformSettings.updated_by = SUPER_ADMIN_EMAIL;
+    platformSettings.updated_at = new Date().toISOString();
+
+    console.log(`[COMMISSION UPDATED] Domestic: ${platformSettings.commission_percent}%, International: ${platformSettings.international_commission}%, By: ${SUPER_ADMIN_EMAIL}`);
+
+    return res.json({
+      success: true,
+      message: 'Commission settings updated successfully. New jobs and checkout will apply these rates.',
+      settings: platformSettings,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to update settings' });
+  }
+});
+
+// Accounts: TrustVault UGX/USD total, commission today, pending payouts, EFRIS status
 app.get('/api/admin/accounts', (_req: Request, res: Response) => {
   return res.json({
-    bankName: 'Equity Bank Uganda',
+    bankName: 'Equity Bank Uganda (Merchant Till 031801)',
     accountName: 'MAXIMUS GLOBAL TRANSPORT LINK LTD',
     tillNumber: '031801',
     mtnEscrowMoMo: '*165*3*031801#',
     airtelMoneyPay: '*185*9*031801#',
-    totalEscrowLockedUGX: 950000,
-    platformFeeRate: '8% Flat Fee',
-    totalGrossTransactedUGX: 184500000,
-    netRevenueUGX: 14760000,
+    trustVaultTotalUGX: 48500000, // Total locked in TrustVault UGX
+    trustVaultTotalUSD: 12850,    // Total locked in TrustVault USD
+    commissionTodayUGX: 1840000,  // Platform commission earned today
+    commissionTodayUSD: 490,
+    pendingPayoutsUGX: 9250000,   // Driver payouts awaiting disbursement
+    pendingPayoutsCount: 4,
+    efrisStatus: {
+      connection: 'ONLINE',
+      tin: '1008492019',
+      uraEfrisSystem: 'CONNECTED & SYNCED',
+      complianceRate: '100%',
+      fiscalInvoicesIssuedToday: 18,
+      fiscalInvoicesIssuedTotal: 860,
+      vatPayableUGX: 331200,
+    },
+    domesticCommissionRate: `${platformSettings.commission_percent}%`,
+    internationalCommissionRate: `${platformSettings.international_commission}%`,
+    totalGrossTransactedUGX: 194500000,
+    netRevenueUGX: 16600000,
     activeShipmentsCount: 15,
     verifiedTransportersCount: 8,
-    pendingKYCCount: 3,
+    pendingKYCCount: adminFleetKyc.filter(k => k.status === 'PENDING_APPROVAL').length,
   });
+});
+
+// Live Bids Status endpoint
+app.get('/api/admin/bids-status', (_req: Request, res: Response) => {
+  return res.json({
+    bids: adminLiveBids,
+  });
+});
+
+// Assign Transporter to Bid
+app.post('/api/admin/assign-bid', (req: Request, res: Response) => {
+  const { cargoId, transporterName } = req.body;
+  const target = adminLiveBids.find(b => b.cargoId === cargoId);
+  if (!target) {
+    return res.status(404).json({ error: 'Cargo ID not found' });
+  }
+  target.assignedTransporter = transporterName || 'Assigned Maximus Carrier';
+  target.status = 'ASSIGNED';
+  return res.json({ success: true, message: `Assigned ${target.assignedTransporter} to ${cargoId}`, bid: target });
+});
+
+// Fleet KYC endpoint
+app.get('/api/admin/fleet-kyc', (_req: Request, res: Response) => {
+  return res.json({
+    records: adminFleetKyc,
+  });
+});
+
+// Fleet KYC Approve/Reject Action
+app.post('/api/admin/kyc-action', (req: Request, res: Response) => {
+  const { id, action, target } = req.body; // action: 'approve' | 'reject', target: 'nin' | 'logbook' | 'all'
+  const record = adminFleetKyc.find(r => r.id === id);
+  if (!record) {
+    return res.status(404).json({ error: 'KYC record not found' });
+  }
+
+  if (target === 'nin') {
+    record.ninVerified = action === 'approve';
+  } else if (target === 'logbook') {
+    record.logbookVerified = action === 'approve';
+  } else {
+    record.ninVerified = action === 'approve';
+    record.logbookVerified = action === 'approve';
+    record.status = action === 'approve' ? 'APPROVED' : 'REJECTED';
+  }
+
+  if (record.ninVerified && record.logbookVerified) {
+    record.status = 'APPROVED';
+  } else if (!record.ninVerified && !record.logbookVerified && action === 'reject') {
+    record.status = 'REJECTED';
+  }
+
+  return res.json({ success: true, message: `KYC ${action} applied for ${record.transporterName}`, record });
 });
 
 app.get('/api/admin/escrow', (_req: Request, res: Response) => {

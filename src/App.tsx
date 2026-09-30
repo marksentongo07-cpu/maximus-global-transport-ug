@@ -92,13 +92,22 @@ export default function App() {
       window.history.replaceState({}, '', '/');
     } else if (path.startsWith('/maximus-admin-2026-secure')) {
       setIsAdminPortalActive(true);
+    } else if (path === '/services' || path.startsWith('/services')) {
+      setActiveTab('services');
     }
 
     const handlePopState = () => {
-      if (window.location.pathname.startsWith('/maximus-admin-2026-secure')) {
+      const currentPath = window.location.pathname;
+      if (currentPath.startsWith('/maximus-admin-2026-secure')) {
         setIsAdminPortalActive(true);
       } else {
         setIsAdminPortalActive(false);
+      }
+
+      if (currentPath === '/services' || currentPath.startsWith('/services')) {
+        setActiveTab('services');
+      } else if (currentPath === '/') {
+        setActiveTab('dashboard');
       }
     };
     window.addEventListener('popstate', handlePopState);
@@ -619,6 +628,15 @@ export default function App() {
     addNotification('ICD Registry Updated', `Updated storage rates and GPS parameters for ${updated.length} ICDs.`);
   };
 
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    if (tab === 'services') {
+      window.history.pushState({}, '', '/services');
+    } else if (tab === 'dashboard' || tab === 'my_jobs' || tab === 'available_loads') {
+      window.history.pushState({}, '', '/');
+    }
+  };
+
   // If on the secret admin route /maximus-admin-2026-secure, render the Secure Admin Lockdown Portal
   if (isAdminPortalActive) {
     return (
@@ -693,7 +711,7 @@ export default function App() {
         language={language}
         onLanguageChange={setLanguage}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         isOffline={isOffline}
         onToggleOffline={() => setIsOffline(!isOffline)}
         onOpenLegal={() => setShowLegalModal(true)}
@@ -848,6 +866,15 @@ export default function App() {
           </div>
         )}
 
+        {/* 4. SERVICES DIRECTORY & REAL CONTACTS DATABASE (/services) */}
+        {activeTab === 'services' && (
+          <ServicesMarketplace
+            currency={currency}
+            language={language}
+            onSelectHaulageCore={() => handleTabChange('dashboard')}
+          />
+        )}
+
       </main>
 
       {/* Footer */}
@@ -860,11 +887,14 @@ export default function App() {
             <span>{t('footerPlatformDesc', language)}</span>
           </div>
 
-          <div className="flex items-center gap-5 text-slate-400">
+          <div className="flex items-center gap-5 text-slate-400 flex-wrap">
+            <button onClick={() => handleTabChange('services')} className="hover:text-[#C9A86A] transition-colors font-medium">
+              Services Directory
+            </button>
             <button onClick={() => setShowLegalModal(true)} className="hover:text-amber-400 transition-colors">
               {t('limitationLiability', language)}
             </button>
-            <button onClick={() => setActiveTab('disputes')} className="hover:text-amber-400 transition-colors">
+            <button onClick={() => handleTabChange('disputes')} className="hover:text-amber-400 transition-colors">
               {t('disputeCenter', language)}
             </button>
           </div>

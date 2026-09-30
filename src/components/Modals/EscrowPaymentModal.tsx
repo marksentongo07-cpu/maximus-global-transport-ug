@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Job, 
   Currency, 
@@ -16,8 +16,10 @@ import {
   Clock, 
   X,
   ArrowRight,
-  RefreshCw
+  RefreshCw,
+  Globe
 } from 'lucide-react';
+import { getCachedPlatformSettings, fetchPlatformSettings } from '../../services/settingsService';
 
 interface EscrowPaymentModalProps {
   job: Job;
@@ -37,8 +39,25 @@ export const EscrowPaymentModal: React.FC<EscrowPaymentModalProps> = ({
   const [cardNumber, setCardNumber] = useState('4242 •••• •••• 4242');
   const [paymentStep, setPaymentStep] = useState<'details' | 'processing' | 'success'>('details');
 
+  // Dynamic Commission Rate from Settings Table
+  const [settings, setSettings] = useState(() => getCachedPlatformSettings());
+
+  useEffect(() => {
+    fetchPlatformSettings().then(setSettings);
+  }, []);
+
+  const isInternational = Boolean(
+    job.isInternational || 
+    (job.pickupLocation?.country && job.pickupLocation.country !== 'Uganda' && job.pickupLocation.country !== 'UG') ||
+    (job.deliveryLocation?.country && job.deliveryLocation.country !== 'Uganda' && job.deliveryLocation.country !== 'UG')
+  );
+
+  const feeRatePercent = isInternational 
+    ? settings.international_commission 
+    : settings.commission_percent;
+
   const agreedTotalUGX = job.agreedPriceUGX || job.marketPriceEstimateUGX;
-  const adminFeeUGX = Math.round(agreedTotalUGX * 0.10);
+  const adminFeeUGX = Math.round(agreedTotalUGX * (feeRatePercent / 100));
   const transporterPayoutUGX = agreedTotalUGX - adminFeeUGX;
 
   const handleProcessPayment = () => {
@@ -129,12 +148,12 @@ export const EscrowPaymentModal: React.FC<EscrowPaymentModalProps> = ({
                 <span className="text-slate-200">{job.pickupLocation.name.split(' ')[0]} → {job.deliveryLocation.name.split(' ')[0]}</span>
               </div>
               <div className="flex justify-between text-slate-400">
-                <span>Transporter Payout (90%):</span>
+                <span>Transporter Payout ({100 - feeRatePercent}%):</span>
                 <span className="font-semibold text-slate-200">{formatMoney(transporterPayoutUGX, currency)}</span>
               </div>
               <div className="flex justify-between text-slate-400">
-                <span>Platform Escrow Fee (10%):</span>
-                <span className="font-semibold text-slate-200">{formatMoney(adminFeeUGX, currency)}</span>
+                <span>Platform Escrow Fee ({feeRatePercent}%{isInternational ? ' Cross-Border' : ''}):</span>
+                <span className="font-semibold text-emerald-400 font-mono">{formatMoney(adminFeeUGX, currency)}</span>
               </div>
               <div className="pt-2 border-t border-slate-800 flex justify-between items-center text-sm font-bold text-white">
                 <span>Total Escrow Deposit:</span>

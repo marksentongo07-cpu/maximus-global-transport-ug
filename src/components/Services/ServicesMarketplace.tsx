@@ -1,314 +1,290 @@
 import React, { useState } from 'react';
 import { 
-  FUTURE_SERVICE_CATEGORIES, 
-  SAMPLE_SERVICE_PROVIDERS 
-} from '../../data/mockData';
-import { ServiceCategory, ServiceProvider, Currency, Language } from '../../types';
+  REAL_SERVICE_PROVIDERS, 
+  ServiceProviderItem 
+} from '../../data/serviceProvidersData';
+import { Currency, Language } from '../../types';
 import { formatMoney } from '../../services/currency';
-import { t } from '../../services/i18n';
 import { 
-  Truck, 
-  Hammer, 
-  Wrench, 
-  Zap, 
-  Scale, 
-  Calculator, 
-  Stethoscope, 
-  HardHat, 
-  Compass, 
-  Palette, 
-  Scissors, 
-  Pickaxe,
-  Search,
-  Star,
-  CheckCircle2,
-  Phone,
-  ShieldCheck,
-  ArrowRight,
+  Search, 
+  ShieldCheck, 
+  Phone, 
+  Mail, 
+  Globe, 
+  MapPin, 
+  CheckCircle2, 
+  MessageSquare, 
+  ExternalLink,
+  Filter,
+  Truck,
+  Plane,
+  Anchor,
+  FileCheck,
+  Building2,
+  Wrench,
   Sparkles,
-  X
+  ArrowRight
 } from 'lucide-react';
 
 interface ServicesMarketplaceProps {
   currency: Currency;
   language?: Language;
-  onSelectHaulageCore: () => void;
+  onSelectHaulageCore?: () => void;
 }
 
-const CATEGORY_ICONS: Record<string, React.FC<{ className?: string }>> = {
-  Truck,
-  Hammer,
-  Wrench,
-  Zap,
-  Scale,
-  Calculator,
-  Stethoscope,
-  HardHat,
-  Compass,
-  Palette,
-  Scissors,
-  Pickaxe,
-};
+type CategoryFilter = 'all' | 'shipping_lines' | 'airlines_cargo' | 'transporters' | 'clearing_agents' | 'banks' | 'professionals';
 
 export const ServicesMarketplace: React.FC<ServicesMarketplaceProps> = ({
   currency,
   language = 'en',
   onSelectHaulageCore,
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
-  const [quoteSent, setQuoteSent] = useState(false);
-  const [quoteDescription, setQuoteDescription] = useState('');
+  const [quoteSuccessMsg, setQuoteSuccessMsg] = useState<string | null>(null);
 
-  const filteredProviders = SAMPLE_SERVICE_PROVIDERS.filter((p) => {
-    if (selectedCategory !== 'all' && p.categoryId !== selectedCategory) return false;
-    if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase()) && !p.profession.toLowerCase().includes(searchQuery.toLowerCase())) {
+  // Filter providers
+  const filteredProviders = REAL_SERVICE_PROVIDERS.filter((provider) => {
+    if (selectedCategory !== 'all' && provider.category !== selectedCategory) {
       return false;
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchName = provider.name.toLowerCase().includes(q);
+      const matchProfession = provider.profession.toLowerCase().includes(q);
+      const matchLocation = provider.location.toLowerCase().includes(q);
+      const matchNotes = provider.notes?.toLowerCase().includes(q);
+      if (!matchName && !matchProfession && !matchLocation && !matchNotes) {
+        return false;
+      }
     }
     return true;
   });
 
-  const handleSendQuote = (e: React.FormEvent) => {
-    e.preventDefault();
-    setQuoteSent(true);
-    setTimeout(() => {
-      setQuoteSent(false);
-      setSelectedProvider(null);
-      setQuoteDescription('');
-    }, 2000);
+  // Request Quote -> opens WhatsApp
+  const handleRequestQuote = (provider: ServiceProviderItem) => {
+    const cleanNumber = provider.phoneRaw || provider.phone.replace(/[^0-9]/g, '');
+    const message = encodeURIComponent(
+      `Hello ${provider.name}, I am contacting you via MAXIMUS Global Transport Link regarding a freight / professional service inquiry.`
+    );
+    const whatsappUrl = `https://wa.me/${cleanNumber}?text=${message}`;
+    
+    // Open WhatsApp in new tab / app
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    
+    setQuoteSuccessMsg(`WhatsApp quote channel opened for ${provider.name}!`);
+    setTimeout(() => setQuoteSuccessMsg(null), 4000);
   };
 
   return (
-    <div className="space-y-6">
-      
-      {/* Hero Explainer for Expandable Marketplace Architecture */}
-      <div className="bg-[#1a2a3f] border border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur text-slate-200">
-        <div className="max-w-2xl space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-700 text-white border border-white/10">
-              Future Services Architecture
-            </span>
-            <span className="text-xs text-white/60">Phase 2 Expansion Ready</span>
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Toast Notification */}
+      {quoteSuccessMsg && (
+        <div className="fixed top-20 right-4 z-50 bg-emerald-500 text-slate-950 px-5 py-3 rounded-2xl shadow-2xl font-bold text-xs flex items-center gap-2.5 animate-bounce">
+          <CheckCircle2 className="w-5 h-5 text-slate-950" />
+          <span>{quoteSuccessMsg}</span>
+        </div>
+      )}
+
+      {/* Hero Header */}
+      <div className="bg-gradient-to-br from-[#0A1931] via-[#0f2747] to-[#0A1931] border border-[#C9A86A]/30 rounded-3xl p-6 sm:p-8 shadow-2xl text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[#C9A86A]/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+        
+        <div className="relative z-10 max-w-3xl space-y-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C9A86A]/20 text-[#e6cb96] border border-[#C9A86A]/40 text-[11px] font-bold tracking-widest uppercase">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#C9A86A]" />
+            Preloaded Official Directory · Real Verified Contacts
           </div>
-          <h1 className="text-[18px] sm:text-2xl font-bold text-white tracking-tight">
-            MAXIMUS Professional Service Marketplace
+          
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            East Africa Logistics &amp; Professional Service Directory
           </h1>
-          <p className="text-[14px] text-white/70 leading-6">
-            Built with an extensible service schema. Beyond freight haulage, clients can connect with verified Carpenters, Electricians, Lawyers, Accountants, Doctors, Builders, Architects, and Heavy Equipment operators across East Africa under the same escrow trust model.
+          
+          <p className="text-sm text-slate-300 leading-relaxed">
+            Verified Shipping Lines, Air Cargo Carriers, Clearing &amp; Forwarding Agents (UCIFA/URA), Licensed Transporters, Banking Escrow Partners, and Allied Master Craftsmen across the Northern &amp; Central Corridors.
           </p>
+
+          <div className="flex flex-wrap items-center gap-4 pt-2 text-xs font-mono text-slate-300">
+            <span className="flex items-center gap-1.5 bg-black/30 px-3 py-1.5 rounded-xl border border-white/10">
+              <Anchor className="w-3.5 h-3.5 text-sky-400" />
+              Ocean Lines: Maersk, MSC, CMA CGM, Grimaldi
+            </span>
+            <span className="flex items-center gap-1.5 bg-black/30 px-3 py-1.5 rounded-xl border border-white/10">
+              <Plane className="w-3.5 h-3.5 text-amber-400" />
+              Air Cargo: Ethiopian, Emirates, Qatar, Turkish, Uganda Airlines
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Categories Grid */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-bold text-white uppercase tracking-wider">Browse Verified Service Sectors:</span>
-          <span className="text-white/60">{FUTURE_SERVICE_CATEGORIES.length} Configured Industries</span>
+      {/* Category Pills & Search Controls */}
+      <div className="bg-[#101F33] border border-white/10 rounded-2xl p-4 shadow-xl space-y-4">
+        {/* Search Bar */}
+        <div className="relative w-full">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search provider by name, city, phone, or service (e.g. Maersk, Namanve, Clearing, Stanbic, Mechanics)..."
+            className="w-full pl-11 pr-4 py-3 bg-[#081220] border border-white/10 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[#C9A86A] transition-colors"
+          />
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          
-          {/* "All" button */}
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`p-4 rounded-xl border text-left transition-all ${
-              selectedCategory === 'all'
-                ? 'bg-orange-500 text-black font-bold border-orange-400 shadow-md'
-                : 'bg-[#1a2a3f] border-white/10 text-white/80 hover:bg-slate-700'
-            }`}
-          >
-            <div className="text-xs font-bold">All Sectors</div>
-            <div className={`text-[10px] ${selectedCategory === 'all' ? 'text-black/80 font-medium' : 'text-white/50'}`}>
-              Full Directory
-            </div>
-          </button>
-
-          {FUTURE_SERVICE_CATEGORIES.map((cat) => {
-            const Icon = CATEGORY_ICONS[cat.iconName] || Truck;
+        {/* Category Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {[
+            { id: 'all', label: `All Verified (${REAL_SERVICE_PROVIDERS.length})`, icon: Sparkles },
+            { id: 'shipping_lines', label: 'Shipping Lines', icon: Anchor },
+            { id: 'airlines_cargo', label: 'Airlines Cargo', icon: Plane },
+            { id: 'transporters', label: 'Legit Transporters', icon: Truck },
+            { id: 'clearing_agents', label: 'Clearing Agents (UCIFA)', icon: FileCheck },
+            { id: 'banks', label: 'Banks (TrustVault)', icon: Building2 },
+            { id: 'professionals', label: 'Other Professionals', icon: Wrench },
+          ].map((cat) => {
+            const Icon = cat.icon;
             const isSelected = selectedCategory === cat.id;
-
             return (
               <button
                 key={cat.id}
-                onClick={() => {
-                  if (cat.isHaulageCore) {
-                    onSelectHaulageCore();
-                  } else {
-                    setSelectedCategory(cat.id);
-                  }
-                }}
-                className={`p-4 rounded-xl border text-left transition-all relative group ${
+                onClick={() => setSelectedCategory(cat.id as CategoryFilter)}
+                className={`transition-all whitespace-nowrap flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border ${
                   isSelected
-                    ? 'bg-orange-500 text-black font-bold border-orange-400 shadow-md'
-                    : 'bg-[#1a2a3f] border-white/10 text-white/80 hover:bg-slate-700'
+                    ? 'bg-[#C9A86A] text-[#0A1931] border-[#C9A86A] shadow-md shadow-[#C9A86A]/20 scale-[1.02]'
+                    : 'bg-[#1a2d47] hover:bg-[#223959] text-slate-300 hover:text-white border-white/10'
                 }`}
               >
-                {cat.isHaulageCore && (
-                  <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Core Active Transport Engine" />
-                )}
-                <Icon className={`w-4 h-4 mb-2 ${isSelected ? 'text-black' : 'text-white/80'}`} />
-                <div className="text-xs font-bold line-clamp-1">{cat.name}</div>
-                <div className={`text-[10px] ${isSelected ? 'text-black/80 font-medium' : 'text-white/50'}`}>
-                  {cat.providerCount} Verified
-                </div>
+                <Icon className="w-3.5 h-3.5" />
+                <span>{cat.label}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Search and Providers List */}
-      <div className="space-y-4 pt-2">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h3 className="text-[18px] font-bold text-white">Vetted Specialists &amp; Contractors</h3>
-            <p className="text-[14px] text-white/60 leading-6">Book corporate services protected by Maximus Escrow arbitration</p>
-          </div>
-
-          <div className="relative w-72">
-            <Search className="w-3.5 h-3.5 text-white/50 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search specialists (e.g. Solar, Attorney)..."
-              className="w-full bg-[#1a2a3f] border border-white/10 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-white/40 focus:outline-none focus:border-orange-400"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredProviders.map((provider) => (
-            <div
-              key={provider.id}
-              className="bg-[#1a2a3f] border border-white/10 hover:border-white/20 rounded-2xl p-5 shadow-xl backdrop-blur transition-all space-y-4"
-            >
-              <div className="flex items-start justify-between">
+      {/* Directory Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {filteredProviders.map((provider) => (
+          <div
+            key={provider.id}
+            className="group relative bg-[#0e1d32] border border-white/10 hover:border-[#C9A86A]/50 rounded-2xl p-5 shadow-xl backdrop-blur flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-[#C9A86A]/10"
+          >
+            <div className="space-y-3">
+              {/* Header: Logo Initial + Name + Verified Badge */}
+              <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <img
-                    src={provider.avatarUrl}
-                    alt={provider.name}
-                    className="w-12 h-12 rounded-xl object-cover border border-white/20 shadow-sm"
-                    referrerPolicy="no-referrer"
-                  />
+                  {/* Logo Initial Badge */}
+                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${provider.colorScheme || 'from-[#C9A86A] to-amber-700'} text-white font-black text-sm flex items-center justify-center shadow-lg tracking-wider shrink-0`}>
+                    {provider.logoInitial}
+                  </div>
                   <div>
-                    <div className="flex items-center gap-1.5">
-                      <h4 className="text-[14px] font-bold text-white">{provider.name}</h4>
-                      {provider.verified && (
-                        <span title="Maximus Vetted & Verified">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs text-white/80 font-medium">{provider.profession}</div>
-                    <div className="text-[10px] text-white/50">{provider.location}</div>
+                    <h3 className="font-extrabold text-white text-base leading-tight group-hover:text-[#C9A86A] transition-colors">
+                      {provider.name}
+                    </h3>
+                    <span className="text-[11px] font-semibold text-slate-400 block mt-0.5">
+                      {provider.categoryLabel}
+                    </span>
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <div className="text-[16px] font-bold text-white font-mono">
-                    {formatMoney(provider.hourlyRateUGX, currency)}
-                  </div>
-                  <div className="text-[11px] text-white/50">per consult / hr</div>
-                </div>
-              </div>
-
-              <p className="text-[14px] text-white/70 leading-6 line-clamp-2">{provider.bio}</p>
-
-              {/* Specialties */}
-              <div className="flex flex-wrap gap-1.5">
-                {provider.specialties.map((s, idx) => (
-                  <span
-                    key={idx}
-                    className="px-2.5 py-0.5 rounded-full text-[10px] bg-slate-700 text-white border border-white/10 font-medium"
-                  >
-                    {s}
+                {/* Verified Badge */}
+                {provider.verified && (
+                  <span className="shrink-0 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Verified
                   </span>
-                ))}
+                )}
               </div>
 
-              <div className="flex justify-between items-center pt-3 border-t border-white/10 text-xs">
-                <div className="flex items-center gap-1 text-orange-400 font-bold">
-                  <Star className="w-3.5 h-3.5 fill-orange-400 text-orange-400" />
-                  <span>{provider.rating}</span>
-                  <span className="text-white/50 font-normal">({provider.reviewCount} client reviews)</span>
-                </div>
+              {/* Profession / Role */}
+              <div className="text-xs font-semibold text-[#e6cb96] leading-snug">
+                {provider.profession}
+              </div>
 
-                <button
-                  onClick={() => setSelectedProvider(provider)}
-                  className="px-5 py-2.5 bg-orange-500 hover:bg-orange-400 text-black font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5"
+              {/* Location */}
+              <div className="text-xs text-slate-300 flex items-start gap-2 bg-[#091424] p-2.5 rounded-xl border border-white/5">
+                <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                <span className="leading-relaxed">{provider.location}</span>
+              </div>
+
+              {/* Real Notes / Description if present */}
+              {provider.notes && (
+                <p className="text-[11px] text-slate-400 leading-relaxed italic">
+                  {provider.notes}
+                </p>
+              )}
+
+              {/* Contact Information (Clickable Phone & Email) */}
+              <div className="space-y-1.5 pt-1 text-xs font-mono">
+                {/* Clickable Phone */}
+                <a
+                  href={`tel:${provider.phoneRaw || provider.phone}`}
+                  className="flex items-center gap-2 text-slate-200 hover:text-[#C9A86A] transition-colors p-1.5 rounded-lg hover:bg-white/5"
+                  title="Call Phone"
                 >
-                  <span>Request Quote</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-black" />
-                </button>
-              </div>
+                  <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>{provider.phone}</span>
+                </a>
 
+                {/* Clickable Email */}
+                {provider.email && (
+                  <a
+                    href={`mailto:${provider.email}`}
+                    className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5 truncate"
+                    title="Send Email"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                    <span className="truncate">{provider.email}</span>
+                  </a>
+                )}
+
+                {/* Website if available */}
+                {provider.website && (
+                  <a
+                    href={provider.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-slate-400 hover:text-sky-300 transition-colors p-1.5 rounded-lg hover:bg-white/5 text-[11px]"
+                  >
+                    <Globe className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="truncate">{provider.website.replace('https://', '')}</span>
+                    <ExternalLink className="w-2.5 h-2.5 text-slate-500" />
+                  </a>
+                )}
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Quote Request Modal */}
-      {selectedProvider && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="bg-[#1a2a3f] border border-white/10 rounded-2xl p-5 max-w-md w-full space-y-4 text-white shadow-2xl">
-            <div className="flex justify-between items-center border-b border-white/10 pb-3">
-              <div>
-                <h3 className="text-[18px] font-bold text-white">Direct Service Inquiry</h3>
-                <p className="text-[14px] text-white/60 leading-6">To: {selectedProvider.name} ({selectedProvider.profession})</p>
-              </div>
-              <button onClick={() => setSelectedProvider(null)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
+            {/* Request Quote Button -> Opens WhatsApp */}
+            <div className="pt-4 mt-3 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => handleRequestQuote(provider)}
+                className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white font-bold rounded-xl shadow-md shadow-emerald-900/30 flex items-center justify-center gap-2 text-xs transition-all"
+              >
+                <MessageSquare className="w-4 h-4 text-white" />
+                <span>Request Quote (WhatsApp)</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
-
-            {quoteSent ? (
-              <div className="p-8 text-center space-y-2">
-                <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-                <h4 className="text-sm font-bold text-white">Quote Request Transmitted!</h4>
-                <p className="text-xs text-slate-400">
-                  {selectedProvider.name} has been notified via SMS and Maximus app. You will receive an offer in your inbox.
-                </p>
-              </div>
-            ) : (
-              <form onSubmit={handleSendQuote} className="space-y-3 text-xs">
-                <div>
-                  <label className="text-slate-300 font-semibold">Scope of Work / Project Description:</label>
-                  <textarea
-                    required
-                    rows={3}
-                    value={quoteDescription}
-                    onChange={(e) => setQuoteDescription(e.target.value)}
-                    placeholder="Describe your site requirements, timeline, and location..."
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400"
-                  />
-                </div>
-
-                <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-[11px] text-slate-400 space-y-1">
-                  <div className="flex justify-between">
-                    <span>Base Hourly Consultation:</span>
-                    <span className="font-bold text-white">{formatMoney(selectedProvider.hourlyRateUGX, currency)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Maximus TrustVault Protection:</span>
-                    <span className="text-emerald-400 font-semibold">Active</span>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-md transition-colors"
-                >
-                  Send Inquiry with Escrow Guarantee
-                </button>
-              </form>
-            )}
-
           </div>
+        ))}
+      </div>
+
+      {filteredProviders.length === 0 && (
+        <div className="p-12 text-center bg-[#101F33] rounded-3xl border border-white/10 space-y-3">
+          <Search className="w-10 h-10 text-slate-500 mx-auto" />
+          <h3 className="text-base font-bold text-white">No service providers match your search</h3>
+          <p className="text-xs text-slate-400">
+            Try adjusting your search keywords or select "All Verified".
+          </p>
+          <button
+            onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
+            className="px-4 py-2 bg-[#C9A86A] text-[#0A1931] font-bold text-xs rounded-xl"
+          >
+            Clear Filters
+          </button>
         </div>
       )}
-
     </div>
   );
 };

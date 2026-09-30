@@ -16,7 +16,8 @@ import {
   CheckCircle2,
   FileText,
   Check,
-  Package
+  Package,
+  Building2
 } from 'lucide-react';
 import { UserRole, Currency, Language } from '../types';
 import { formatMoney } from '../services/currency';
@@ -164,9 +165,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <AlertTriangle className="w-4 h-4 shrink-0" />
                 <span>Disputes</span>
               </button>
+
+              <button 
+                onClick={() => onTabChange('services')}
+                className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === 'services' 
+                    ? 'bg-[#C9A86A] text-[#0A1931] rounded-full px-5 py-2 font-bold shadow-md' 
+                    : 'text-white/70 hover:text-white rounded-full px-4 py-2 font-medium'
+                }`}
+              >
+                <Building2 className="w-4 h-4 shrink-0 text-cyan-400" />
+                <span>Services</span>
+              </button>
             </>
           ) : (
-            /* TRANSPORTER SEES ONLY: Available Loads | My Bids | GPS Tracking | Disputes */
+            /* TRANSPORTER SEES ONLY: Available Loads | My Bids | GPS Tracking | Disputes | Services */
             <>
               <button 
                 onClick={() => onTabChange('dashboard')}
@@ -217,6 +230,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <AlertTriangle className="w-4 h-4 shrink-0" />
                 <span>Disputes</span>
+              </button>
+
+              <button 
+                onClick={() => onTabChange('services')}
+                className={`transition-all whitespace-nowrap flex items-center gap-2 ${
+                  activeTab === 'services' 
+                    ? 'bg-[#C9A86A] text-[#0A1931] rounded-full px-5 py-2 font-bold shadow-md' 
+                    : 'text-white/70 hover:text-white rounded-full px-4 py-2 font-medium'
+                }`}
+              >
+                <Building2 className="w-4 h-4 shrink-0 text-cyan-400" />
+                <span>Services</span>
               </button>
             </>
           )}
@@ -475,6 +500,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               <AlertTriangle className="w-3.5 h-3.5" />
               <span>Disputes</span>
             </button>
+
+            <button 
+              onClick={() => onTabChange('services')} 
+              className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+                activeTab === 'services' 
+                  ? 'bg-[#C9A86A] text-[#0A1931] px-4 py-1.5 font-bold shadow-sm' 
+                  : 'text-white/70 hover:text-white px-3 py-1.5'
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Services</span>
+            </button>
           </>
         ) : (
           <>
@@ -524,6 +561,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <AlertTriangle className="w-3.5 h-3.5" />
               <span>Disputes</span>
+            </button>
+
+            <button 
+              onClick={() => onTabChange('services')} 
+              className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all ${
+                activeTab === 'services' 
+                  ? 'bg-[#C9A86A] text-[#0A1931] px-4 py-1.5 font-bold shadow-sm' 
+                  : 'text-white/70 hover:text-white px-3 py-1.5'
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Services</span>
             </button>
           </>
         )}

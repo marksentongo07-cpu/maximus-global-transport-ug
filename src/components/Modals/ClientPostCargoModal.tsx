@@ -15,6 +15,7 @@ import {
 } from '../../services/pricingEngine';
 import { formatMoney } from '../../services/currency';
 import { WorldwidePlaceInput, PlaceResult } from '../Common/WorldwidePlaceInput';
+import { getCachedPlatformSettings } from '../../services/settingsService';
 import { 
   Package, 
   MapPin, 
@@ -181,8 +182,14 @@ export const ClientPostCargoModal: React.FC<ClientPostCargoModalProps> = ({
     }
 
     const finalClientPriceUGX = priceUGX || priceQuote.negotiationStartingPriceUGX;
-    // 8% commission on final agreed amount - MAXIMUS Free Market standard
-    const adminFeeUGX = Math.round(finalClientPriceUGX * 0.08);
+    
+    // Dynamic Commission from Settings Table: domestic vs cross-border
+    const currentSettings = getCachedPlatformSettings();
+    const isCrossBorder = countryFrom !== 'Uganda' || countryTo !== 'Uganda';
+    const dynamicRate = isCrossBorder 
+      ? currentSettings.international_commission 
+      : currentSettings.commission_percent;
+    const adminFeeUGX = Math.round(finalClientPriceUGX * (dynamicRate / 100));
 
     const newJob: Job = {
       id: 'job-intl-' + Date.now().toString().slice(-4),
@@ -216,7 +223,7 @@ export const ClientPostCargoModal: React.FC<ClientPostCargoModalProps> = ({
       estimatedDistanceKm: priceQuote.distanceKm,
       marketPriceEstimateUGX: priceQuote.totalMarketEstimateUGX,
       adminFeeUGX,
-      commissionRatePercent: 8,
+      commissionRatePercent: dynamicRate,
       shipmentType: 'single',
       clientBudgetUGX: finalClientPriceUGX,
       isNegotiable,
