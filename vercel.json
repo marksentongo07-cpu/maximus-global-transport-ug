@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/admin", "destination": "/index.html" },
+    { "source": "/admin/(.*)", "destination": "/index.html" },
+    { "source": "/app/admin", "destination": "/index.html" },
+    { "source": "/app/admin/(.*)", "destination": "/index.html" },
+    { "source": "/maximus-admin-2026-secure", "destination": "/index.html" },
+    { "source": "/maximus-admin-2026-secure/(.*)", "destination": "/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

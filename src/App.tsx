@@ -66,7 +66,9 @@ export default function App() {
 
   // Secret Route & Server-Verified Super Admin State
   const [isAdminPortalActive, setIsAdminPortalActive] = useState<boolean>(() => {
-    return typeof window !== 'undefined' && window.location.pathname.startsWith('/maximus-admin-2026-secure');
+    if (typeof window === 'undefined') return false;
+    const p = window.location.pathname;
+    return p.startsWith('/maximus-admin-2026-secure') || p.startsWith('/admin') || p.startsWith('/app/admin');
   });
   const [isServerSuperAdmin, setIsServerSuperAdmin] = useState<boolean>(false);
 
@@ -81,25 +83,35 @@ export default function App() {
   // Check URL pathname and server-side authentication from httpOnly cookie
   useEffect(() => {
     const path = window.location.pathname;
-    // Block & redirect old admin routes to root "/"
+    // Redirect /admin and /app/admin to /maximus-admin-2026-secure
     if (
       path === '/admin' || 
       path.startsWith('/admin/') || 
+      path === '/app/admin' || 
+      path.startsWith('/app/admin/')
+    ) {
+      window.history.replaceState({}, '', '/maximus-admin-2026-secure');
+      setIsAdminPortalActive(true);
+    } else if (path.startsWith('/maximus-admin-2026-secure')) {
+      setIsAdminPortalActive(true);
+    } else if (
       path === '/super-admin' || 
       path.startsWith('/super-admin/') || 
       path === '/dashboard' || 
       path.startsWith('/dashboard/')
     ) {
       window.history.replaceState({}, '', '/');
-    } else if (path.startsWith('/maximus-admin-2026-secure')) {
-      setIsAdminPortalActive(true);
     } else if (path === '/services' || path.startsWith('/services')) {
       setActiveTab('services');
     }
 
     const handlePopState = () => {
       const currentPath = window.location.pathname;
-      if (currentPath.startsWith('/maximus-admin-2026-secure')) {
+      if (
+        currentPath.startsWith('/maximus-admin-2026-secure') ||
+        currentPath.startsWith('/admin') ||
+        currentPath.startsWith('/app/admin')
+      ) {
         setIsAdminPortalActive(true);
       } else {
         setIsAdminPortalActive(false);
