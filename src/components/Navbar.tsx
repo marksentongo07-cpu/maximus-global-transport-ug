@@ -17,7 +17,8 @@ import {
   FileText,
   Check,
   Package,
-  Building2
+  Building2,
+  Lock
 } from 'lucide-react';
 import { UserRole, Currency, Language } from '../types';
 import { formatMoney } from '../services/currency';
@@ -40,6 +41,8 @@ interface NavbarProps {
   notifications: Array<{ id: string; title: string; desc: string; time: string; read: boolean }>;
   onMarkNotificationsRead: () => void;
   userEmail?: string;
+  onOpenAdminAccess?: () => void;
+  onOpenAdminSecure?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -58,7 +61,48 @@ export const Navbar: React.FC<NavbarProps> = ({
   notifications,
   onMarkNotificationsRead,
   userEmail = 'marksentongo07@gmail.com',
+  onOpenAdminAccess,
+  onOpenAdminSecure,
 }) => {
+  // Check if ?admin=true is present in URL
+  const [showAdminLock, setShowAdminLock] = useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams.get('admin') === 'true') {
+        setShowAdminLock(true);
+      }
+    }
+  }, []);
+
+  // Rapid 5x click and 2s long-press on MAXIMUS logo
+  const clickTimesRef = React.useRef<number[]>([]);
+  const pressTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const handleLogoClick = () => {
+    const now = Date.now();
+    clickTimesRef.current = [...clickTimesRef.current.filter(t => now - t < 2500), now];
+    if (clickTimesRef.current.length >= 5) {
+      clickTimesRef.current = [];
+      if (onOpenAdminAccess) onOpenAdminAccess();
+      return;
+    }
+    onTabChange('dashboard');
+  };
+
+  const handlePressStart = () => {
+    pressTimerRef.current = setTimeout(() => {
+      if (onOpenAdminAccess) onOpenAdminAccess();
+    }, 2000); // 2-second hold
+  };
+
+  const handlePressEnd = () => {
+    if (pressTimerRef.current) {
+      clearTimeout(pressTimerRef.current);
+      pressTimerRef.current = null;
+    }
+  };
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showCurrencyMenu, setShowCurrencyMenu] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -99,8 +143,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Zone 1: Brand Mark with subtle gradient backdrop */}
         <div className="flex items-center gap-3 shrink-0">
           <button 
-            onClick={() => onTabChange('dashboard')} 
-            className="flex items-center gap-3 text-left group focus:outline-none"
+            onClick={handleLogoClick}
+            onMouseDown={handlePressStart}
+            onMouseUp={handlePressEnd}
+            onTouchStart={handlePressStart}
+            onTouchEnd={handlePressEnd}
+            className="flex items-center gap-3 text-left group focus:outline-none select-none cursor-pointer"
+            title="MAXIMUS Global Transport Link (5x click or 2s hold for Admin Access)"
           >
             <Logo size={40} className="w-10 h-10 shadow-lg shadow-black/40 rounded-xl" />
             <div>
@@ -177,6 +226,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Building2 className="w-4 h-4 shrink-0 text-cyan-400" />
                 <span>Services</span>
               </button>
+
+              {/* Owner Admin Secret Shortcut (Only visible if ?admin=true in URL) */}
+              {showAdminLock && (
+                <button
+                  onClick={() => {
+                    if (onOpenAdminSecure) {
+                      onOpenAdminSecure();
+                    } else {
+                      window.location.pathname = '/maximus-admin-2026-secure';
+                    }
+                  }}
+                  className="transition-all p-2 rounded-full bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/50 shadow-sm cursor-pointer ml-1"
+                  title="Super Admin Mode (?admin=true detected)"
+                >
+                  <Lock className="w-4 h-4 text-amber-300 animate-pulse" />
+                  <span className="sr-only">Super Admin</span>
+                </button>
+              )}
             </>
           ) : (
             /* TRANSPORTER SEES ONLY: Available Loads | My Bids | GPS Tracking | Disputes | Services */
@@ -243,6 +310,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Building2 className="w-4 h-4 shrink-0 text-cyan-400" />
                 <span>Services</span>
               </button>
+
+              {/* Owner Admin Secret Shortcut (Only visible if ?admin=true in URL) */}
+              {showAdminLock && (
+                <button
+                  onClick={() => {
+                    if (onOpenAdminSecure) {
+                      onOpenAdminSecure();
+                    } else {
+                      window.location.pathname = '/maximus-admin-2026-secure';
+                    }
+                  }}
+                  className="transition-all p-2 rounded-full bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/50 shadow-sm cursor-pointer ml-1"
+                  title="Super Admin Mode (?admin=true detected)"
+                >
+                  <Lock className="w-4 h-4 text-amber-300 animate-pulse" />
+                  <span className="sr-only">Super Admin</span>
+                </button>
+              )}
             </>
           )}
         </nav>
@@ -575,6 +660,23 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>Services</span>
             </button>
           </>
+        )}
+
+        {showAdminLock && (
+          <button
+            onClick={() => {
+              if (onOpenAdminSecure) {
+                onOpenAdminSecure();
+              } else {
+                window.location.pathname = '/maximus-admin-2026-secure';
+              }
+            }}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold shrink-0 shadow-sm ml-auto"
+            title="Admin Secure Access"
+          >
+            <Lock className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+            <span>Admin</span>
+          </button>
         )}
       </div>
     </header>

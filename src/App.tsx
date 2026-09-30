@@ -42,6 +42,7 @@ import { ClientPostCargoModal } from './components/Modals/ClientPostCargoModal';
 import { TransporterRegisterModal } from './components/Modals/TransporterRegisterModal';
 import { PricingGuidePage } from './components/Pricing/PricingGuidePage';
 import { SecureAdminPortal } from './components/Admin/SecureAdminPortal';
+import { AdminAccessModal } from './components/Modals/AdminAccessModal';
 import { TutorialTooltip, TutorialTooltipData } from './components/Common/TutorialTooltip';
 import { 
   ShieldCheck, 
@@ -173,6 +174,7 @@ export default function App() {
   const [showTransporterRegisterModal, setShowTransporterRegisterModal] = useState(false);
   const [tutorialTooltip, setTutorialTooltip] = useState<TutorialTooltipData | null>(null);
   const [showLegalModal, setShowLegalModal] = useState(false);
+  const [showAdminQuickModal, setShowAdminQuickModal] = useState(false);
   const [celebrationBanner, setCelebrationBanner] = useState<string | null>(null);
 
   // Active Job for GPS Map Tracking
@@ -721,6 +723,11 @@ export default function App() {
         notifications={notifications}
         onMarkNotificationsRead={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
         userEmail={currentUserEmail}
+        onOpenAdminAccess={() => setShowAdminQuickModal(true)}
+        onOpenAdminSecure={() => {
+          setIsAdminPortalActive(true);
+          window.history.pushState({}, '', '/maximus-admin-2026-secure');
+        }}
       />
 
       {/* Main Viewport Content */}
@@ -884,7 +891,17 @@ export default function App() {
             <Logo size={24} className="w-6 h-6 shadow-sm" />
             <span className="font-bold text-white">MAXIMUS</span>
             <span className="text-slate-500">·</span>
-            <span>{t('footerPlatformDesc', language)}</span>
+            <span className="text-[11px] text-slate-400">
+              ©{' '}
+              <button 
+                onClick={() => setShowAdminQuickModal(true)} 
+                className="hover:text-amber-400 font-mono underline decoration-slate-600 hover:decoration-amber-400 cursor-pointer"
+                title="Admin Access (Owner Login)"
+              >
+                2026
+              </button>{' '}
+              MAXIMUS Global Transport Link · {t('footerPlatformDesc', language)}
+            </span>
           </div>
 
           <div className="flex items-center gap-5 text-slate-400 flex-wrap">
@@ -1034,6 +1051,19 @@ export default function App() {
         <TransporterRegisterModal
           onClose={() => setShowTransporterRegisterModal(false)}
           onRegisterTransporter={handleRegisterTransporter}
+        />
+      )}
+
+      {/* 12. Owner Admin Access Quick Modal (triggered by 2026 click or logo 5x/long-press) */}
+      {showAdminQuickModal && (
+        <AdminAccessModal
+          onClose={() => setShowAdminQuickModal(false)}
+          onSuccess={() => {
+            setShowAdminQuickModal(false);
+            setIsServerSuperAdmin(true);
+            setIsAdminPortalActive(true);
+            window.history.pushState({}, '', '/maximus-admin-2026-secure');
+          }}
         />
       )}
 
