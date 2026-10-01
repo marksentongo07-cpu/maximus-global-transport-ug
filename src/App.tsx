@@ -240,9 +240,52 @@ export default function App() {
     nationalIdFile?: string;
     logbookFile?: string;
     truckPhotoFile?: string;
+    additionalVehicles?: Array<{
+      type: Vehicle['type'];
+      plateNumber: string;
+      capacityTons?: number;
+      name?: string;
+      logbookNumber?: string;
+    }>;
   }) => {
     const newTransporterId = 'trans-' + Date.now().toString().slice(-4);
     const newVehId = 'veh-' + Date.now().toString().slice(-4);
+
+    const primaryVehicle: Vehicle = {
+      id: newVehId,
+      transporterId: newTransporterId,
+      type: tData.truckType,
+      name: `${tData.truckType.replace('_', ' ').toUpperCase()} Commercial Hauler`,
+      plateNumber: tData.plateNumber,
+      capacityTons: 10,
+      availableUnits: 1,
+      currentLocation: {
+        name: 'Kampala Logistics Base',
+        lat: 0.3476,
+        lng: 32.5825,
+      },
+      ratePerKmUGX: 4500,
+      photoUrl: tData.truckPhotoFile || '/src/assets/images/maximus_hero_truck_1790435606454.jpg',
+    };
+
+    const extraVehicles: Vehicle[] = (tData.additionalVehicles || []).map((extra, idx) => ({
+      id: `veh-${Date.now().toString().slice(-4)}-${idx + 1}`,
+      transporterId: newTransporterId,
+      type: extra.type,
+      name: extra.name || `${extra.type.replace('_', ' ').toUpperCase()} Commercial Hauler`,
+      plateNumber: extra.plateNumber,
+      capacityTons: extra.capacityTons || 15,
+      availableUnits: 1,
+      currentLocation: {
+        name: 'Uganda Regional Logistics Depot',
+        lat: 0.3476 + (idx * 0.05),
+        lng: 32.5825 + (idx * 0.05),
+      },
+      ratePerKmUGX: 4500,
+      photoUrl: '/src/assets/images/maximus_hero_truck_1790435606454.jpg',
+    }));
+
+    const allFleetVehicles = [primaryVehicle, ...extraVehicles];
 
     const newTransporter: Transporter = {
       id: newTransporterId,
@@ -255,7 +298,7 @@ export default function App() {
       rating: 5.0,
       totalTrips: 0,
       loyaltyPoints: 100,
-      badges: ['New Carrier', 'Bank-Grade KYC Applicant'],
+      badges: ['New Carrier', 'Bank-Grade KYC Applicant', `${allFleetVehicles.length} Trucks Registered`],
       kycStatus: 'pending',
       nin: tData.nin,
       kycDocs: {
@@ -276,24 +319,7 @@ export default function App() {
         bankAccountNumber: '9030018472910',
         accountName: tData.name,
       },
-      vehicles: [
-        {
-          id: newVehId,
-          transporterId: newTransporterId,
-          type: tData.truckType,
-          name: `${tData.truckType.replace('_', ' ').toUpperCase()} Commercial Hauler`,
-          plateNumber: tData.plateNumber,
-          capacityTons: 10,
-          availableUnits: 1,
-          currentLocation: {
-            name: 'Kampala Logistics Base',
-            lat: 0.3476,
-            lng: 32.5825,
-          },
-          ratePerKmUGX: 4500,
-          photoUrl: tData.truckPhotoFile || '/src/assets/images/maximus_hero_truck_1790435606454.jpg',
-        }
-      ],
+      vehicles: allFleetVehicles,
       isAvailable: true,
       status: 'active',
       currentLocation: {
@@ -308,20 +334,9 @@ export default function App() {
     setActiveTab('dashboard');
     setShowTransporterRegisterModal(false);
 
-    // Requirement: After registration, show tutorial tooltip:
-    // For Transporter: "Welcome! 3 loads near you - tap to bid UGX price"
-    setTutorialTooltip({
-      type: 'transporter',
-      message: 'Welcome! 3 loads near you - tap to bid UGX price',
-      actionText: 'View Loads & Tap to Bid 🚚',
-      onAction: () => {
-        setActiveTab('dashboard');
-      }
-    });
-
     addNotification(
       'Welcome to Maximus Freight! 🚚',
-      '3 loads near you - tap to bid UGX price. Super Admin will verify your KYC documents.'
+      `Registered ${allFleetVehicles.length} truck${allFleetVehicles.length > 1 ? 's' : ''} to your fleet. View loads and submit bids.`
     );
   };
 
@@ -643,6 +658,16 @@ export default function App() {
   };
 
   const handleTabChange = (tab: string) => {
+    if (tab === 'admin') {
+      const localRole = typeof window !== 'undefined' ? localStorage.getItem('maximus_role') : null;
+      if (localRole === 'super_admin' || isServerSuperAdmin) {
+        setIsAdminPortalActive(true);
+        window.history.pushState({}, '', '/maximus-admin-2026-secure');
+      } else {
+        setShowAdminQuickModal(true);
+      }
+      return;
+    }
     setActiveTab(tab);
     if (tab === 'services') {
       window.history.pushState({}, '', '/services');

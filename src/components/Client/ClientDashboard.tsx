@@ -148,25 +148,35 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
           <p className="text-[14px] text-white/60 leading-6">{t('monitorNegotiations', language)}</p>
         </div>
 
-        <div className="flex items-center gap-2 p-1.5 bg-[#1a2a3f] border border-white/10 rounded-full shadow-inner">
-          {[
-            { id: 'all', label: `${t('allLoads', language)} (${jobs.length})` },
-            { id: 'active', label: `${t('inTransit', language)} (${activeShipments.length})` },
-            { id: 'open', label: `${t('bidding', language)} (${openNegotiatingJobs.length})` },
-            { id: 'delivered', label: `${t('delivered', language)} (${deliveredJobs.length})` },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setFilterTab(tab.id as typeof filterTab)}
-              className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all ${
-                filterTab === tab.id
-                  ? 'bg-orange-500 text-black shadow-md'
-                  : 'text-white/60 hover:text-white'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2 p-1.5 bg-[#1a2a3f] border border-white/10 rounded-full shadow-inner">
+            {[
+              { id: 'all', label: `${t('allLoads', language)} (${jobs.length})` },
+              { id: 'active', label: `${t('inTransit', language)} (${activeShipments.length})` },
+              { id: 'open', label: `${t('bidding', language)} (${openNegotiatingJobs.length})` },
+              { id: 'delivered', label: `${t('delivered', language)} (${deliveredJobs.length})` },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setFilterTab(tab.id as typeof filterTab)}
+                className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all ${
+                  filterTab === tab.id
+                    ? 'bg-orange-500 text-black shadow-md'
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={onOpenPostJob}
+            className="px-5 py-2 bg-gradient-to-r from-[#C9A86A] to-[#a88748] hover:from-[#d6b77c] hover:to-[#b79653] text-[#0A1931] font-black text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+          >
+            <Plus className="w-4 h-4 text-[#0A1931]" />
+            <span>+ Post Another Load</span>
+          </button>
         </div>
       </div>
 
@@ -411,6 +421,16 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
                   >
                     <FileText className="w-3.5 h-3.5 text-white/80" />
                     <span>{t('invoice', language)}</span>
+                  </button>
+
+                  {/* Quick Post Another Load for this corridor */}
+                  <button
+                    onClick={onOpenPostJob}
+                    className="px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-xs rounded-xl border border-amber-500/40 transition-colors flex items-center gap-1.5 cursor-pointer"
+                    title="Post another cargo load"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Post Another Load</span>
                   </button>
 
                   {/* Rate Transporter (if delivered) */}

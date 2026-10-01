@@ -16,8 +16,18 @@ import {
   CreditCard,
   AlertTriangle,
   Sparkles,
-  Lock
+  Lock,
+  Plus,
+  Trash2
 } from 'lucide-react';
+
+export interface ExtraTruckItem {
+  id: string;
+  truckType: VehicleType;
+  plateNumber: string;
+  capacityTons: number;
+  logbookNumber: string;
+}
 
 interface TransporterRegisterModalProps {
   onClose: () => void;
@@ -32,6 +42,13 @@ interface TransporterRegisterModalProps {
     nationalIdFile?: string;
     logbookFile?: string;
     truckPhotoFile?: string;
+    additionalVehicles?: Array<{
+      type: VehicleType;
+      plateNumber: string;
+      capacityTons?: number;
+      name?: string;
+      logbookNumber?: string;
+    }>;
   }) => void;
 }
 
@@ -47,6 +64,28 @@ export const TransporterRegisterModal: React.FC<TransporterRegisterModalProps> =
   const [driverName, setDriverName] = useState<string>('Ronald Mukasa');
   const [phone, setPhone] = useState<string>('+256 772 491 802');
   const [companyName, setCompanyName] = useState<string>('Mukasa Heavy Haulage Logistics');
+
+  // Support registering as many trucks as possible (unlimited fleet)
+  const [additionalTrucks, setAdditionalTrucks] = useState<ExtraTruckItem[]>([]);
+
+  const handleAddExtraTruck = () => {
+    const newTruck: ExtraTruckItem = {
+      id: 'extra-truck-' + Date.now(),
+      truckType: 'semi_trailer',
+      plateNumber: `UBF ${Math.floor(100 + Math.random() * 899)}K`,
+      capacityTons: 30,
+      logbookNumber: `URA-LOG-${Math.floor(100000 + Math.random() * 899999)}`,
+    };
+    setAdditionalTrucks(prev => [...prev, newTruck]);
+  };
+
+  const handleUpdateExtraTruck = (id: string, updates: Partial<ExtraTruckItem>) => {
+    setAdditionalTrucks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
+  };
+
+  const handleRemoveExtraTruck = (id: string) => {
+    setAdditionalTrucks(prev => prev.filter(t => t.id !== id));
+  };
 
   // Statutory Upload States (with default sample files for frictionless demo)
   const [drivingPermitUploaded, setDrivingPermitUploaded] = useState(true);
@@ -84,6 +123,13 @@ export const TransporterRegisterModal: React.FC<TransporterRegisterModalProps> =
       nationalIdFile: nationalIdUploaded ? 'Verified NIRA National ID' : undefined,
       logbookFile: logbookUploaded ? 'Verified URA Vehicle Logbook' : undefined,
       truckPhotoFile: truckPhotoPreview,
+      additionalVehicles: additionalTrucks.map(t => ({
+        type: t.truckType,
+        plateNumber: t.plateNumber.trim().toUpperCase(),
+        capacityTons: t.capacityTons,
+        logbookNumber: t.logbookNumber,
+        name: `${t.truckType.replace('_', ' ').toUpperCase()} Commercial Hauler`,
+      })),
     });
   };
 
@@ -244,6 +290,101 @@ export const TransporterRegisterModal: React.FC<TransporterRegisterModalProps> =
                 />
               </div>
             </div>
+          </div>
+
+          {/* Section 1B: Unlimited Fleet Trucks Registration */}
+          <div className="bg-[#0f1c2e] p-4 rounded-xl border border-white/10 space-y-3">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <span className="text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Truck className="w-4 h-4 text-orange-400" />
+                  Additional Fleet Vehicles (Unlimited)
+                </span>
+                <p className="text-[11px] text-white/60">
+                  Register as many trucks as you operate — all trucks will receive instant job alerts.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-orange-500/20 text-orange-300 font-bold border border-orange-500/30">
+                  {1 + additionalTrucks.length} Trucks in Fleet
+                </span>
+                <button
+                  type="button"
+                  onClick={handleAddExtraTruck}
+                  className="px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-400 text-black font-extrabold text-xs flex items-center gap-1 shadow-md transition-all cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5 text-black" />
+                  <span>Add Another Truck</span>
+                </button>
+              </div>
+            </div>
+
+            {/* List of Additional Trucks */}
+            {additionalTrucks.length > 0 && (
+              <div className="space-y-2.5 pt-1">
+                {additionalTrucks.map((trk, index) => (
+                  <div key={trk.id} className="p-3 bg-[#1a2a3f] border border-white/10 rounded-xl space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-white flex items-center gap-1.5">
+                        <Truck className="w-3.5 h-3.5 text-orange-400" />
+                        <span>Truck #{index + 2} Details</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveExtraTruck(trk.id)}
+                        className="text-rose-400 hover:text-rose-300 p-1 rounded hover:bg-rose-500/10 transition-colors flex items-center gap-1 text-[11px]"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Remove</span>
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div>
+                        <label className="text-[10px] text-white/60 block mb-0.5">Category</label>
+                        <select
+                          value={trk.truckType}
+                          onChange={(e) => handleUpdateExtraTruck(trk.id, { truckType: e.target.value as VehicleType })}
+                          className="w-full bg-[#0f1c2e] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                        >
+                          <option value="fuso">Fuso 5-10T</option>
+                          <option value="semi_trailer">Semi-Trailer 30-40T</option>
+                          <option value="box_truck">Box Truck 10T</option>
+                          <option value="flatbed">Flatbed 30T</option>
+                          <option value="pickup">Pickup 1-2T</option>
+                          <option value="refrigerated">Refrigerated Reefer</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] text-white/60 block mb-0.5">Plate Number</label>
+                        <input
+                          type="text"
+                          required
+                          value={trk.plateNumber}
+                          onChange={(e) => handleUpdateExtraTruck(trk.id, { plateNumber: e.target.value.toUpperCase() })}
+                          placeholder="UBF 123K"
+                          className="w-full bg-[#0f1c2e] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-mono font-bold text-orange-400 uppercase"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] text-white/60 block mb-0.5">Capacity (Tons)</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="100"
+                          value={trk.capacityTons}
+                          onChange={(e) => handleUpdateExtraTruck(trk.id, { capacityTons: Number(e.target.value) })}
+                          className="w-full bg-[#0f1c2e] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Section 2: Bank-Grade KYC Uploads (National ID + Truck Logbook + Photo of truck + Driving Permit) */}

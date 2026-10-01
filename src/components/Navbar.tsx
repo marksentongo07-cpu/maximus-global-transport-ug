@@ -227,23 +227,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>Services</span>
               </button>
 
-              {/* Owner Admin Secret Shortcut (Only visible if ?admin=true in URL) */}
-              {showAdminLock && (
-                <button
-                  onClick={() => {
-                    if (onOpenAdminSecure) {
-                      onOpenAdminSecure();
-                    } else {
-                      window.location.pathname = '/maximus-admin-2026-secure';
-                    }
-                  }}
-                  className="transition-all p-2 rounded-full bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/50 shadow-sm cursor-pointer ml-1"
-                  title="Super Admin Mode (?admin=true detected)"
-                >
-                  <Lock className="w-4 h-4 text-amber-300 animate-pulse" />
-                  <span className="sr-only">Super Admin</span>
-                </button>
-              )}
+              {/* Admin Tab near Services */}
+              <button 
+                onClick={() => onTabChange('admin')}
+                className={`transition-all whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs border cursor-pointer ${
+                  activeTab === 'admin' 
+                    ? 'bg-[#C9A86A] text-[#0A1931] border-[#C9A86A] shadow-md' 
+                    : 'bg-slate-800/80 text-amber-300 hover:text-white hover:bg-slate-700 border-amber-500/30'
+                }`}
+                title="Admin Portal (Enter Code to View Accounts)"
+              >
+                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                <span>Admin</span>
+              </button>
             </>
           ) : (
             /* TRANSPORTER SEES ONLY: Available Loads | My Bids | GPS Tracking | Disputes | Services */
@@ -311,23 +307,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>Services</span>
               </button>
 
-              {/* Owner Admin Secret Shortcut (Only visible if ?admin=true in URL) */}
-              {showAdminLock && (
-                <button
-                  onClick={() => {
-                    if (onOpenAdminSecure) {
-                      onOpenAdminSecure();
-                    } else {
-                      window.location.pathname = '/maximus-admin-2026-secure';
-                    }
-                  }}
-                  className="transition-all p-2 rounded-full bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/50 shadow-sm cursor-pointer ml-1"
-                  title="Super Admin Mode (?admin=true detected)"
-                >
-                  <Lock className="w-4 h-4 text-amber-300 animate-pulse" />
-                  <span className="sr-only">Super Admin</span>
-                </button>
-              )}
+              {/* Admin Tab near Services */}
+              <button 
+                onClick={() => onTabChange('admin')}
+                className={`transition-all whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs border cursor-pointer ${
+                  activeTab === 'admin' 
+                    ? 'bg-[#C9A86A] text-[#0A1931] border-[#C9A86A] shadow-md' 
+                    : 'bg-slate-800/80 text-amber-300 hover:text-white hover:bg-slate-700 border-amber-500/30'
+                }`}
+                title="Admin Portal (Enter Code to View Accounts)"
+              >
+                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                <span>Admin</span>
+              </button>
             </>
           )}
         </nav>
@@ -658,6 +650,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Building2 className="w-3.5 h-3.5" />
               <span>Services</span>
+            </button>
+
+            {/* Admin Tab near Services */}
+            <button 
+              onClick={() => onTabChange('admin')} 
+              className={`flex items-center gap-1.5 rounded-full whitespace-nowrap shrink-0 transition-all px-3 py-1.5 font-bold text-xs border cursor-pointer ${
+                activeTab === 'admin' 
+                  ? 'bg-[#C9A86A] text-[#0A1931] border-[#C9A86A] shadow-sm' 
+                  : 'bg-slate-800 text-amber-300 border-amber-500/30'
+              }`}
+              title="Admin Portal"
+            >
+              <Lock className="w-3.5 h-3.5 text-amber-400" />
+              <span>Admin</span>
             </button>
           </>
         )}

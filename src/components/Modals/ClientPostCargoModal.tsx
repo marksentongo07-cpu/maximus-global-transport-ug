@@ -36,7 +36,8 @@ import {
   Globe,
   Ship,
   Plane,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Plus
 } from 'lucide-react';
 
 interface ClientPostCargoModalProps {
@@ -104,6 +105,11 @@ export const ClientPostCargoModal: React.FC<ClientPostCargoModalProps> = ({
   const [cargoTitle, setCargoTitle] = useState<string>('40ft Container: Guangzhou to Gulu via Mombasa Corridor');
   const [clientPhone, setClientPhone] = useState<string>('+256 772 100 200');
 
+  // Support posting as many jobs as possible (quantity multiplier & consecutive posting)
+  const [loadQuantity, setLoadQuantity] = useState<number>(1);
+  const [postedSuccessCount, setPostedSuccessCount] = useState<number>(0);
+  const [postedMessage, setPostedMessage] = useState<string | null>(null);
+
   // Exchange rate assumption for dual display: 1 USD = 3,750 UGX
   const USD_TO_UGX_RATE = 3750;
 
@@ -144,9 +150,7 @@ export const ClientPostCargoModal: React.FC<ClientPostCargoModalProps> = ({
     );
   }, [pickupCoords, deliveryCoords, vehicleType, weightTons, cargoType, policeEscortNeeded, uraPermitNeeded, wideLength, wideWidth, wideHeight]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const publishJobs = (andAddAnother: boolean = false) => {
     const vehicleDisplay = vehicleType === 'other' && customVehicleDesc.trim() 
       ? customVehicleDesc.trim() 
       : VEHICLE_BASE_RATES[vehicleType as VehicleType]?.label || vehicleType;
@@ -191,53 +195,73 @@ export const ClientPostCargoModal: React.FC<ClientPostCargoModalProps> = ({
       : currentSettings.commission_percent;
     const adminFeeUGX = Math.round(finalClientPriceUGX * (dynamicRate / 100));
 
-    const newJob: Job = {
-      id: 'job-intl-' + Date.now().toString().slice(-4),
-      title: finalTitle,
-      clientId: 'client-001',
-      clientName: 'Mukwano Commercial Exports',
-      clientPhone: clientPhone || '+256 772 100 200',
-      cargoDescription: `Worldwide shipment: ${cargoType} (${weightTons}T) from ${pickupLocationName} (${countryFrom}) to ${deliveryLocationName} (${countryTo}). Shipping mode: ${shippingMode}. Customs clearance required: ${customsNeeded ? 'YES' : 'NO'}. Vehicle requested: ${vehicleDisplay}. ${isNegotiable ? 'Client offer is negotiable.' : 'Fixed budget.'}`,
-      weightTons,
-      dimensions: {
-        lengthMeters: wideLength || 6.0,
-        widthMeters: wideWidth || 2.4,
-        heightMeters: wideHeight || 2.0,
-      },
-      category,
-      cargoType,
-      containerDetails: containerData,
-      wideLoadDetails: wideData,
-      pickupLocation: {
-        name: pickupLocationName,
-        address: `${pickupLocationName}, ${countryFrom}`,
-        lat: pickupCoords.lat,
-        lng: pickupCoords.lng,
-      },
-      deliveryLocation: {
-        name: deliveryLocationName,
-        address: `${deliveryLocationName}, ${countryTo}`,
-        lat: deliveryCoords.lat,
-        lng: deliveryCoords.lng,
-      },
-      estimatedDistanceKm: priceQuote.distanceKm,
-      marketPriceEstimateUGX: priceQuote.totalMarketEstimateUGX,
-      adminFeeUGX,
-      commissionRatePercent: dynamicRate,
-      shipmentType: 'single',
-      clientBudgetUGX: finalClientPriceUGX,
-      isNegotiable,
-      desiredVehicleType: vehicleType,
-      customVehicleType: vehicleType === 'other' ? customVehicleDesc : undefined,
-      pickupDate: '2026-09-29 08:30 AM',
-      photoUrl: '/src/assets/images/cargo_loading_depot_1790435648670.jpg',
-      status: 'open',
-      offers: [],
-      escrowStatus: 'none',
-      createdAt: 'Just now',
-    };
+    const qty = Math.max(1, loadQuantity);
 
-    onSubmitJob(newJob);
+    for (let i = 0; i < qty; i++) {
+      const loadSuffix = qty > 1 ? ` (Truck #${i + 1} of ${qty})` : '';
+      const newJob: Job = {
+        id: `job-intl-${Date.now().toString().slice(-4)}${i > 0 ? `-${i + 1}` : ''}`,
+        title: `${finalTitle}${loadSuffix}`,
+        clientId: 'client-001',
+        clientName: 'Mukwano Commercial Exports',
+        clientPhone: clientPhone || '+256 772 100 200',
+        cargoDescription: `Worldwide shipment: ${cargoType} (${weightTons}T) from ${pickupLocationName} (${countryFrom}) to ${deliveryLocationName} (${countryTo}). Shipping mode: ${shippingMode}. Customs clearance required: ${customsNeeded ? 'YES' : 'NO'}. Vehicle requested: ${vehicleDisplay}. ${isNegotiable ? 'Client offer is negotiable.' : 'Fixed budget.'}`,
+        weightTons,
+        dimensions: {
+          lengthMeters: wideLength || 6.0,
+          widthMeters: wideWidth || 2.4,
+          heightMeters: wideHeight || 2.0,
+        },
+        category,
+        cargoType,
+        containerDetails: containerData,
+        wideLoadDetails: wideData,
+        pickupLocation: {
+          name: pickupLocationName,
+          address: `${pickupLocationName}, ${countryFrom}`,
+          lat: pickupCoords.lat,
+          lng: pickupCoords.lng,
+        },
+        deliveryLocation: {
+          name: deliveryLocationName,
+          address: `${deliveryLocationName}, ${countryTo}`,
+          lat: deliveryCoords.lat,
+          lng: deliveryCoords.lng,
+        },
+        estimatedDistanceKm: priceQuote.distanceKm,
+        marketPriceEstimateUGX: priceQuote.totalMarketEstimateUGX,
+        adminFeeUGX,
+        commissionRatePercent: dynamicRate,
+        shipmentType: 'single',
+        clientBudgetUGX: finalClientPriceUGX,
+        isNegotiable,
+        desiredVehicleType: vehicleType,
+        customVehicleType: vehicleType === 'other' ? customVehicleDesc : undefined,
+        pickupDate: '2026-09-29 08:30 AM',
+        photoUrl: '/src/assets/images/cargo_loading_depot_1790435648670.jpg',
+        status: 'open',
+        offers: [],
+        escrowStatus: 'none',
+        createdAt: 'Just now',
+      };
+
+      onSubmitJob(newJob);
+    }
+
+    const newTotal = postedSuccessCount + qty;
+    setPostedSuccessCount(newTotal);
+
+    if (andAddAnother) {
+      setPostedMessage(`✓ ${qty} shipment load${qty > 1 ? 's' : ''} published to Live Bids! Total jobs posted in session: ${newTotal}. Enter details for next load:`);
+      setCargoTitle(`Consignment #${newTotal + 1}: ${cargoType} to ${deliveryLocationName.split(',')[0]}`);
+    } else {
+      onClose();
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    publishJobs(false);
   };
 
   return (
@@ -277,6 +301,19 @@ export const ClientPostCargoModal: React.FC<ClientPostCargoModalProps> = ({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 max-h-[82vh] overflow-y-auto">
           
+          {/* Consecutive Posting Success Banner */}
+          {postedMessage && (
+            <div className="p-3.5 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl text-emerald-200 text-xs font-semibold flex items-center justify-between shadow-lg">
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <span>{postedMessage}</span>
+              </div>
+              <span className="text-[11px] font-mono text-emerald-300 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-500/40 shrink-0">
+                {postedSuccessCount} Active Jobs
+              </span>
+            </div>
+          )}
+
           {/* Section 1: Worldwide Pickup & Destination Route */}
           <div className="bg-[#0f243d] p-4 rounded-2xl border border-white/10 space-y-3">
             <div className="flex items-center justify-between">
@@ -583,22 +620,72 @@ export const ClientPostCargoModal: React.FC<ClientPostCargoModalProps> = ({
             </span>
           </div>
 
+          {/* Section: Quantity of Loads / Trucks Needed (Unlimited Posting) */}
+          <div className="p-3.5 bg-black/40 border border-white/10 rounded-2xl flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                <Truck className="w-4 h-4 text-amber-400" />
+                <span>Quantity of Trucks / Container Loads Needed:</span>
+              </span>
+              <p className="text-[11px] text-white/50">
+                Post multiple loads for this corridor at once (e.g. 5 containers from Guangzhou to Gulu).
+              </p>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              {[1, 2, 3, 5, 10].map(qty => (
+                <button
+                  key={qty}
+                  type="button"
+                  onClick={() => setLoadQuantity(qty)}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    loadQuantity === qty 
+                      ? 'bg-[#C9A86A] text-[#0A1931] shadow-md scale-105' 
+                      : 'bg-slate-800 text-white hover:bg-slate-700 border border-white/10'
+                  }`}
+                >
+                  {qty} {qty === 1 ? 'Load' : 'Loads'}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Submit Actions */}
-          <div className="pt-2 flex items-center justify-end gap-3 border-t border-white/10">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-white/70 hover:text-white rounded-xl hover:bg-white/10 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-3 bg-gradient-to-r from-[#C9A86A] to-[#a88748] hover:from-[#d6b77c] hover:to-[#b79653] text-[#0A1931] text-xs font-extrabold rounded-xl shadow-lg shadow-[#C9A86A]/20 transition-all flex items-center gap-2"
-            >
-              <span>Publish Worldwide Shipment</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+          <div className="pt-2 flex items-center justify-between flex-wrap gap-3 border-t border-white/10">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 text-xs font-semibold text-white/70 hover:text-white rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+
+              {postedSuccessCount > 0 && (
+                <span className="text-xs text-emerald-400 font-bold">
+                  ✓ {postedSuccessCount} Loads Active on Board
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => publishJobs(true)}
+                className="px-4 py-2.5 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <Plus className="w-4 h-4 text-amber-400" />
+                <span>+ Post &amp; Add Another Load</span>
+              </button>
+
+              <button
+                type="submit"
+                className="px-6 py-2.5 bg-gradient-to-r from-[#C9A86A] to-[#a88748] hover:from-[#d6b77c] hover:to-[#b79653] text-[#0A1931] text-xs font-black rounded-xl shadow-lg shadow-[#C9A86A]/20 transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <span>Publish {loadQuantity > 1 ? `${loadQuantity} Loads` : 'Shipment'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </form>
       </div>
