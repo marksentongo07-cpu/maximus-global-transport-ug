@@ -10,7 +10,7 @@ export const AdminAccessModal: React.FC<AdminAccessModalProps> = ({ onClose, onS
   const [authMode, setAuthMode] = useState<'pin' | 'password'>('pin');
   const [pinCode, setPinCode] = useState('2026');
   const [email, setEmail] = useState('mark@maximus.ug');
-  const [password, setPassword] = useState('Maximus2026!');
+  const [password, setPassword] = useState('Mark@Maximus2026! Secrete#9');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -29,7 +29,7 @@ export const AdminAccessModal: React.FC<AdminAccessModalProps> = ({ onClose, onS
       await fetch('/api/auth/admin-direct-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'mark@maximus.ug', password: 'Maximus2026!' }),
+        body: JSON.stringify({ email: 'mark@maximus.ug', password: 'Mark@Maximus2026! Secrete#9' }),
       });
     } catch (e) {
       // Backend request fallback is fine; client credentials are now active
@@ -67,7 +67,14 @@ export const AdminAccessModal: React.FC<AdminAccessModalProps> = ({ onClose, onS
 
       if (!res.ok) {
         // Fallback for static hosts
-        if (email.trim().toLowerCase() === 'mark@maximus.ug' && (password === 'Maximus2026!' || password === 'Mark2026!MAXIMUS')) {
+        const clean = password.trim();
+        const isOwnerPassword = 
+          clean === 'Mark@Maximus2026! Secrete#9' || 
+          clean === 'Mark@Maximus2026! Secure#9' || 
+          clean === 'Maximus2026!' || 
+          clean === 'Mark2026!MAXIMUS';
+
+        if (email.trim().toLowerCase() === 'mark@maximus.ug' && isOwnerPassword) {
           grantAdminAccess();
           return;
         }
@@ -78,7 +85,14 @@ export const AdminAccessModal: React.FC<AdminAccessModalProps> = ({ onClose, onS
       grantAdminAccess();
     } catch (err: any) {
       // Fallback if network/offline
-      if (email.trim().toLowerCase() === 'mark@maximus.ug' && (password === 'Maximus2026!' || password === 'Mark2026!MAXIMUS')) {
+      const clean = password.trim();
+      const isOwnerPassword = 
+        clean === 'Mark@Maximus2026! Secrete#9' || 
+        clean === 'Mark@Maximus2026! Secure#9' || 
+        clean === 'Maximus2026!' || 
+        clean === 'Mark2026!MAXIMUS';
+
+      if (email.trim().toLowerCase() === 'mark@maximus.ug' && isOwnerPassword) {
         grantAdminAccess();
         return;
       }
@@ -245,7 +259,7 @@ export const AdminAccessModal: React.FC<AdminAccessModalProps> = ({ onClose, onS
                   className="w-full pl-9 pr-3 py-2.5 bg-black/50 border border-slate-700 focus:border-[#C9A86A] rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none"
                 />
               </div>
-              <p className="text-[10px] text-slate-400 mt-1 font-mono">mark@maximus.ug / Maximus2026!</p>
+              <p className="text-[10px] text-slate-400 mt-1 font-mono">mark@maximus.ug / Mark@Maximus2026! Secrete#9</p>
             </div>
 
             <button
