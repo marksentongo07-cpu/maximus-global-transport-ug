@@ -19,9 +19,12 @@ import {
   Eye,
   Plus,
   LocateFixed,
-  X
+  X,
+  CreditCard,
+  Wallet
 } from 'lucide-react';
 import { LeafletLiveFleetMap } from '../Map/LeafletLiveFleetMap';
+import { UnifiedPaymentMethodsModal } from '../Payment/UnifiedPaymentMethodsModal';
 
 interface ClientDashboardProps {
   jobs: Job[];
@@ -34,6 +37,7 @@ interface ClientDashboardProps {
   onOpenInvoice: (job: Job) => void;
   onOpenDispute: (job: Job) => void;
   onRateTransporter: (jobId: string, rating: number, comment: string) => void;
+  onSwitchToTransporter?: () => void;
 }
 
 export const ClientDashboard: React.FC<ClientDashboardProps> = ({
@@ -47,6 +51,7 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
   onOpenInvoice,
   onOpenDispute,
   onRateTransporter,
+  onSwitchToTransporter,
 }) => {
   const [filterTab, setFilterTab] = useState<'all' | 'active' | 'open' | 'delivered'>('all');
   const [callingTransporter, setCallingTransporter] = useState<string | null>(null);
@@ -54,6 +59,7 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
   const [starCount, setStarCount] = useState<number>(5);
   const [reviewComment, setReviewComment] = useState('');
   const [trackingMapJobId, setTrackingMapJobId] = useState<string | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const activeShipments = jobs.filter(j => j.status === 'in_transit' || j.status === 'loaded' || j.status === 'booked');
   const openNegotiatingJobs = jobs.filter(j => j.status === 'open' || j.status === 'negotiating' || j.status === 'escrow_pending');
@@ -130,15 +136,53 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
               <div className="text-[14px] text-white/60 font-medium">{t('safeDeliveriesCompleted', language)}</div>
             </div>
           </div>
-          <button
-            onClick={onOpenPostJob}
-            className="px-5 py-2.5 bg-orange-500 hover:bg-orange-400 text-black font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5"
-          >
-            <Plus className="w-4 h-4 text-black" />
-            <span>{t('postLoad', language)}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowPaymentModal(true)}
+              className="px-4 py-2.5 bg-[#C9A86A] hover:bg-[#d6b77c] text-[#0A1931] font-black text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+              title="Manage Cargo Escrow Deposit Methods & Carrier Payout Accounts"
+            >
+              <CreditCard className="w-4 h-4 text-[#0A1931]" />
+              <span>Payment Methods</span>
+            </button>
+            <button
+              onClick={onOpenPostJob}
+              className="px-5 py-2.5 bg-orange-500 hover:bg-orange-400 text-black font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="w-4 h-4 text-black" />
+              <span>{t('postLoad', language)}</span>
+            </button>
+          </div>
         </div>
 
+      </div>
+
+      {/* Customer Payment Methods & Dual-Role Wallet Banner */}
+      <div className="bg-[#1a2a3f] border border-[#C9A86A]/40 p-4 sm:p-5 rounded-2xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-[#C9A86A]/20 border border-[#C9A86A]/30 flex items-center justify-center text-[#C9A86A] shrink-0">
+            <CreditCard className="w-6 h-6 text-[#C9A86A]" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-white font-extrabold text-sm sm:text-base">Payment Methods &amp; Dual-Role Wallet</span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono">
+                Escrow Inflow &amp; Payout Outflow Active
+              </span>
+            </div>
+            <p className="text-xs text-white/70 mt-0.5">
+              Pay cargo escrow via <strong>Equity Till 031801</strong>, MTN/Airtel MoMo, or Card. If you also operate trucks to haul loads today, your carrier payout account is linked.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setShowPaymentModal(true)}
+          className="px-4 py-2.5 bg-[#C9A86A] hover:bg-[#d6b77c] text-[#0A1931] font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 self-start md:self-center cursor-pointer shrink-0"
+        >
+          <Wallet className="w-4 h-4 text-[#0A1931]" />
+          <span>Manage Payment Methods</span>
+        </button>
       </div>
 
       {/* Filter Tabs & Header */}
@@ -525,6 +569,20 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
           </div>
         </div>
       )}
+
+      {/* Unified Payment Methods Modal */}
+      <UnifiedPaymentMethodsModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        activePersona="client"
+        onSwitchPersona={(role) => {
+          setShowPaymentModal(false);
+          if (role === 'transporter' && onSwitchToTransporter) {
+            onSwitchToTransporter();
+          }
+        }}
+        currency={currency}
+      />
 
     </div>
   );

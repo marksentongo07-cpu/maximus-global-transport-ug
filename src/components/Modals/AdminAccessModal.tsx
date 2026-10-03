@@ -8,14 +8,14 @@ interface AdminAccessModalProps {
 
 export const AdminAccessModal: React.FC<AdminAccessModalProps> = ({ onClose, onSuccess }) => {
   const [authMode, setAuthMode] = useState<'pin' | 'password'>('pin');
-  const [pinCode, setPinCode] = useState('2026');
+  const [pinCode, setPinCode] = useState('48484');
   const [email, setEmail] = useState('mark@maximus.ug');
   const [password, setPassword] = useState('Mark@Maximus2026! Secrete#9');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Accepted PIN / Simple number codes
-  const VALID_PINS = ['2026', '031801', '1234', '9999'];
+  // Accepted PIN: Exactly 48484 as specified by the owner
+  const VALID_PINS = ['48484'];
 
   const grantAdminAccess = async () => {
     // 1. Set local storage role for immediate client recognition
@@ -29,7 +29,7 @@ export const AdminAccessModal: React.FC<AdminAccessModalProps> = ({ onClose, onS
       await fetch('/api/auth/admin-direct-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'mark@maximus.ug', password: 'Mark@Maximus2026! Secrete#9' }),
+        body: JSON.stringify({ email: 'mark@maximus.ug', password: 'Mark@Maximus2026! Secrete#9', pin: '48484' }),
       });
     } catch (e) {
       // Backend request fallback is fine; client credentials are now active
@@ -45,9 +45,12 @@ export const AdminAccessModal: React.FC<AdminAccessModalProps> = ({ onClose, onS
 
     if (VALID_PINS.includes(cleanPin)) {
       setLoading(true);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('maximus_vault_unlocked', 'true');
+      }
       grantAdminAccess();
     } else {
-      setErrorMessage(`Invalid code "${cleanPin}". Enter 2026 for instant Super Admin access.`);
+      setErrorMessage(`Access Denied: Invalid Security Code. Only the owner with code 48484 can access the vault.`);
     }
   };
 
@@ -178,18 +181,18 @@ export const AdminAccessModal: React.FC<AdminAccessModalProps> = ({ onClose, onS
                   autoFocus
                   value={pinCode}
                   onChange={(e) => setPinCode(e.target.value)}
-                  placeholder="2026"
+                  placeholder="48484"
                   className="w-full pl-11 pr-4 py-3 bg-black/60 border-2 border-slate-700 focus:border-[#C9A86A] rounded-xl text-lg font-mono font-bold tracking-widest text-amber-300 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/40"
                 />
               </div>
               <div className="flex items-center justify-between text-[11px] text-slate-400 mt-1.5">
-                <span>Default owner code: <strong className="text-amber-300 font-mono">2026</strong></span>
+                <span>Owner Limitation: <strong className="text-amber-300 font-mono">Code 48484 (Only Mark Sentongo)</strong></span>
                 <button
                   type="button"
-                  onClick={() => setPinCode('2026')}
+                  onClick={() => setPinCode('48484')}
                   className="text-amber-400 hover:underline cursor-pointer font-bold"
                 >
-                  Fill 2026
+                  Fill 48484
                 </button>
               </div>
             </div>
@@ -198,14 +201,14 @@ export const AdminAccessModal: React.FC<AdminAccessModalProps> = ({ onClose, onS
             <button
               type="button"
               onClick={() => {
-                setPinCode('2026');
+                setPinCode('48484');
                 setLoading(true);
                 grantAdminAccess();
               }}
               className="w-full py-2 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>⚡ One-Tap Fast Unlock with Code 2026</span>
+              <span>⚡ One-Tap Fast Unlock with Code 48484</span>
             </button>
 
             <button

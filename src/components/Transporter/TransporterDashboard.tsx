@@ -36,12 +36,14 @@ import {
   CreditCard,
   Smartphone,
   Receipt,
-  ArrowRight
+  ArrowRight,
+  Wallet
 } from 'lucide-react';
 import { EquityTillBanner } from '../Payment/EquityTillBanner';
 import { DriverPayoutSettingsModal } from './DriverPayoutSettingsModal';
 import { AdminDriverPayoutModal } from '../Admin/AdminDriverPayoutModal';
 import { SafeBodaTrustPromptModal } from '../Modals/SafeBodaTrustPromptModal';
+import { UnifiedPaymentMethodsModal } from '../Payment/UnifiedPaymentMethodsModal';
 import { gpsTrackingService, GpsLocationPing } from '../../services/gpsTrackingService';
 
 interface TransporterDashboardProps {
@@ -64,6 +66,7 @@ interface TransporterDashboardProps {
   onExecuteDriverPayout?: (jobId: string, payoutData: any) => void;
   onSwitchToAdminVerify?: () => void;
   onApproveDriverKYC?: (transporterId: string) => void;
+  onSwitchToClient?: () => void;
 }
 
 export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
@@ -86,10 +89,12 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
   onExecuteDriverPayout,
   onSwitchToAdminVerify,
   onApproveDriverKYC,
+  onSwitchToClient,
 }) => {
   const [activeTab, setActiveTab] = useState<'loads' | 'active_trips' | 'fleet'>('loads');
   const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
   const [showPayoutSettingsModal, setShowPayoutSettingsModal] = useState(false);
+  const [showUnifiedPaymentModal, setShowUnifiedPaymentModal] = useState(false);
   const [selectedPayoutJob, setSelectedPayoutJob] = useState<Job | null>(null);
   const [showPayoutModal, setShowPayoutModal] = useState(false);
   const [selectedProofJob, setSelectedProofJob] = useState<Job | null>(null);
@@ -365,13 +370,24 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
               <span>Driver Payout Account Profile (Till 031801 Escrow Release Routing)</span>
             </span>
 
-            <button
-              onClick={() => setShowPayoutSettingsModal(true)}
-              className="px-3.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-white border border-white/10 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors shadow-sm"
-            >
-              <CreditCard className="w-3.5 h-3.5 text-white/80" />
-              <span>Edit Payout &amp; Bank Details</span>
-            </button>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => setShowUnifiedPaymentModal(true)}
+                className="px-3.5 py-1.5 bg-[#C9A86A] hover:bg-[#d6b77c] text-[#0A1931] rounded-xl font-black text-xs flex items-center gap-1.5 transition-colors shadow-md cursor-pointer"
+                title="Manage both Driver Payout Accounts and Client Cargo Escrow Deposit Methods"
+              >
+                <Wallet className="w-3.5 h-3.5 text-[#0A1931]" />
+                <span>Dual-Role Payment Methods &amp; Wallet</span>
+              </button>
+
+              <button
+                onClick={() => setShowPayoutSettingsModal(true)}
+                className="px-3.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-white border border-white/10 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+              >
+                <CreditCard className="w-3.5 h-3.5 text-white/80" />
+                <span>Edit Payout &amp; Bank Details</span>
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
@@ -453,15 +469,26 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
           </button>
         </div>
 
-        {activeTab === 'fleet' && (
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowAddVehicleModal(true)}
-            className="px-5 py-2 bg-orange-500 hover:bg-orange-400 text-black font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5"
+            onClick={() => setShowUnifiedPaymentModal(true)}
+            className="px-4 py-2 bg-[#C9A86A] hover:bg-[#d6b77c] text-[#0A1931] font-black text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+            title="Manage payment methods (Driver Payouts & Cargo Escrow Deposits)"
           >
-            <Plus className="w-3.5 h-3.5 text-black" />
-            <span>{t('addVehicle', language)}</span>
+            <CreditCard className="w-4 h-4 text-[#0A1931]" />
+            <span>Payment Methods</span>
           </button>
-        )}
+
+          {activeTab === 'fleet' && (
+            <button
+              onClick={() => setShowAddVehicleModal(true)}
+              className="px-5 py-2 bg-orange-500 hover:bg-orange-400 text-black font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5 text-black" />
+              <span>{t('addVehicle', language)}</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Tab 1: Active Trips & Stepper Console */}
@@ -1506,6 +1533,22 @@ export const TransporterDashboard: React.FC<TransporterDashboardProps> = ({
           }}
         />
       )}
+
+      {/* Unified Dual-Role Payment Methods Modal */}
+      <UnifiedPaymentMethodsModal
+        isOpen={showUnifiedPaymentModal}
+        onClose={() => setShowUnifiedPaymentModal(false)}
+        activePersona="transporter"
+        onSwitchPersona={(role) => {
+          setShowUnifiedPaymentModal(false);
+          if (role === 'client' && onSwitchToClient) {
+            onSwitchToClient();
+          }
+        }}
+        currency={currency}
+        userPhone={transporter.phone}
+        userName={transporter.name}
+      />
 
     </div>
   );

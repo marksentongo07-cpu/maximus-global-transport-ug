@@ -38,6 +38,7 @@ import { Job, Transporter, EscrowTransaction, Dispute, Currency, Language } from
 import { formatMoney } from '../../services/currency';
 import { fetchPlatformSettings, savePlatformSettings, PlatformSettings } from '../../services/settingsService';
 import { REAL_SERVICE_PROVIDERS, ServiceProviderItem } from '../../data/serviceProvidersData';
+import { BusinessMovementGraphs } from './BusinessMovementGraphs';
 
 interface SecureAdminPortalProps {
   jobs: Job[];
@@ -106,6 +107,40 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
   // Services Directory search within admin
   const [servicesSearch, setServicesSearch] = useState('');
   const [servicesCategory, setServicesCategory] = useState<string>('all');
+
+  // Super Admin Vault Extra Limitation Code: 48484 (Strictly for Mark Sentongo / Owner only)
+  const [isVaultUnlocked, setIsVaultUnlocked] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('maximus_vault_unlocked') === 'true';
+    }
+    return false;
+  });
+  const [vaultCodeInput, setVaultCodeInput] = useState<string>('');
+  const [vaultErrorMessage, setVaultErrorMessage] = useState<string | null>(null);
+
+  const handleUnlockVault = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setVaultErrorMessage(null);
+    const clean = vaultCodeInput.trim();
+    if (clean === '48484') {
+      setIsVaultUnlocked(true);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('maximus_vault_unlocked', 'true');
+      }
+      setSuccessNotice('Access Granted: Code 48484 verified. Super Admin Vault and Business Movement Graphs unlocked.');
+    } else {
+      setVaultErrorMessage('Access Denied: Invalid Security Code. Only the owner with code 48484 can access the vault.');
+    }
+  };
+
+  const handleLockVault = () => {
+    setIsVaultUnlocked(false);
+    setVaultCodeInput('');
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('maximus_vault_unlocked');
+    }
+    setSuccessNotice('Super Admin Vault has been locked.');
+  };
 
   // Verify server session via /api/auth/me
   useEffect(() => {
@@ -708,7 +743,11 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
         {/* ---------------------------------------------------- */}
         <div className="max-w-7xl mx-auto mt-3 pt-3 border-t border-white/10 flex items-center gap-2 overflow-x-auto scrollbar-none">
           {[
-            { id: 'accounts', label: '1. Accounts', icon: Building2 },
+            { 
+              id: 'accounts', 
+              label: isVaultUnlocked ? '1. Owner Vault & Accounts (Unlocked)' : '1. Super Admin Vault (Code 48484)', 
+              icon: Building2 
+            },
             { id: 'bids', label: '2. Live Bids Status', icon: ListOrdered },
             { id: 'kyc', label: '3. Fleet KYC', icon: Users },
             { id: 'commission', label: '4. Commission Control (8% Slider)', icon: Sliders },
@@ -750,10 +789,124 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
         )}
 
         {/* ---------------------------------------------------- */}
-        {/* TAB 1: ACCOUNTS (TrustVault UGX/USD total, commission today, pending payouts, EFRIS status) */}
+        {/* TAB 1: ACCOUNTS & BUSINESS MOVEMENT GRAPHS (SUPER ADMIN VAULT) */}
         {/* ---------------------------------------------------- */}
         {adminTab === 'accounts' && (
           <div className="space-y-6">
+            {!isVaultUnlocked ? (
+              /* Super Admin Vault Lockdown Gate requiring Code 48484 */
+              <div className="max-w-2xl mx-auto my-8 p-8 sm:p-10 rounded-3xl bg-[#0B1526] border-2 border-[#C9A86A]/50 shadow-2xl relative overflow-hidden text-center animate-in fade-in duration-200">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#C9A86A]/10 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="space-y-4 relative z-10">
+                  <div className="w-16 h-16 rounded-2xl bg-[#C9A86A]/20 border border-[#C9A86A]/40 flex items-center justify-center mx-auto text-[#C9A86A] shadow-lg">
+                    <Lock className="w-8 h-8 text-[#C9A86A]" />
+                  </div>
+
+                  <div>
+                    <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30 font-mono">
+                      Owner-Only Extra Limitation
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl font-black text-white mt-2">
+                      Super Admin Vault Lockdown
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-lg mx-auto leading-relaxed">
+                      Code <strong className="text-amber-300 font-mono">48484</strong> is the mandatory extra security limitation required to access the Super Admin Vault.
+                    </p>
+                    <div className="p-3 bg-black/40 rounded-xl border border-white/10 text-xs text-amber-200 mt-3 inline-block font-mono">
+                      🔒 Note: As per now, only Mark Sentongo (Owner) can access it; no one else.
+                    </div>
+                  </div>
+
+                  {vaultErrorMessage && (
+                    <div className="p-3.5 rounded-xl bg-red-950/80 border border-red-500/40 text-red-200 text-xs flex items-center justify-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                      <span>{vaultErrorMessage}</span>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleUnlockVault} className="space-y-4 pt-2 max-w-md mx-auto text-left">
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                        Owner Security Code (PIN)
+                      </label>
+                      <div className="relative">
+                        <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <input
+                          type="password"
+                          value={vaultCodeInput}
+                          onChange={(e) => {
+                            setVaultCodeInput(e.target.value);
+                            setVaultErrorMessage(null);
+                          }}
+                          placeholder="Enter code 48484"
+                          className="w-full pl-10 pr-24 py-3.5 bg-[#050D1A] border-2 border-white/20 focus:border-[#C9A86A] rounded-xl text-white text-base tracking-widest font-mono text-center focus:outline-none transition-colors"
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setVaultCodeInput('48484');
+                            setVaultErrorMessage(null);
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[11px] font-mono font-bold transition-colors cursor-pointer"
+                        >
+                          Fill 48484
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-slate-400 mt-1.5 text-center">
+                        Authorized strictly for: <code className="text-amber-300">Mark Sentongo (mark@maximus.ug)</code>
+                      </p>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full py-3.5 px-4 rounded-xl font-black text-sm bg-gradient-to-r from-[#C9A86A] to-[#a88748] hover:from-[#d6b77c] hover:to-[#b79653] text-[#0A1931] shadow-xl shadow-[#C9A86A]/20 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                    >
+                      <ShieldCheck className="w-5 h-5" />
+                      <span>Verify Code 48484 &amp; Unlock Vault</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </form>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Vault Active Owner Banner */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#0F223D] to-[#0A1931] border border-[#C9A86A]/60 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in duration-150">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-[#C9A86A]/20 border border-[#C9A86A]/40 flex items-center justify-center text-[#C9A86A] shrink-0 shadow-md">
+                      <ShieldCheck className="w-6 h-6 text-[#C9A86A]" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-white font-extrabold text-base">Super Admin Vault Unlocked</span>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">
+                          Code 48484 Verified · Owner Only
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-300 mt-0.5">
+                        Private financial telemetry active for <strong>Mark Sentongo</strong>. Real-time graphs showing how business is moving across all East African corridors.
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleLockVault}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/10 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer self-start md:self-center shrink-0"
+                    title="Lock the vault again"
+                  >
+                    <Lock className="w-4 h-4 text-amber-400" />
+                    <span>Re-Lock Vault</span>
+                  </button>
+                </div>
+
+                {/* Visual Business Graphs (How Business is Moving) */}
+                <BusinessMovementGraphs 
+                  currency={currency} 
+                  onCurrencyToggle={() => onCurrencyChange(currency === 'UGX' ? 'USD' : 'UGX')} 
+                />
+
             <div className="p-5 rounded-2xl bg-[#0B1526] border border-[#C9A86A]/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-black text-white flex items-center gap-2">
@@ -884,8 +1037,10 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
                 </div>
               </div>
             </div>
-          </div>
+          </>
         )}
+      </div>
+    )}
 
         {/* ---------------------------------------------------- */}
         {/* TAB 2: LIVE BIDS STATUS (Table: Cargo ID, Pickup Country with Worldwide/Uganda/Kenya filter, Bids count, Status, Assign button) */}

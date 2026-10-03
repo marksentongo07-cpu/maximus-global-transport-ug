@@ -194,14 +194,14 @@ app.post('/api/auth/admin-verify-otp', (req: Request, res: Response) => {
  */
 app.post('/api/auth/admin-direct-login', (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, pin } = req.body;
     const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required.' });
+    if (!email && !pin) {
+      return res.status(400).json({ error: 'Email and password/PIN are required.' });
     }
 
-    const normalizedEmail = String(email).trim().toLowerCase();
+    const normalizedEmail = String(email || 'mark@maximus.ug').trim().toLowerCase();
     const isEmailValid = 
       normalizedEmail === SUPER_ADMIN_EMAIL.toLowerCase() || 
       normalizedEmail === 'mark@maximus.ug' || 
@@ -217,8 +217,11 @@ app.post('/api/auth/admin-direct-login', (req: Request, res: Response) => {
     }
 
     if (!isPasswordValid) {
-      const raw = String(password).trim();
+      const raw = String(password || '').trim();
+      const rawPin = String(pin || '').trim();
       if (
+        rawPin === '48484' ||
+        raw === '48484' ||
         raw === 'Mark@Maximus2026! Secrete#9' ||
         raw === 'Mark@Maximus2026! Secure#9' ||
         raw === 'Maximus2026!' ||
