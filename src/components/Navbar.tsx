@@ -43,6 +43,7 @@ interface NavbarProps {
   userEmail?: string;
   onOpenAdminAccess?: () => void;
   onOpenAdminSecure?: () => void;
+  onOpenBrandInsignia?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -63,6 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   userEmail = 'marksentongo07@gmail.com',
   onOpenAdminAccess,
   onOpenAdminSecure,
+  onOpenBrandInsignia,
 }) => {
   // Check if ?admin=true is present in URL
   const [showAdminLock, setShowAdminLock] = useState<boolean>(false);
@@ -151,19 +153,31 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="flex items-center gap-3 text-left group focus:outline-none select-none cursor-pointer"
             title="MAXIMUS Global Transport Link (5x click or 2s hold for Admin Access)"
           >
-            <Logo size={40} className="w-10 h-10 shadow-lg shadow-black/40 rounded-xl" />
+            <Logo size={40} className="w-10 h-10 shadow-xl shadow-black/60 rounded-2xl transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(201,168,106,0.35)]" />
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-[18px] font-bold tracking-tight text-white group-hover:text-orange-400 transition-colors">
+                <span className="text-[19px] font-black tracking-[0.06em] text-white group-hover:text-[#F3DE9C] transition-colors">
                   MAXIMUS
                 </span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#FF8C00]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-tr from-[#9E7835] via-[#C9A86A] to-[#FFEAA8] shadow-sm shadow-[#C9A86A]/60"></span>
               </div>
-              <p className="text-[10px] tracking-[0.08em] text-slate-400 uppercase font-semibold">
+              <p className="text-[9.5px] tracking-[0.16em] text-amber-200/75 uppercase font-bold">
                 GLOBAL TRANSPORT LINK
               </p>
             </div>
           </button>
+
+          {onOpenBrandInsignia && (
+            <button
+              type="button"
+              onClick={onOpenBrandInsignia}
+              className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C9A86A]/10 hover:bg-[#C9A86A]/25 border border-[#C9A86A]/35 text-[10.5px] text-[#FFEAA8] font-mono transition-all cursor-pointer shadow-sm shadow-amber-950/20"
+              title="Inspect 24K Gold Bullion Insignia & Brand Assets"
+            >
+              <span className="text-amber-400 text-xs">✦</span>
+              <span>Insignia</span>
+            </button>
+          )}
         </div>
 
         {/* Zone 2: Navigation Tabs - Strictly filtered per user role */}

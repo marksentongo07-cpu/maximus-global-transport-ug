@@ -39,6 +39,7 @@ import { formatMoney } from '../../services/currency';
 import { fetchPlatformSettings, savePlatformSettings, PlatformSettings } from '../../services/settingsService';
 import { REAL_SERVICE_PROVIDERS, ServiceProviderItem } from '../../data/serviceProvidersData';
 import { BusinessMovementGraphs } from './BusinessMovementGraphs';
+import { Logo } from '../Logo';
 
 interface SecureAdminPortalProps {
   jobs: Job[];
@@ -504,8 +505,8 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
           
           {/* Top Brand Header */}
           <div className="text-center space-y-3">
-            <div className="inline-flex p-4 rounded-3xl bg-[#0A1931] border border-[#C9A86A]/40 shadow-2xl shadow-[#C9A86A]/10">
-              <Lock className="w-10 h-10 text-[#C9A86A]" />
+            <div className="inline-flex items-center justify-center p-2 rounded-3xl bg-[#0A1931] border border-[#C9A86A]/40 shadow-2xl shadow-[#C9A86A]/20">
+              <Logo size={60} className="w-15 h-15 shadow-xl" />
             </div>
 
             {/* GOLD BADGE: "SUPER ADMIN MODE" */}
@@ -701,9 +702,7 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
           
           {/* Gold Badge & Identification */}
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-[#C9A86A] to-[#8f7139] text-[#0A1931] shadow-md font-bold">
-              <ShieldCheck className="w-5 h-5 text-[#0A1931]" />
-            </div>
+            <Logo size={42} className="w-10.5 h-10.5 shadow-lg shadow-black/60 rounded-xl" />
             <div>
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1 rounded-full text-[11px] font-black tracking-widest uppercase bg-[#C9A86A] text-[#0A1931] shadow-md shadow-[#C9A86A]/20">

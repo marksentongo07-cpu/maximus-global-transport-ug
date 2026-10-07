@@ -1,53 +1,203 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="512" height="512" role="img" aria-label="MAXIMUS Global Transport Link - Imperial Luxury Insignia">
   <defs>
-    <linearGradient id="maximusBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0B192C" />
-      <stop offset="100%" stop-color="#050C16" />
+    <!-- Deep Obsidian & Midnight Sapphire Enamel Radial Background -->
+    <radialGradient id="maximus-bg-radial" cx="50%" cy="32%" r="68%">
+      <stop offset="0%" stop-color="#111F35" />
+      <stop offset="38%" stop-color="#081324" />
+      <stop offset="72%" stop-color="#040913" />
+      <stop offset="100%" stop-color="#010307" />
+    </radialGradient>
+
+    <!-- 24K Royal Bullion Gold (Primary High-Gloss Bevel) -->
+    <linearGradient id="maximus-gold-primary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF7D6" />
+      <stop offset="18%" stop-color="#F3D389" />
+      <stop offset="42%" stop-color="#D4AC5B" />
+      <stop offset="68%" stop-color="#A37E33" />
+      <stop offset="86%" stop-color="#E2BE71" />
+      <stop offset="100%" stop-color="#73511A" />
     </linearGradient>
-    <linearGradient id="truckOrangeGrad" x1="0%" y1="0%" x2="100%" y2="80%">
-      <stop offset="0%" stop-color="#FFA726" />
-      <stop offset="40%" stop-color="#FF8C00" />
-      <stop offset="100%" stop-color="#E65100" />
+
+    <!-- Chiseled Champagne Mirror Light Facet -->
+    <linearGradient id="maximus-gold-light" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.98" />
+      <stop offset="25%" stop-color="#FFF1C7" />
+      <stop offset="55%" stop-color="#E9C776" />
+      <stop offset="85%" stop-color="#C49A47" />
+      <stop offset="100%" stop-color="#966F26" />
     </linearGradient>
-    <linearGradient id="cabAccentGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9" />
-      <stop offset="100%" stop-color="#E2E8F0" stop-opacity="0.4" />
+
+    <!-- Chiseled Burnished Bronze Shadow Facet -->
+    <linearGradient id="maximus-gold-shadow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B88E3E" />
+      <stop offset="35%" stop-color="#7A561E" />
+      <stop offset="70%" stop-color="#4A310C" />
+      <stop offset="100%" stop-color="#241703" />
     </linearGradient>
+
+    <!-- Platinum Mirror Glare Gradient -->
+    <linearGradient id="maximus-platinum-glare" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Bezel Rim Metallic Fluting Gradient -->
+    <linearGradient id="maximus-bezel-rim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE8A3" />
+      <stop offset="22%" stop-color="#A37C2D" />
+      <stop offset="48%" stop-color="#F9DF98" />
+      <stop offset="74%" stop-color="#6E4A14" />
+      <stop offset="100%" stop-color="#E8C474" />
+    </linearGradient>
+
+    <!-- Windshield Sapphire Tint with Champagne Reflection -->
+    <linearGradient id="maximus-windshield-tint" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B1A30" />
+      <stop offset="45%" stop-color="#132B4F" />
+      <stop offset="75%" stop-color="#091424" />
+      <stop offset="100%" stop-color="#030810" />
+    </linearGradient>
+
+    <!-- Laser Headlight Forward Beam Projector -->
+    <linearGradient id="maximus-headlight-beam" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#FFF9E6" stop-opacity="0.95" />
+      <stop offset="30%" stop-color="#FFD166" stop-opacity="0.7" />
+      <stop offset="70%" stop-color="#E5A93C" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#C9A86A" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Global Trade Orbit Meridian Arc -->
+    <linearGradient id="maximus-orbit-meridian" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#C9A86A" stop-opacity="0.05" />
+      <stop offset="25%" stop-color="#FF9F1C" stop-opacity="0.6" />
+      <stop offset="55%" stop-color="#FFE28A" stop-opacity="0.95" />
+      <stop offset="85%" stop-color="#D4AC5B" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="1" />
+    </linearGradient>
+
+    <!-- Wheel Turbine Metallic Gradient -->
+    <radialGradient id="maximus-wheel-metal" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="35%" stop-color="#F1CE7D" />
+      <stop offset="70%" stop-color="#A88133" />
+      <stop offset="100%" stop-color="#4D350F" />
+    </radialGradient>
   </defs>
 
-  <!-- Background rounded container -->
-  <rect x="2" y="2" width="96" height="96" rx="22" fill="url(#maximusBgGrad)" stroke="#FF8C00" stroke-width="2.5" stroke-opacity="0.35" />
+  <!-- 1. LUXURY SQUIRCLE CUSHION MEDALLION BASE -->
+  <rect x="5" y="6" width="110" height="110" rx="26" fill="#000000" opacity="0.9" />
+  <rect x="5" y="5" width="110" height="110" rx="26" fill="url(#maximus-bg-radial)" stroke="url(#maximus-bezel-rim)" stroke-width="2.4" />
+  <rect x="9.5" y="9.5" width="101" height="101" rx="22" fill="none" stroke="url(#maximus-gold-primary)" stroke-width="0.8" stroke-opacity="0.45" />
 
-  <!-- Left Container Pillar (M left leg) -->
-  <path d="M 18 25 L 32 25 L 32 75 L 18 75 Z" fill="url(#truckOrangeGrad)" />
-  <line x1="22" y1="30" x2="22" y2="70" stroke="#CC5500" stroke-width="1.5" stroke-linecap="round" />
-  <line x1="28" y1="30" x2="28" y2="70" stroke="#CC5500" stroke-width="1.5" stroke-linecap="round" />
+  <!-- Micro-Corner Precision Vault Studs / Nautical Rivets -->
+  <circle cx="15.5" cy="15.5" r="1.5" fill="#FFEAA8" opacity="0.8" />
+  <circle cx="104.5" cy="15.5" r="1.5" fill="#FFEAA8" opacity="0.8" />
+  <circle cx="15.5" cy="104.5" r="1.5" fill="#FFEAA8" opacity="0.8" />
+  <circle cx="104.5" cy="104.5" r="1.5" fill="#FFEAA8" opacity="0.8" />
 
-  <!-- Center V-Peak / Chute of the M -->
-  <path d="M 32 25 L 50 48 L 68 25 L 60 25 L 50 38 L 40 25 Z" fill="#FFA726" />
-  <polygon points="50,44 43,32 57,32" fill="#E65100" />
+  <!-- Cardinal Chronometer Index Marks at 12, 3, 6, 9 o'clock -->
+  <line x1="60" y1="6" x2="60" y2="8.5" stroke="#FFEAA8" stroke-width="1" stroke-opacity="0.8" />
+  <line x1="60" y1="111.5" x2="60" y2="114" stroke="#FFEAA8" stroke-width="1" stroke-opacity="0.8" />
+  <line x1="6" y1="60" x2="8.5" y2="60" stroke="#FFEAA8" stroke-width="1" stroke-opacity="0.8" />
+  <line x1="111.5" y1="60" x2="114" y2="60" stroke="#FFEAA8" stroke-width="1" stroke-opacity="0.8" />
 
-  <!-- Right Container Pillar (M right leg) -->
-  <path d="M 68 25 L 82 25 L 82 52 L 68 52 Z" fill="url(#truckOrangeGrad)" />
-  <line x1="72" y1="30" x2="72" y2="48" stroke="#CC5500" stroke-width="1.5" stroke-linecap="round" />
-  <line x1="78" y1="30" x2="78" y2="48" stroke="#CC5500" stroke-width="1.5" stroke-linecap="round" />
+  <!-- Ambient Gold Heart Glow behind Monogram -->
+  <ellipse cx="60" cy="52" rx="34" ry="24" fill="#C9A86A" opacity="0.1" />
 
-  <!-- FORWARD TRUCK CAB -->
-  <path d="M 62 52 L 82 52 L 88 64 L 88 75 L 62 75 Z" fill="url(#truckOrangeGrad)" />
-  <path d="M 67 55 L 79 55 L 84 63 L 67 63 Z" fill="#0B192C" stroke="#FFA726" stroke-width="1" />
-  <line x1="70" y1="57" x2="76" y2="61" stroke="url(#cabAccentGrad)" stroke-width="1.5" stroke-linecap="round" />
-  <circle cx="86" cy="68" r="2" fill="#FFFBEB" />
-  <line x1="88" y1="68" x2="94" y2="68" stroke="#FDE047" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+  <!-- 2. CELESTIAL TRADE MERIDIAN (East Africa to Global Corridors) -->
+  <path d="M 12 84 C 22 96, 50 102, 78 86 C 102 72, 110 46, 96 30 C 88 22, 74 24, 62 32"
+        fill="none" stroke="url(#maximus-orbit-meridian)" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="80 7" opacity="0.85" />
 
-  <!-- WHEELS & HIGHWAY BASE -->
-  <circle cx="78" cy="76" r="6" fill="#0F172A" stroke="#FF8C00" stroke-width="2" />
-  <circle cx="78" cy="76" r="2.5" fill="#E2E8F0" />
+  <!-- 3. ARCHITECTURAL 'M' MONOGRAM & CHISELED MONOLITHS -->
+  <g id="monogram-and-chassis">
+    <!-- === LEFT FREIGHT CONTAINER COLUMN (The West Pylon) === -->
+    <path d="M 18 28 L 26 21 L 26 84 L 18 84 Z" fill="url(#maximus-gold-light)" />
+    <path d="M 26 21 L 34 28 L 34 84 L 26 84 Z" fill="url(#maximus-gold-shadow)" />
+    <polygon points="18,28 26,21 34,28 26,32" fill="#FFFBF0" opacity="0.9" />
+    <!-- Fluting -->
+    <line x1="22" y1="36" x2="22" y2="80" stroke="#664614" stroke-width="0.85" opacity="0.75" />
+    <line x1="22.5" y1="36" x2="22.5" y2="80" stroke="#FFEAA8" stroke-width="0.5" opacity="0.6" />
+    <line x1="30" y1="36" x2="30" y2="80" stroke="#664614" stroke-width="0.85" opacity="0.75" />
+    <line x1="30.5" y1="36" x2="30.5" y2="80" stroke="#FFEAA8" stroke-width="0.5" opacity="0.6" />
 
-  <circle cx="50" cy="76" r="6" fill="#0F172A" stroke="#FF8C00" stroke-width="2" />
-  <circle cx="50" cy="76" r="2.5" fill="#E2E8F0" />
+    <!-- === CENTER IMPERIAL APEX & ESCROW V-CHEVRON === -->
+    <path d="M 34 28 L 54 58 L 54 48 L 38 25 Z" fill="url(#maximus-gold-light)" />
+    <path d="M 54 58 L 74 28 L 70 25 L 54 48 Z" fill="url(#maximus-gold-shadow)" />
+    <polygon points="54,48 60,57 60,67 54,58" fill="url(#maximus-gold-light)" />
+    <polygon points="60,57 66,48 66,58 60,67" fill="url(#maximus-gold-shadow)" />
 
-  <circle cx="26" cy="76" r="6" fill="#0F172A" stroke="#FF8C00" stroke-width="2" />
-  <circle cx="26" cy="76" r="2.5" fill="#E2E8F0" />
+    <!-- Ascending Imperial Crown Spearhead -->
+    <path d="M 60 15 L 70 30 L 60 26 Z" fill="url(#maximus-gold-shadow)" />
+    <path d="M 60 15 L 60 26 L 50 30 Z" fill="url(#maximus-gold-light)" />
+    <line x1="60" y1="15" x2="60" y2="26" stroke="#FFFFFF" stroke-width="0.6" opacity="0.9" />
 
-  <line x1="12" y1="84" x2="88" y2="84" stroke="#FF8C00" stroke-width="2.5" stroke-linecap="round" opacity="0.9" />
+    <!-- Central Vault Escrow Keystone Diamond -->
+    <polygon points="60,33 66,41 60,49 54,41" fill="url(#maximus-gold-primary)" stroke="#FFFDF5" stroke-width="0.6" />
+    <polygon points="60,33 60,49 54,41" fill="#FFF4D0" opacity="0.8" />
+    <polygon points="60,33 66,41 60,41" fill="#FFFFFF" opacity="0.6" />
+    <polygon points="60,41 66,41 60,49" fill="#997028" opacity="0.9" />
+    <polygon points="60,38 61.5,41 60,44 58.5,41" fill="#FFFFFF" />
+
+    <!-- === RIGHT MONOLITH & AERODYNAMIC FREIGHT HAULER CAB === -->
+    <path d="M 74 28 L 82 21 L 90 28 L 90 48 L 74 48 Z" fill="url(#maximus-gold-light)" />
+    <path d="M 82 21 L 90 28 L 90 48 L 82 48 Z" fill="url(#maximus-gold-shadow)" />
+    <polygon points="74,28 82,21 90,28 82,32" fill="#FFFBF0" opacity="0.9" />
+    <line x1="78" y1="34" x2="78" y2="46" stroke="#664614" stroke-width="0.8" opacity="0.75" />
+    <line x1="86" y1="34" x2="86" y2="46" stroke="#FFEAA8" stroke-width="0.5" opacity="0.6" />
+
+    <!-- Luxury Sculpted Truck Cab -->
+    <path d="M 70 48 L 90 48 L 98 62 L 98 84 L 70 84 Z" fill="url(#maximus-gold-light)" stroke="url(#maximus-gold-primary)" stroke-width="0.5" />
+    <path d="M 88 64 L 98 64 L 98 84 L 88 84 Z" fill="url(#maximus-gold-shadow)" />
+    <!-- Sapphire Windshield -->
+    <path d="M 75 52 L 88 52 L 94 62 L 75 62 Z" fill="url(#maximus-windshield-tint)" stroke="url(#maximus-gold-primary)" stroke-width="0.8" />
+    <line x1="78" y1="54" x2="88" y2="60" stroke="url(#maximus-platinum-glare)" stroke-width="1.4" stroke-linecap="round" />
+    <!-- Sun Visor -->
+    <polygon points="73,49 91,49 89,52 73,52" fill="#FFF3CC" />
+    <!-- Grille Louvers -->
+    <line x1="76" y1="67" x2="94" y2="67" stroke="#543A11" stroke-width="0.9" />
+    <line x1="76" y1="67.5" x2="94" y2="67.5" stroke="#FFEAA8" stroke-width="0.5" />
+    <line x1="76" y1="71" x2="94" y2="71" stroke="#543A11" stroke-width="0.9" />
+    <line x1="76" y1="71.5" x2="94" y2="71.5" stroke="#FFEAA8" stroke-width="0.5" />
+
+    <!-- Laser Headlight Beam -->
+    <polygon points="98,73 112,69 114,77 98,75" fill="url(#maximus-headlight-beam)" />
+    <circle cx="96.5" cy="74" r="1.8" fill="#FFFFFF" />
+    <circle cx="96.5" cy="74" r="2.8" fill="none" stroke="#FFE79A" stroke-width="0.6" opacity="0.8" />
+  </g>
+
+  <!-- 4. THREE HAUTE-HORLOGERIE CHRONOMETER WHEELS -->
+  <!-- Wheel 1 -->
+  <g>
+    <circle cx="26" cy="89" r="6" fill="#040913" stroke="url(#maximus-gold-primary)" stroke-width="1.4" />
+    <circle cx="26" cy="89" r="4.2" fill="none" stroke="url(#maximus-gold-light)" stroke-width="0.8" />
+    <circle cx="26" cy="89" r="3.2" fill="url(#maximus-wheel-metal)" />
+    <circle cx="26" cy="89" r="1.3" fill="#FFFFFF" />
+    <circle cx="26" cy="89" r="0.6" fill="#1A2B42" />
+  </g>
+  <!-- Wheel 2 -->
+  <g>
+    <circle cx="54" cy="89" r="6" fill="#040913" stroke="url(#maximus-gold-primary)" stroke-width="1.4" />
+    <circle cx="54" cy="89" r="4.2" fill="none" stroke="url(#maximus-gold-light)" stroke-width="0.8" />
+    <circle cx="54" cy="89" r="3.2" fill="url(#maximus-wheel-metal)" />
+    <circle cx="54" cy="89" r="1.3" fill="#FFFFFF" />
+    <circle cx="54" cy="89" r="0.6" fill="#1A2B42" />
+  </g>
+  <!-- Wheel 3 -->
+  <g>
+    <circle cx="86" cy="89" r="6" fill="#040913" stroke="url(#maximus-gold-primary)" stroke-width="1.4" />
+    <circle cx="86" cy="89" r="4.2" fill="none" stroke="url(#maximus-gold-light)" stroke-width="0.8" />
+    <circle cx="86" cy="89" r="3.2" fill="url(#maximus-wheel-metal)" />
+    <circle cx="86" cy="89" r="1.3" fill="#FFFFFF" />
+    <circle cx="86" cy="89" r="0.6" fill="#1A2B42" />
+  </g>
+
+  <!-- 5. SOLID 24K GOLD BULLION HIGHWAY PLINTH -->
+  <path d="M 14 96 L 106 96 L 102 101 L 18 101 Z" fill="url(#maximus-gold-shadow)" stroke="url(#maximus-gold-primary)" stroke-width="0.6" />
+  <path d="M 14 96 L 106 96 L 104 98 L 16 98 Z" fill="url(#maximus-gold-light)" opacity="0.85" />
+  <line x1="22" y1="97" x2="98" y2="97" stroke="url(#maximus-platinum-glare)" stroke-width="1.1" />
+
+  <!-- Navigation Satellite Diamond Glint at Orbital Zenith -->
+  <circle cx="96" cy="30" r="1.6" fill="#FFFFFF" />
+  <circle cx="96" cy="30" r="3" fill="none" stroke="#FFEAA8" stroke-width="0.5" opacity="0.6" />
 </svg>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Lock, Mail, KeyRound, AlertCircle, ArrowRight, X, Sparkles, Key, Hash, CheckCircle2 } from 'lucide-react';
+import { Logo } from '../Logo';
 
 interface AdminAccessModalProps {
   onClose: () => void;
@@ -119,10 +120,8 @@ export const AdminAccessModal: React.FC<AdminAccessModalProps> = ({ onClose, onS
         </button>
 
         {/* Top Header Badge */}
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-[#C9A86A]/20 border border-[#C9A86A] flex items-center justify-center text-[#C9A86A]">
-            <Lock className="w-5 h-5 text-[#C9A86A]" />
-          </div>
+        <div className="flex items-center gap-2.5 mb-2">
+          <Logo size={36} className="w-9 h-9 shadow-md rounded-xl" />
           <span className="text-[11px] font-black uppercase tracking-widest text-[#0A1931] bg-[#C9A86A] px-2.5 py-0.5 rounded shadow-sm">
             SUPER ADMIN ACCESS
           </span>

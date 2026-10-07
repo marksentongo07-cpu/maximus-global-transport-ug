@@ -43,6 +43,7 @@ import { TransporterRegisterModal } from './components/Modals/TransporterRegiste
 import { PricingGuidePage } from './components/Pricing/PricingGuidePage';
 import { SecureAdminPortal } from './components/Admin/SecureAdminPortal';
 import { AdminAccessModal } from './components/Modals/AdminAccessModal';
+import { BrandInsigniaModal } from './components/Modals/BrandInsigniaModal';
 import { TutorialTooltip, TutorialTooltipData } from './components/Common/TutorialTooltip';
 import { 
   ShieldCheck, 
@@ -187,6 +188,7 @@ export default function App() {
   const [tutorialTooltip, setTutorialTooltip] = useState<TutorialTooltipData | null>(null);
   const [showLegalModal, setShowLegalModal] = useState(false);
   const [showAdminQuickModal, setShowAdminQuickModal] = useState(false);
+  const [showBrandInsigniaModal, setShowBrandInsigniaModal] = useState(false);
   const [celebrationBanner, setCelebrationBanner] = useState<string | null>(null);
 
   // Active Job for GPS Map Tracking
@@ -765,6 +767,7 @@ export default function App() {
           setIsAdminPortalActive(true);
           window.history.pushState({}, '', '/maximus-admin-2026-secure');
         }}
+        onOpenBrandInsignia={() => setShowBrandInsigniaModal(true)}
       />
 
       {/* Main Viewport Content */}
@@ -925,8 +928,16 @@ export default function App() {
       <footer className="border-t border-slate-800 bg-[#0B192C] text-slate-400 text-xs py-6 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Logo size={24} className="w-6 h-6 shadow-sm" />
-            <span className="font-bold text-white">MAXIMUS</span>
+            <button
+              onClick={() => setShowBrandInsigniaModal(true)}
+              className="flex items-center gap-2 hover:opacity-95 transition-all group cursor-pointer text-left focus:outline-none"
+              title="Inspect MAXIMUS Imperial Insignia & Brand Assets"
+            >
+              <Logo size={26} className="w-6.5 h-6.5 shadow-sm group-hover:scale-110 transition-transform" />
+              <span className="font-black text-white tracking-wider group-hover:text-[#F3DE9C] transition-colors">
+                MAXIMUS
+              </span>
+            </button>
             <span className="text-slate-500">·</span>
             <span className="text-[11px] text-slate-400">
               ©{' '}
@@ -942,6 +953,14 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-5 text-slate-400 flex-wrap">
+            <button 
+              onClick={() => setShowBrandInsigniaModal(true)} 
+              className="text-[#FFEAA8] hover:text-white transition-colors font-medium flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#C9A86A]/10 border border-[#C9A86A]/30 hover:bg-[#C9A86A]/20 cursor-pointer"
+              title="View 24K Gold Bullion Logo, 3D Render & Vector Assets"
+            >
+              <span className="text-amber-400 text-xs">✦</span>
+              <span>Imperial Brand Insignia</span>
+            </button>
             <button onClick={() => handleTabChange('services')} className="hover:text-[#C9A86A] transition-colors font-medium">
               Services Directory
             </button>
@@ -1101,6 +1120,14 @@ export default function App() {
             setIsAdminPortalActive(true);
             window.history.pushState({}, '', '/maximus-admin-2026-secure');
           }}
+        />
+      )}
+
+      {/* 13. Brand Insignia & Luxury Logo Showcase Modal */}
+      {showBrandInsigniaModal && (
+        <BrandInsigniaModal
+          isOpen={showBrandInsigniaModal}
+          onClose={() => setShowBrandInsigniaModal(false)}
         />
       )}
 
