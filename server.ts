@@ -301,6 +301,104 @@ let platformSettings: PlatformSettings = {
   updated_at: new Date().toISOString(),
 };
 
+// -------------------------------------------------------------
+// OWNER PROFIT DISTRIBUTION SETTINGS (ADMIN ACCOUNTS SECTION)
+// Policy:
+// 1% fee is for Jesus (Sacred tithe & benevolence fund)
+// Biggest % is for me (Mark Sentongo - Founder & Principal Owner, e.g. 80%)
+// Certain % is for app maintenance / administration fee (e.g. 19%)
+// -------------------------------------------------------------
+interface ProfitDistributionSettings {
+  jesus_percent: number;       // Always 1%
+  owner_percent: number;       // Biggest %, e.g. 80%
+  maintenance_percent: number; // Administration fee %, e.g. 19%
+  owner_name: string;
+  owner_email: string;
+  owner_payout_account: string;
+  jesus_fund_account: string;
+  maintenance_fund_account: string;
+  updated_at: string;
+}
+
+let profitDistributionConfig: ProfitDistributionSettings = {
+  jesus_percent: 1, // 1% fee is for Jesus
+  owner_percent: 80, // biggest % is for me (Mark Sentongo)
+  maintenance_percent: 19, // certain % is for app maintenance
+  owner_name: 'Mark Sentongo',
+  owner_email: 'marksentongo07@gmail.com',
+  owner_payout_account: 'Equity Bank Till 031801 / MTN MoMo *165*3*031801#',
+  jesus_fund_account: 'Kingdom Ministry & Benevolence Vault (Faith-Based Highway Mission)',
+  maintenance_fund_account: 'Maximus Cloud Hosting (GCP/AWS), URA EFRIS Sync & Ops Reserve',
+  updated_at: new Date().toISOString(),
+};
+
+let profitDisbursementsLog = [
+  {
+    id: 'DISB-2026-001',
+    timestamp: '2026-10-08 08:30 EAT',
+    jobId: 'CRG-UG-101',
+    sourceDescription: 'Mbale Grain Hub → Namanve ICD Freight Commission',
+    netProfitUGX: 115000,
+    netProfitUSD: 30.50,
+    jesusAmountUGX: 1150, // 1%
+    jesusAmountUSD: 0.31,
+    ownerAmountUGX: 92000, // 80%
+    ownerAmountUSD: 24.40,
+    maintenanceAmountUGX: 21850, // 19%
+    maintenanceAmountUSD: 5.79,
+    status: 'DISBURSED' as const,
+    referenceCode: 'MAX-JESUS-01150-MOMOBANK',
+  },
+  {
+    id: 'DISB-2026-002',
+    timestamp: '2026-10-08 10:15 EAT',
+    jobId: 'CRG-INT-802',
+    sourceDescription: 'China Guangzhou → Gulu Northern Hub Heavy Freight',
+    netProfitUGX: 1850000,
+    netProfitUSD: 490.00,
+    jesusAmountUGX: 18500, // 1%
+    jesusAmountUSD: 4.90,
+    ownerAmountUGX: 1480000, // 80%
+    ownerAmountUSD: 392.00,
+    maintenanceAmountUGX: 351500, // 19%
+    maintenanceAmountUSD: 93.10,
+    status: 'DISBURSED' as const,
+    referenceCode: 'MAX-JESUS-18500-EQUITY031801',
+  },
+  {
+    id: 'DISB-2026-003',
+    timestamp: '2026-10-08 12:45 EAT',
+    jobId: 'CRG-KE-304',
+    sourceDescription: 'Mombasa Port Fuel Depot → Tororo Regional Terminal',
+    netProfitUGX: 890000,
+    netProfitUSD: 236.00,
+    jesusAmountUGX: 8900, // 1%
+    jesusAmountUSD: 2.36,
+    ownerAmountUGX: 712000, // 80%
+    ownerAmountUSD: 188.80,
+    maintenanceAmountUGX: 169100, // 19%
+    maintenanceAmountUSD: 44.84,
+    status: 'DISBURSED' as const,
+    referenceCode: 'MAX-JESUS-08900-MOMOBANK',
+  },
+  {
+    id: 'DISB-2026-004',
+    timestamp: '2026-10-08 14:20 EAT',
+    jobId: 'CRG-UG-102',
+    sourceDescription: 'Jinja Works → Bwebajja Entebbe Construction Haulage',
+    netProfitUGX: 155000,
+    netProfitUSD: 41.00,
+    jesusAmountUGX: 1550, // 1%
+    jesusAmountUSD: 0.41,
+    ownerAmountUGX: 124000, // 80%
+    ownerAmountUSD: 32.80,
+    maintenanceAmountUGX: 29450, // 19%
+    maintenanceAmountUSD: 7.79,
+    status: 'ALLOCATED' as const,
+    referenceCode: 'MAX-JESUS-01550-STANBIC',
+  }
+];
+
 // In-memory live bids status store for admin control
 let adminLiveBids = [
   {
@@ -456,8 +554,31 @@ app.post('/api/admin/settings', (req: Request, res: Response) => {
   }
 });
 
-// Accounts: TrustVault UGX/USD total, commission today, pending payouts, EFRIS status
+// Accounts: TrustVault UGX/USD total, commission today, pending payouts, EFRIS status, & Profit Distribution
 app.get('/api/admin/accounts', (_req: Request, res: Response) => {
+  const netRevenueUGX = 16600000;
+  const netRevenueUSD = 4420;
+  const commissionTodayUGX = 1840000;
+  const commissionTodayUSD = 490;
+
+  const jesusCumulativeUGX = Math.round(netRevenueUGX * (profitDistributionConfig.jesus_percent / 100));
+  const jesusCumulativeUSD = Math.round(netRevenueUSD * (profitDistributionConfig.jesus_percent / 100) * 100) / 100;
+
+  const ownerCumulativeUGX = Math.round(netRevenueUGX * (profitDistributionConfig.owner_percent / 100));
+  const ownerCumulativeUSD = Math.round(netRevenueUSD * (profitDistributionConfig.owner_percent / 100) * 100) / 100;
+
+  const maintenanceCumulativeUGX = Math.round(netRevenueUGX * (profitDistributionConfig.maintenance_percent / 100));
+  const maintenanceCumulativeUSD = Math.round(netRevenueUSD * (profitDistributionConfig.maintenance_percent / 100) * 100) / 100;
+
+  const jesusTodayUGX = Math.round(commissionTodayUGX * (profitDistributionConfig.jesus_percent / 100));
+  const jesusTodayUSD = Math.round(commissionTodayUSD * (profitDistributionConfig.jesus_percent / 100) * 100) / 100;
+
+  const ownerTodayUGX = Math.round(commissionTodayUGX * (profitDistributionConfig.owner_percent / 100));
+  const ownerTodayUSD = Math.round(commissionTodayUSD * (profitDistributionConfig.owner_percent / 100) * 100) / 100;
+
+  const maintenanceTodayUGX = Math.round(commissionTodayUGX * (profitDistributionConfig.maintenance_percent / 100));
+  const maintenanceTodayUSD = Math.round(commissionTodayUSD * (profitDistributionConfig.maintenance_percent / 100) * 100) / 100;
+
   return res.json({
     bankName: 'Equity Bank Uganda (Merchant Till 031801)',
     accountName: 'MAXIMUS GLOBAL TRANSPORT LINK LTD',
@@ -466,8 +587,8 @@ app.get('/api/admin/accounts', (_req: Request, res: Response) => {
     airtelMoneyPay: '*185*9*031801#',
     trustVaultTotalUGX: 48500000, // Total locked in TrustVault UGX
     trustVaultTotalUSD: 12850,    // Total locked in TrustVault USD
-    commissionTodayUGX: 1840000,  // Platform commission earned today
-    commissionTodayUSD: 490,
+    commissionTodayUGX,          // Platform commission earned today
+    commissionTodayUSD,
     pendingPayoutsUGX: 9250000,   // Driver payouts awaiting disbursement
     pendingPayoutsCount: 4,
     efrisStatus: {
@@ -482,11 +603,113 @@ app.get('/api/admin/accounts', (_req: Request, res: Response) => {
     domesticCommissionRate: `${platformSettings.commission_percent}%`,
     internationalCommissionRate: `${platformSettings.international_commission}%`,
     totalGrossTransactedUGX: 194500000,
-    netRevenueUGX: 16600000,
+    netRevenueUGX,
+    netRevenueUSD,
     activeShipmentsCount: 15,
     verifiedTransportersCount: 8,
     pendingKYCCount: adminFleetKyc.filter(k => k.status === 'PENDING_APPROVAL').length,
+    profitDistribution: {
+      config: profitDistributionConfig,
+      cumulative: {
+        totalNetUGX: netRevenueUGX,
+        totalNetUSD: netRevenueUSD,
+        jesusUGX: jesusCumulativeUGX,
+        jesusUSD: jesusCumulativeUSD,
+        ownerUGX: ownerCumulativeUGX,
+        ownerUSD: ownerCumulativeUSD,
+        maintenanceUGX: maintenanceCumulativeUGX,
+        maintenanceUSD: maintenanceCumulativeUSD,
+      },
+      today: {
+        totalNetUGX: commissionTodayUGX,
+        totalNetUSD: commissionTodayUSD,
+        jesusUGX: jesusTodayUGX,
+        jesusUSD: jesusTodayUSD,
+        ownerUGX: ownerTodayUGX,
+        ownerUSD: ownerTodayUSD,
+        maintenanceUGX: maintenanceTodayUGX,
+        maintenanceUSD: maintenanceTodayUSD,
+      },
+      disbursements: profitDisbursementsLog,
+    }
   });
+});
+
+// Profit Distribution Specific API
+app.get('/api/admin/profit-distribution', (_req: Request, res: Response) => {
+  return res.json({
+    config: profitDistributionConfig,
+    disbursements: profitDisbursementsLog,
+  });
+});
+
+app.post('/api/admin/profit-distribution', (req: Request, res: Response) => {
+  try {
+    const { maintenance_percent, owner_payout_account, jesus_fund_account, maintenance_fund_account } = req.body;
+
+    if (maintenance_percent !== undefined) {
+      const m = Number(maintenance_percent);
+      if (isNaN(m) || m < 2 || m > 35) {
+        return res.status(400).json({ error: 'App maintenance fee must be between 2% and 35%.' });
+      }
+      // Fixed policy:
+      // 1% is for Jesus
+      // Biggest % is for me (Mark Sentongo) = 100 - 1 - maintenance
+      profitDistributionConfig.maintenance_percent = Math.round(m * 10) / 10;
+      profitDistributionConfig.jesus_percent = 1;
+      profitDistributionConfig.owner_percent = Math.round((99 - profitDistributionConfig.maintenance_percent) * 10) / 10;
+    }
+
+    if (owner_payout_account) profitDistributionConfig.owner_payout_account = String(owner_payout_account);
+    if (jesus_fund_account) profitDistributionConfig.jesus_fund_account = String(jesus_fund_account);
+    if (maintenance_fund_account) profitDistributionConfig.maintenance_fund_account = String(maintenance_fund_account);
+
+    profitDistributionConfig.updated_at = new Date().toISOString();
+
+    console.log(`[PROFIT SPLIT UPDATED] Jesus: 1%, Mark Sentongo: ${profitDistributionConfig.owner_percent}%, Maintenance: ${profitDistributionConfig.maintenance_percent}%`);
+
+    return res.json({
+      success: true,
+      message: 'Profit distribution policy updated successfully. 1% for Jesus, biggest % for Mark Sentongo, and app maintenance fee secured.',
+      config: profitDistributionConfig,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to update profit distribution settings' });
+  }
+});
+
+// Execute simulated or logged profit disbursement
+app.post('/api/admin/disburse-profit', (req: Request, res: Response) => {
+  try {
+    const { target, amountUGX, recipientNotes } = req.body; // target: 'jesus' | 'owner' | 'maintenance' | 'all'
+    const newRecord = {
+      id: `DISB-2026-${String(profitDisbursementsLog.length + 1).padStart(3, '0')}`,
+      timestamp: new Date().toLocaleDateString('en-GB') + ' ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' EAT',
+      jobId: 'MANUAL-TREASURY-SPLIT',
+      sourceDescription: recipientNotes || `Treasury allocation to ${target.toUpperCase()}`,
+      netProfitUGX: Number(amountUGX) || 1000000,
+      netProfitUSD: Math.round(((Number(amountUGX) || 1000000) / 3750) * 100) / 100,
+      jesusAmountUGX: Math.round((Number(amountUGX) || 1000000) * (profitDistributionConfig.jesus_percent / 100)),
+      jesusAmountUSD: Math.round((((Number(amountUGX) || 1000000) * (profitDistributionConfig.jesus_percent / 100)) / 3750) * 100) / 100,
+      ownerAmountUGX: Math.round((Number(amountUGX) || 1000000) * (profitDistributionConfig.owner_percent / 100)),
+      ownerAmountUSD: Math.round((((Number(amountUGX) || 1000000) * (profitDistributionConfig.owner_percent / 100)) / 3750) * 100) / 100,
+      maintenanceAmountUGX: Math.round((Number(amountUGX) || 1000000) * (profitDistributionConfig.maintenance_percent / 100)),
+      maintenanceAmountUSD: Math.round((((Number(amountUGX) || 1000000) * (profitDistributionConfig.maintenance_percent / 100)) / 3750) * 100) / 100,
+      status: 'DISBURSED' as const,
+      referenceCode: `MAX-${target.toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}-TILL031801`,
+    };
+
+    profitDisbursementsLog.unshift(newRecord);
+
+    return res.json({
+      success: true,
+      message: `Profit disbursement of UGX ${Number(amountUGX).toLocaleString()} recorded successfully.`,
+      disbursement: newRecord,
+      allDisbursements: profitDisbursementsLog,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to disburse profit' });
+  }
 });
 
 // Live Bids Status endpoint

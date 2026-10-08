@@ -694,6 +694,31 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
             </div>
           </div>
 
+          {/* Statutory Owner Profit Distribution Policy Banner */}
+          <div className="p-5 rounded-2xl bg-gradient-to-r from-[#16122C] via-[#0F1D33] to-[#0D1520] border-2 border-[#C9A86A]/40 shadow-xl space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-500/20 text-purple-300 border border-purple-500/40 font-mono">
+                    ✝ 1% FOR JESUS
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">
+                    👑 80% FOR ME (MARK SENTONGO)
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono">
+                    ⚙ 19% APP MAINTENANCE
+                  </span>
+                </div>
+                <h4 className="text-sm font-black text-white flex items-center gap-2">
+                  <span>Founder Profit Distribution Policy (Accounts Section Rule)</span>
+                </h4>
+                <p className="text-xs text-slate-300">
+                  Platform net profit is systematically partitioned: 1% consecrated to Jesus Christ (ministry &amp; divine favor), 80% (biggest share) awarded to Mark Sentongo, and 19% reserved for cloud maintenance and EFRIS compliance. Full controls and disbursement available in the Super Admin Vault / Accounts tab.
+                </p>
+              </div>
+            </div>
+          </div>
+
         </div>
       )}
 

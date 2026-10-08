@@ -340,3 +340,59 @@ export interface ServiceProvider {
   bio: string;
   specialties: string[];
 }
+
+export interface ProfitDistributionConfig {
+  jesus_percent: number;       // Fixed 1% ("1% fee is for Jesus")
+  owner_percent: number;       // Biggest % (e.g. 80%, "biggest % is for me" - Mark Sentongo)
+  maintenance_percent: number; // Administration fee (e.g. 19%, "certain % is for app maintenance")
+  owner_name: string;
+  owner_email: string;
+  owner_payout_account: string;
+  jesus_fund_account: string;
+  maintenance_fund_account: string;
+  updated_at: string;
+}
+
+export interface ProfitDisbursementItem {
+  id: string;
+  timestamp: string;
+  jobId?: string;
+  sourceDescription: string;
+  netProfitUGX: number;
+  netProfitUSD: number;
+  jesusAmountUGX: number;
+  jesusAmountUSD: number;
+  ownerAmountUGX: number;
+  ownerAmountUSD: number;
+  maintenanceAmountUGX: number;
+  maintenanceAmountUSD: number;
+  status: 'ALLOCATED' | 'DISBURSED' | 'PENDING';
+  referenceCode: string;
+}
+
+export interface ProfitAccountsPayload {
+  config: ProfitDistributionConfig;
+  cumulativeNetUGX: number;
+  cumulativeNetUSD: number;
+  todayCommissionUGX: number;
+  todayCommissionUSD: number;
+  trustVaultTotalUGX: number;
+  trustVaultTotalUSD: number;
+  calculatedCumulative: {
+    jesusUGX: number;
+    jesusUSD: number;
+    ownerUGX: number;
+    ownerUSD: number;
+    maintenanceUGX: number;
+    maintenanceUSD: number;
+  };
+  calculatedToday: {
+    jesusUGX: number;
+    jesusUSD: number;
+    ownerUGX: number;
+    ownerUSD: number;
+    maintenanceUGX: number;
+    maintenanceUSD: number;
+  };
+  disbursements: ProfitDisbursementItem[];
+}

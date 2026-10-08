@@ -39,6 +39,7 @@ import { formatMoney } from '../../services/currency';
 import { fetchPlatformSettings, savePlatformSettings, PlatformSettings } from '../../services/settingsService';
 import { REAL_SERVICE_PROVIDERS, ServiceProviderItem } from '../../data/serviceProvidersData';
 import { BusinessMovementGraphs } from './BusinessMovementGraphs';
+import { ProfitDistributionSection } from './ProfitDistributionSection';
 import { Logo } from '../Logo';
 
 interface SecureAdminPortalProps {
@@ -744,7 +745,7 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
           {[
             { 
               id: 'accounts', 
-              label: isVaultUnlocked ? '1. Owner Vault & Accounts (Unlocked)' : '1. Super Admin Vault (Code 48484)', 
+              label: isVaultUnlocked ? '1. Owner Vault, Accounts & Profit Split (Unlocked)' : '1. Super Admin Vault & Accounts (Code 48484)', 
               icon: Building2 
             },
             { id: 'bids', label: '2. Live Bids Status', icon: ListOrdered },
@@ -1006,6 +1007,13 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
                 </p>
               </div>
             </div>
+
+            {/* Owner Profit Distribution Engine (1% for Jesus · Biggest % for Mark Sentongo · App Maintenance Fee) */}
+            <ProfitDistributionSection
+              currency={currency}
+              accountData={accountData}
+              onRefreshData={fetchProtectedAccounts}
+            />
 
             {/* Banking Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
