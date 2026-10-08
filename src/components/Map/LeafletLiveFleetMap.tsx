@@ -30,7 +30,11 @@ import {
   RefreshCw,
   Zap,
   MapPin,
-  Globe
+  Globe,
+  ChevronLeft,
+  ChevronRight,
+  Activity,
+  Gauge
 } from 'lucide-react';
 import { formatMoney } from '../../services/currency';
 import { Language } from '../../types';
@@ -230,6 +234,7 @@ export const LeafletLiveFleetMap: React.FC<LeafletLiveFleetMapProps> = ({
   const [mapCenter, setMapCenter] = useState<[number, number]>([0.3476, 32.5825]); // Center Kampala Core
   const [mapZoom, setMapZoom] = useState<number>(8); // Zoom 8
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showTelemetrySidebar, setShowTelemetrySidebar] = useState(true);
 
   // Poll real-time GPS locations every 4 seconds from backend
   const fetchFleetLocations = async () => {
@@ -239,16 +244,26 @@ export const LeafletLiveFleetMap: React.FC<LeafletLiveFleetMapProps> = ({
         if (res.ok) {
           const data = await res.json();
           setTrucks([data]);
-          if (!selectedTruck) setSelectedTruck(data);
+          setSelectedTruck(prev => prev ? (data.jobId === prev.jobId ? data : prev) : data);
         }
       } else {
         const res = await fetch('/api/fleet-locations');
         if (res.ok) {
           const data = await res.json();
-          setTrucks(data.trucks || []);
+          const list: LiveTruckData[] = data.trucks || [];
+          setTrucks(list);
           if (data.summary) {
             setSummary(data.summary);
           }
+          // Ensure a truck is selected so coordinates & telemetry are immediately readable aside
+          setSelectedTruck(prev => {
+            if (!prev && list.length > 0) return list[0];
+            if (prev) {
+              const updated = list.find(t => t.jobId === prev.jobId);
+              return updated || prev;
+            }
+            return null;
+          });
         }
       }
     } catch (err) {
@@ -413,6 +428,20 @@ export const LeafletLiveFleetMap: React.FC<LeafletLiveFleetMapProps> = ({
               <span className="capitalize">{mapStyle}</span>
             </button>
 
+            {/* GPS Telemetry Readout Side Panel Toggle */}
+            <button
+              onClick={() => setShowTelemetrySidebar(!showTelemetrySidebar)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-all shadow-md ${
+                showTelemetrySidebar
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black border-emerald-400'
+                  : 'bg-slate-800 text-slate-300 border-white/10 hover:text-white'
+              }`}
+              title="Toggle Live GPS Location & Telemetry Side Panel"
+            >
+              <Activity className="w-3.5 h-3.5" />
+              <span>{showTelemetrySidebar ? 'Hide Telemetry' : 'Show GPS Aside'}</span>
+            </button>
+
             {/* Refresh Button */}
             <button
               onClick={() => {
@@ -524,9 +553,12 @@ export const LeafletLiveFleetMap: React.FC<LeafletLiveFleetMapProps> = ({
         </div>
       )}
 
-      {/* MAIN LEAFLET MAP CONTAINER */}
-      <div className="relative flex-1 w-full h-full min-h-[400px]">
-        <MapContainer
+      {/* MAIN CONTAINER: MAP WITH DEDICATED LIVE GPS TELEMETRY READOUT ASIDE */}
+      <div className="relative flex-1 w-full h-full min-h-[460px] flex flex-col md:flex-row overflow-hidden">
+        
+        {/* LEAFLET MAP CONTAINER */}
+        <div className="relative flex-1 w-full h-full min-h-[380px]">
+          <MapContainer
           center={mapCenter}
           zoom={mapZoom}
           scrollWheelZoom={true}
@@ -836,7 +868,225 @@ export const LeafletLiveFleetMap: React.FC<LeafletLiveFleetMapProps> = ({
           </div>
         )}
 
+        </div>
+        {/* END LEAFLET MAP WRAPPER */}
+
+        {/* ========================================================================= */}
+        {/* GPS LOCATION ASIDE PANEL: Read Coordinates, Highway Station, Speed, ETA */}
+        {/* ========================================================================= */}
+        {showTelemetrySidebar && (
+          <aside className="w-full md:w-84 lg:w-96 bg-[#0a1526] border-t md:border-t-0 md:border-l border-white/10 flex flex-col z-[998] shrink-0 text-white overflow-y-auto max-h-[380px] md:max-h-none">
+            
+            {/* Header of Aside */}
+            <div className="p-3.5 bg-[#0f1f38] border-b border-white/10 flex items-center justify-between sticky top-0 z-10">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></div>
+                <div className="flex items-center gap-1.5 font-bold text-xs uppercase tracking-wider text-emerald-400">
+                  <MapPin className="w-4 h-4 text-emerald-400" />
+                  <span>Current GPS Telemetry</span>
+                </div>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-white/10">
+                Live Sat
+              </span>
+            </div>
+
+            {/* Content of Aside */}
+            {selectedTruck ? (
+              <div className="p-4 space-y-4 text-xs">
+
+                {/* Primary Card: Driver & Vehicle Plate */}
+                <div className="bg-gradient-to-br from-[#13243f] to-[#0d182b] p-3.5 rounded-xl border border-white/10 shadow-lg">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-amber-500 text-slate-950">
+                          #{selectedTruck.jobId}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                          selectedTruck.status === 'delivering' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                          selectedTruck.status === 'empty_returning' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                          'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                        }`}>
+                          {selectedTruck.status === 'delivering' ? 'Delivering Freight' :
+                           selectedTruck.status === 'empty_returning' ? 'Returning Empty' : 'Stopped >30m'}
+                        </span>
+                      </div>
+                      <h3 className="text-base font-extrabold text-white">{selectedTruck.driverName}</h3>
+                      <p className="text-xs text-[#C5A059] font-mono font-semibold">{selectedTruck.numberPlate}</p>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="text-[10px] text-white/50 block">Telemetry</span>
+                      <span className="text-[11px] font-mono text-emerald-400 font-bold">Active</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-[11px]">
+                    <span className="text-white/60">Phone:</span>
+                    <a href={`tel:${selectedTruck.phone}`} className="font-mono text-cyan-300 hover:underline flex items-center gap-1 font-bold">
+                      <Phone className="w-3 h-3 text-emerald-400" />
+                      {selectedTruck.phone}
+                    </a>
+                  </div>
+                </div>
+
+                {/* Coordinates & Exact Geographic Location Aside */}
+                <div className="bg-[#0e1d33] p-3.5 rounded-xl border border-white/10 space-y-2.5">
+                  <div className="text-[11px] font-bold text-white/70 uppercase tracking-wider flex items-center gap-1.5">
+                    <Navigation className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Exact Geographical Coordinates</span>
+                  </div>
+
+                  {/* Lat / Lng Digital Readout */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-slate-950/70 p-2.5 rounded-lg border border-white/5 font-mono">
+                      <span className="text-[9px] text-white/40 uppercase block">Latitude</span>
+                      <span className="text-sm font-bold text-cyan-300">
+                        {selectedTruck.lat.toFixed(5)}° N
+                      </span>
+                    </div>
+                    <div className="bg-slate-950/70 p-2.5 rounded-lg border border-white/5 font-mono">
+                      <span className="text-[9px] text-white/40 uppercase block">Longitude</span>
+                      <span className="text-sm font-bold text-cyan-300">
+                        {selectedTruck.lng.toFixed(5)}° E
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Highway Landmark / Station */}
+                  <div className="bg-slate-950/70 p-2.5 rounded-lg border border-white/5">
+                    <span className="text-[9px] text-white/40 uppercase block">Current Location Station</span>
+                    <p className="text-xs font-semibold text-white mt-0.5 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span>{selectedTruck.lastSeenLocationName}</span>
+                    </p>
+                  </div>
+
+                  {/* Speedometer & Satellite Ping Time */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-slate-950/70 p-2 rounded-lg border border-white/5">
+                      <span className="text-[9px] text-white/40 uppercase block flex items-center gap-1">
+                        <Gauge className="w-3 h-3 text-amber-400" />
+                        Live Speed
+                      </span>
+                      <span className={`text-xs font-extrabold font-mono mt-0.5 block ${
+                        selectedTruck.speed > 0 ? 'text-emerald-400' : 'text-rose-400'
+                      }`}>
+                        {selectedTruck.speed > 0 ? `${selectedTruck.speed} km/h` : '0 km/h (Stopped)'}
+                      </span>
+                    </div>
+
+                    <div className="bg-slate-950/70 p-2 rounded-lg border border-white/5">
+                      <span className="text-[9px] text-white/40 uppercase block flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-cyan-400" />
+                        Ping Age
+                      </span>
+                      <span className="text-xs font-semibold text-white/90 mt-0.5 block">
+                        {selectedTruck.lastUpdateRelative}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Trip & Cargo Details */}
+                <div className="bg-[#0e1d33] p-3.5 rounded-xl border border-white/10 space-y-2">
+                  <div className="text-[11px] font-bold text-white/70 uppercase tracking-wider">
+                    Consignment & Destination
+                  </div>
+                  <div className="text-slate-300 text-xs">
+                    <span className="text-white/40 block text-[10px]">Cargo</span>
+                    <span className="font-semibold text-white">{selectedTruck.cargo}</span>
+                  </div>
+                  <div className="text-slate-300 text-xs">
+                    <span className="text-white/40 block text-[10px]">Destination Hub</span>
+                    <span className="font-semibold text-white">{selectedTruck.destination}</span>
+                  </div>
+
+                  {selectedTruck.etaText && (
+                    <div className="mt-2 p-2 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-300 text-xs font-semibold flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span>{selectedTruck.etaText}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Quick Camera Centering & Follow Buttons */}
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    onClick={() => {
+                      setMapCenter([selectedTruck.lat, selectedTruck.lng]);
+                      setMapZoom(13);
+                    }}
+                    className="flex-1 py-2 px-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border border-white/10 transition-colors"
+                  >
+                    <LocateFixed className="w-3.5 h-3.5 text-orange-400" />
+                    <span>Center Map</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleFollowToggle(selectedTruck.jobId)}
+                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                      followedJobId === selectedTruck.jobId
+                        ? 'bg-cyan-500 text-slate-950 font-black'
+                        : 'bg-orange-500 hover:bg-orange-400 text-slate-950 font-black'
+                    }`}
+                  >
+                    <Radio className="w-3.5 h-3.5" />
+                    <span>{followedJobId === selectedTruck.jobId ? 'Locked Camera' : 'Follow Live'}</span>
+                  </button>
+                </div>
+
+                {/* Fleet Switcher if multiple trucks */}
+                {trucks.length > 1 && !clientJobId && (
+                  <div className="pt-2 border-t border-white/10">
+                    <span className="text-[10px] text-white/50 uppercase tracking-wider block mb-2 font-bold">
+                      Switch Truck Telemetry ({trucks.length} Active):
+                    </span>
+                    <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                      {trucks.map(t => (
+                        <button
+                          key={t.jobId}
+                          onClick={() => {
+                            setSelectedTruck(t);
+                            setMapCenter([t.lat, t.lng]);
+                          }}
+                          className={`w-full p-2 rounded-lg text-left text-[11px] flex items-center justify-between transition-colors ${
+                            selectedTruck.jobId === t.jobId
+                              ? 'bg-orange-500/20 border border-orange-500/40 text-orange-200'
+                              : 'bg-slate-900/60 hover:bg-slate-800 border border-white/5 text-slate-300'
+                          }`}
+                        >
+                          <div className="truncate">
+                            <span className="font-bold text-white block truncate">{t.driverName}</span>
+                            <span className="text-[10px] text-white/60 font-mono">{t.lastSeenLocationName}</span>
+                          </div>
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0 ${
+                            t.status === 'delivering' ? 'bg-emerald-500/20 text-emerald-300' :
+                            t.status === 'empty_returning' ? 'bg-amber-500/20 text-amber-300' :
+                            'bg-rose-500/20 text-rose-300'
+                          }`}>
+                            {t.speed > 0 ? `${t.speed} km/h` : 'Stopped'}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            ) : (
+              <div className="p-6 text-center text-white/50 text-xs">
+                <MapPin className="w-8 h-8 text-white/30 mx-auto mb-2 animate-bounce" />
+                <p>Click on any truck marker on the map to inspect its real-time GPS coordinates and location readout.</p>
+              </div>
+            )}
+
+          </aside>
+        )}
+
       </div>
+      {/* END MAIN CONTAINER */}
 
       {/* FOOTER BAR: Active East African Corridors & Escrow Guarantee */}
       <div className="p-2.5 sm:p-3 bg-slate-950 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
