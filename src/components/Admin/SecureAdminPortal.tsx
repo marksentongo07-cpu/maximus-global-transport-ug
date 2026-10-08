@@ -1513,17 +1513,15 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
 
                   {/* WhatsApp button */}
                   <div className="pt-2 border-t border-white/5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const clean = provider.phoneRaw || provider.phone.replace(/[^0-9]/g, '');
-                        window.open(`https://wa.me/${clean}?text=Hello%20${encodeURIComponent(provider.name)}%2C%20inquiry%20from%20Maximus%20Admin.`, '_blank');
-                      }}
-                      className="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all"
+                    <a
+                      href={`https://wa.me/${provider.phoneRaw || provider.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(provider.name)}%2C%20inquiry%20from%20Maximus%20Admin.`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all text-center block"
                     >
-                      <MessageSquare className="w-3.5 h-3.5" />
+                      <MessageSquare className="w-3.5 h-3.5 inline mr-1" />
                       <span>Request Quote (WhatsApp)</span>
-                    </button>
+                    </a>
                   </div>
                 </div>
               ))}

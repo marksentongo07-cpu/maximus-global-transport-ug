@@ -14,7 +14,16 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(express.json());
+// Security & Hardening Middleware
+app.disable('x-powered-by');
+app.use((_req: Request, res: Response, next: NextFunction) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
+app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
 
 // -------------------------------------------------------------
@@ -907,7 +916,14 @@ app.get('/api/fintech/wallet', (_req: Request, res: Response) => {
 app.post('/api/fintech/wallet/topup', (req: Request, res: Response) => {
   try {
     const { amountUGX, gateway, phone, pin } = req.body;
-    const numericAmount = Math.max(10000, Number(amountUGX) || 500000);
+    const parsed = Number(amountUGX);
+    if (isNaN(parsed) || parsed <= 0) {
+      return res.status(400).json({ error: 'Please specify a valid positive top-up amount in UGX.' });
+    }
+    if (parsed > 100000000) {
+      return res.status(400).json({ error: 'Single top-up exceeds maximum limit of 100,000,000 UGX.' });
+    }
+    const numericAmount = Math.max(5000, parsed);
     
     // Security check: optional PIN verification
     if (customerWalletStore.pinSet && pin && pin !== customerWalletStore.securityPinHash && pin !== '1234') {
@@ -951,7 +967,10 @@ app.post('/api/fintech/wallet/topup', (req: Request, res: Response) => {
 app.post('/api/fintech/escrow/book-truck', (req: Request, res: Response) => {
   try {
     const { jobId, jobTitle, freightTotalUGX, driverName, driverPhone, pin } = req.body;
-    const amount = Number(freightTotalUGX) || 5000000;
+    const amount = Number(freightTotalUGX);
+    if (isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ error: 'Valid freight amount in UGX is required.' });
+    }
 
     // Security PIN check
     if (customerWalletStore.pinSet && pin && pin !== customerWalletStore.securityPinHash && pin !== '1234') {
@@ -1005,7 +1024,8 @@ app.post('/api/fintech/escrow/book-truck', (req: Request, res: Response) => {
 app.post('/api/fintech/escrow/release-goods-received', (req: Request, res: Response) => {
   try {
     const { jobId, jobTitle, driverName, driverPhone, driverNetwork, freightTotalUGX } = req.body;
-    const totalUGX = Number(freightTotalUGX) || 5000000;
+    const parsed = Number(freightTotalUGX);
+    const totalUGX = !isNaN(parsed) && parsed > 0 ? parsed : 5000000;
 
     // AUTO COMMISSION SPLIT (e.g. 90% = 4,500,000 UGX to driver, 10% = 500,000 UGX to MAXIMUS)
     const driverPercent = 90;
@@ -2018,9 +2038,10 @@ app.post('/api/location/batch', (req: Request, res: Response) => {
       return res.status(400).json({ error: 'points array is required' });
     }
 
+    const safePoints = points.slice(0, 500); // Prevent unbounded loops
     let lastTruck: any = null;
 
-    for (const item of points) {
+    for (const item of safePoints) {
       if (!item.jobId || typeof item.lat !== 'number' || typeof item.lng !== 'number') continue;
       const existing = fleetRegistry.get(item.jobId);
       const point: BreadcrumbPoint = {

@@ -67,6 +67,7 @@ export const CustomerWalletModal: React.FC<CustomerWalletModalProps> = ({
   const [topupPin, setTopupPin] = useState('4848');
   const [topupProcessing, setTopupProcessing] = useState(false);
   const [topupSuccessNotice, setTopupSuccessNotice] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Escrow / Goods Received Action State
   const [selectedEscrowJob, setSelectedEscrowJob] = useState<any>(null);
@@ -109,6 +110,7 @@ export const CustomerWalletModal: React.FC<CustomerWalletModalProps> = ({
     e.preventDefault();
     setTopupProcessing(true);
     setTopupSuccessNotice(null);
+    setErrorMessage(null);
 
     try {
       const res = await fetch('/api/fintech/wallet/topup', {
@@ -131,10 +133,10 @@ export const CustomerWalletModal: React.FC<CustomerWalletModalProps> = ({
           setTopupSuccessNotice(null);
         }, 2000);
       } else {
-        alert(data.error || 'Failed to complete top-up.');
+        setErrorMessage(data.error || 'Failed to complete top-up.');
       }
-    } catch (err) {
-      alert('Network issue during topup.');
+    } catch {
+      setErrorMessage('Network issue during topup. Please try again.');
     } finally {
       setTopupProcessing(false);
     }
@@ -145,10 +147,12 @@ export const CustomerWalletModal: React.FC<CustomerWalletModalProps> = ({
     if (!showOtpPrompt) {
       setSelectedEscrowJob(job);
       setShowOtpPrompt(true);
+      setErrorMessage(null);
       return;
     }
 
     setEscrowProcessing(true);
+    setErrorMessage(null);
     try {
       const res = await fetch('/api/fintech/escrow/release-goods-received', {
         method: 'POST',
@@ -185,10 +189,10 @@ export const CustomerWalletModal: React.FC<CustomerWalletModalProps> = ({
           onGoodsReceivedRelease(job.id);
         }
       } else {
-        alert(data.error || 'Failed to release escrow');
+        setErrorMessage(data.error || 'Failed to release escrow');
       }
     } catch {
-      alert('Network error releasing escrow.');
+      setErrorMessage('Network error releasing escrow. Please retry.');
     } finally {
       setEscrowProcessing(false);
     }
@@ -278,6 +282,22 @@ export const CustomerWalletModal: React.FC<CustomerWalletModalProps> = ({
 
         {/* MODAL BODY */}
         <div className="p-5 sm:p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+
+          {/* Dynamic Error Notice Banner */}
+          {errorMessage && (
+            <div className="p-3.5 bg-rose-950/80 border border-rose-500/50 rounded-2xl text-rose-200 text-xs flex items-center justify-between gap-3 shadow-lg">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                <span>{errorMessage}</span>
+              </div>
+              <button 
+                onClick={() => setErrorMessage(null)}
+                className="text-rose-400 hover:text-white text-xs font-bold px-2 py-0.5 rounded cursor-pointer"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
           
           {/* TAB 1: CHIPPER-STYLE DUAL-CURRENCY WALLET CARD */}
           {activeTab === 'balance' && (

@@ -61,21 +61,6 @@ export const ServicesMarketplace: React.FC<ServicesMarketplaceProps> = ({
     return true;
   });
 
-  // Request Quote -> opens WhatsApp
-  const handleRequestQuote = (provider: ServiceProviderItem) => {
-    const cleanNumber = provider.phoneRaw || provider.phone.replace(/[^0-9]/g, '');
-    const message = encodeURIComponent(
-      `Hello ${provider.name}, I am contacting you via MAXIMUS Global Transport Link regarding a freight / professional service inquiry.`
-    );
-    const whatsappUrl = `https://wa.me/${cleanNumber}?text=${message}`;
-    
-    // Open WhatsApp in new tab / app
-    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-    
-    setQuoteSuccessMsg(`WhatsApp quote channel opened for ${provider.name}!`);
-    setTimeout(() => setQuoteSuccessMsg(null), 4000);
-  };
-
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Toast Notification */}
@@ -254,17 +239,22 @@ export const ServicesMarketplace: React.FC<ServicesMarketplaceProps> = ({
               </div>
             </div>
 
-            {/* Request Quote Button -> Opens WhatsApp */}
+            {/* Request Quote Link -> Opens WhatsApp directly and safely */}
             <div className="pt-4 mt-3 border-t border-white/10">
-              <button
-                type="button"
-                onClick={() => handleRequestQuote(provider)}
-                className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white font-bold rounded-xl shadow-md shadow-emerald-900/30 flex items-center justify-center gap-2 text-xs transition-all"
+              <a
+                href={`https://wa.me/${provider.phoneRaw || provider.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${provider.name}, I am contacting you via MAXIMUS Global Transport Link regarding a freight / professional service inquiry.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  setQuoteSuccessMsg(`WhatsApp quote channel opened for ${provider.name}!`);
+                  setTimeout(() => setQuoteSuccessMsg(null), 4000);
+                }}
+                className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white font-bold rounded-xl shadow-md shadow-emerald-900/30 flex items-center justify-center gap-2 text-xs transition-all text-center"
               >
                 <MessageSquare className="w-4 h-4 text-white" />
                 <span>Request Quote (WhatsApp)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              </a>
             </div>
           </div>
         ))}
