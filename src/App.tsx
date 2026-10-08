@@ -44,6 +44,7 @@ import { PricingGuidePage } from './components/Pricing/PricingGuidePage';
 import { SecureAdminPortal } from './components/Admin/SecureAdminPortal';
 import { AdminAccessModal } from './components/Modals/AdminAccessModal';
 import { BrandInsigniaModal } from './components/Modals/BrandInsigniaModal';
+import { CustomerWalletModal } from './components/FinTech/CustomerWalletModal';
 import { TutorialTooltip, TutorialTooltipData } from './components/Common/TutorialTooltip';
 import { 
   ShieldCheck, 
@@ -189,6 +190,7 @@ export default function App() {
   const [showLegalModal, setShowLegalModal] = useState(false);
   const [showAdminQuickModal, setShowAdminQuickModal] = useState(false);
   const [showBrandInsigniaModal, setShowBrandInsigniaModal] = useState(false);
+  const [showCustomerWalletModal, setShowCustomerWalletModal] = useState(false);
   const [celebrationBanner, setCelebrationBanner] = useState<string | null>(null);
 
   // Active Job for GPS Map Tracking
@@ -768,6 +770,7 @@ export default function App() {
           window.history.pushState({}, '', '/maximus-admin-2026-secure');
         }}
         onOpenBrandInsignia={() => setShowBrandInsigniaModal(true)}
+        onOpenWallet={() => setShowCustomerWalletModal(true)}
       />
 
       {/* Main Viewport Content */}
@@ -801,6 +804,7 @@ export default function App() {
                   setActiveDisputeRecord(null);
                 }}
                 onRateTransporter={handleRateTransporter}
+                onOpenWallet={() => setShowCustomerWalletModal(true)}
               />
             )}
 
@@ -1128,6 +1132,30 @@ export default function App() {
         <BrandInsigniaModal
           isOpen={showBrandInsigniaModal}
           onClose={() => setShowBrandInsigniaModal(false)}
+        />
+      )}
+
+      {/* 14. FinTech Customer Wallet & Escrow Modal (Chipper Cash style for Trucking) */}
+      {showCustomerWalletModal && (
+        <CustomerWalletModal
+          isOpen={showCustomerWalletModal}
+          onClose={() => setShowCustomerWalletModal(false)}
+          currency={currency}
+          activeEscrowJobs={jobs.filter(j => j.status === 'in_transit' || j.status === 'delivered' || j.escrowStatus === 'held').map(j => ({
+            id: j.id,
+            title: j.title,
+            origin: j.pickupLocation.name,
+            destination: j.deliveryLocation.name,
+            freightAmountUGX: j.agreedPriceUGX || j.marketPriceEstimateUGX,
+            driverName: j.assignedTransporter?.name || 'Moses Ochen (Equator Freight)',
+            driverPhone: j.assignedTransporter?.phone || '+256 788 341 629',
+            driverNetwork: 'MTN',
+            status: j.status,
+          }))}
+          onGoodsReceivedRelease={(jobId) => {
+            handleConfirmPODByAdmin(jobId);
+            addNotification('Goods Received & Payout Disbursed', `Trip #${jobId} confirmed. 90% auto-disbursed to driver MoMo.`);
+          }}
         />
       )}
 

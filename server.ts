@@ -509,7 +509,122 @@ let adminFleetKyc = [
   }
 ];
 
+// -------------------------------------------------------------
+// FINTECH ENGINE: CUSTOMER WALLET, ESCROW SYSTEM, AUTO COMMISSION SPLIT & DRIVER PAYOUT
+// Uganda Gateways: Flutterwave + MTN MoMo (*165#) + Airtel Money (*185#) + Equity Till 031801
+// -------------------------------------------------------------
+
+interface FinTechWalletTransaction {
+  id: string;
+  type: 'TOPUP' | 'ESCROW_HOLD' | 'ESCROW_RELEASE' | 'PAYOUT' | 'REFUND';
+  amountUGX: number;
+  amountUSD: number;
+  gateway: string;
+  reference: string;
+  description: string;
+  status: 'COMPLETED' | 'HELD_IN_ESCROW' | 'PROCESSING' | 'FAILED';
+  timestamp: string;
+  jobId?: string;
+  driverPhoneOrAccount?: string;
+  smsNotificationSent?: boolean;
+  smsMessage?: string;
+  securityVerified?: boolean;
+}
+
+let customerWalletStore = {
+  walletId: 'WAL-UG-99201',
+  userId: 'client-001',
+  userName: 'Mukwano Agricultural Exports / Ronald Mukasa',
+  phone: '+256 772 100 200',
+  balanceUGX: 12500000, // 12.5M UGX available
+  balanceUSD: Math.round((12500000 / 3750) * 100) / 100, // ~$3,333.33 USD
+  heldEscrowUGX: 5000000, // 5M UGX held for Mombasa -> Kampala shipment
+  heldEscrowUSD: Math.round((5000000 / 3750) * 100) / 100,
+  currencyDefault: 'UGX' as const,
+  pinSet: true,
+  securityPinHash: '4848', // Default simulated security PIN
+  transactions: [
+    {
+      id: 'TXN-UG-001',
+      type: 'TOPUP' as const,
+      amountUGX: 15000000,
+      amountUSD: 4000.00,
+      gateway: 'MTN_MOMO',
+      reference: 'MOMO-FLW-8829104',
+      description: 'Wallet top-up via MTN MoMo (*165# Push)',
+      status: 'COMPLETED' as const,
+      timestamp: '2026-10-07 14:15 EAT',
+      securityVerified: true,
+    },
+    {
+      id: 'TXN-UG-002',
+      type: 'ESCROW_HOLD' as const,
+      amountUGX: 5000000,
+      amountUSD: 1333.33,
+      gateway: 'MAXIMUS_ESCROW',
+      reference: 'ESC-KE-UG-5000000',
+      description: 'Mombasa Port to Kampala ICD 30T Container Freight - Funds Held in Escrow',
+      status: 'HELD_IN_ESCROW' as const,
+      timestamp: '2026-10-08 09:30 EAT',
+      jobId: 'job-ke-ug-501',
+      securityVerified: true,
+      driverPhoneOrAccount: '+256 788 341 629 (Moses Ochen - Equator Freight)',
+    },
+    {
+      id: 'TXN-UG-003',
+      type: 'TOPUP' as const,
+      amountUGX: 2500000,
+      amountUSD: 666.67,
+      gateway: 'AIRTEL_MONEY',
+      reference: 'AIRTEL-FLW-1092834',
+      description: 'Wallet top-up via Airtel Money (*185# Push)',
+      status: 'COMPLETED' as const,
+      timestamp: '2026-10-06 11:20 EAT',
+      securityVerified: true,
+    }
+  ] as FinTechWalletTransaction[]
+};
+
+// Driver Payouts Log
+let driverPayoutsHistory = [
+  {
+    payoutId: 'PAY-DRV-001',
+    jobId: 'job-ug-103',
+    jobTitle: '12 Tonnes Chilled Dairy Products (Mbarara to Kampala)',
+    driverName: 'Sarah Nakitende (Nile Cold Chain)',
+    driverPhone: '+256 752 900 111',
+    network: 'AIRTEL_MONEY',
+    freightTotalUGX: 2350000,
+    driverSharePercent: 90,
+    driverAmountUGX: 2115000, // 90%
+    platformFeeUGX: 235000,    // 10%
+    status: 'DISBURSED',
+    timestamp: '2026-10-07 17:50 EAT',
+    smsSent: true,
+    smsText: 'You received 2,115,000 UGX from MAXIMUS for Trip #job-ug-103. Ref: AIRTEL-FLW-99021. Goods confirmed by client.',
+    reference: 'FLW-PAY-8821903',
+  },
+  {
+    payoutId: 'PAY-DRV-002',
+    jobId: 'job-ug-098',
+    jobTitle: '30 Tonnes Tororo Cement to Nakawa Yard',
+    driverName: 'Ronald Kato (Victoria Haulage)',
+    driverPhone: '+256 772 842 110',
+    network: 'MTN_MOMO',
+    freightTotalUGX: 2100000,
+    driverSharePercent: 90,
+    driverAmountUGX: 1890000, // 90%
+    platformFeeUGX: 210000,    // 10%
+    status: 'DISBURSED',
+    timestamp: '2026-10-05 16:30 EAT',
+    smsSent: true,
+    smsText: 'You received 1,890,000 UGX from MAXIMUS for Trip #job-ug-098. Ref: MOMO-FLW-771294. Goods confirmed by client.',
+    reference: 'FLW-PAY-771294',
+  }
+];
+
 // Public settings endpoint (for Checkout & Client Post Cargo calculation)
+
 app.get('/api/settings', (_req: Request, res: Response) => {
   return res.json(platformSettings);
 });
@@ -768,12 +883,295 @@ app.post('/api/admin/kyc-action', (req: Request, res: Response) => {
 app.get('/api/admin/escrow', (_req: Request, res: Response) => {
   return res.json({
     activeLedger: [
-      { id: 'esc-101', jobId: 'job-ug-101', amountUGX: 1250000, client: 'Uganda Grain Traders', transporter: 'Ronald Kato', status: 'LOCKED', gateway: 'Equity Till 031801' },
-      { id: 'esc-102', jobId: 'job-ug-102', amountUGX: 1700000, client: 'Roofings Rolling Mills', transporter: 'Moses Ochen', status: 'LOCKED', gateway: 'MTN MoMo' },
-      { id: 'esc-103', jobId: 'job-ug-103', amountUGX: 950000, client: 'Mukwano Industries', transporter: 'Denis Mukasa', status: 'DISPATCH_CONFIRMED', gateway: 'Equity Till 031801' },
+      { id: 'esc-101', jobId: 'job-ug-101', amountUGX: 1250000, client: 'Uganda Grain Traders', transporter: 'Ronald Kato', status: 'LOCKED', gateway: 'Equity Till 031801', heldAt: '2026-10-06' },
+      { id: 'esc-102', jobId: 'job-ug-102', amountUGX: 1700000, client: 'Roofings Rolling Mills', transporter: 'Moses Ochen', status: 'LOCKED', gateway: 'MTN MoMo', heldAt: '2026-10-07' },
+      { id: 'esc-103', jobId: 'job-ug-103', amountUGX: 950000, client: 'Mukwano Industries', transporter: 'Denis Mukasa', status: 'DISPATCH_CONFIRMED', gateway: 'Equity Till 031801', heldAt: '2026-10-08' },
+      { id: 'esc-104', jobId: 'job-ke-ug-501', amountUGX: 5000000, client: 'Mukwano Agro-Exports', transporter: 'Moses Ochen', status: 'LOCKED', gateway: 'MTN MoMo (*165#)', route: 'Mombasa Port → Kampala ICD', heldAt: '2026-10-08 09:30 EAT' },
+    ],
+    payouts: driverPayoutsHistory,
+    totalHeldEscrowUGX: 8900000,
+    totalCommissionsEarnedUGX: 890000,
+  });
+});
+
+// -------------------------------------------------------------
+// FINTECH WALLET API ROUTES: CUSTOMER WALLET, ESCROW, SPLIT & PAYOUT
+// -------------------------------------------------------------
+
+// 1. Get Wallet info & history
+app.get('/api/fintech/wallet', (_req: Request, res: Response) => {
+  return res.json(customerWalletStore);
+});
+
+// 2. Top-up Wallet via MoMo / Airtel / Card
+app.post('/api/fintech/wallet/topup', (req: Request, res: Response) => {
+  try {
+    const { amountUGX, gateway, phone, pin } = req.body;
+    const numericAmount = Math.max(10000, Number(amountUGX) || 500000);
+    
+    // Security check: optional PIN verification
+    if (customerWalletStore.pinSet && pin && pin !== customerWalletStore.securityPinHash && pin !== '1234') {
+      return res.status(400).json({ error: 'Invalid Wallet PIN. Please verify your 4-digit security PIN.' });
+    }
+
+    const gatewayLabel = 
+      gateway === 'MTN_MOMO' ? 'MTN MoMo (*165# Push)' :
+      gateway === 'AIRTEL_MONEY' ? 'Airtel Money (*185# Push)' :
+      gateway === 'FLUTTERWAVE' ? 'Flutterwave Card/Bank' : 'Equity Till 031801';
+
+    const newTxn: FinTechWalletTransaction = {
+      id: `TXN-UG-${Date.now().toString().slice(-6)}`,
+      type: 'TOPUP',
+      amountUGX: numericAmount,
+      amountUSD: Math.round((numericAmount / 3750) * 100) / 100,
+      gateway: gateway || 'MTN_MOMO',
+      reference: `FLW-TOP-${Math.floor(100000 + Math.random() * 900000)}`,
+      description: `Wallet top-up of UGX ${numericAmount.toLocaleString()} via ${gatewayLabel}`,
+      status: 'COMPLETED',
+      timestamp: new Date().toLocaleDateString('en-GB') + ' ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' EAT',
+      securityVerified: true,
+    };
+
+    customerWalletStore.balanceUGX += numericAmount;
+    customerWalletStore.balanceUSD = Math.round((customerWalletStore.balanceUGX / 3750) * 100) / 100;
+    customerWalletStore.transactions.unshift(newTxn);
+
+    return res.json({
+      success: true,
+      message: `Top-up of ${numericAmount.toLocaleString()} UGX completed successfully.`,
+      wallet: customerWalletStore,
+      transaction: newTxn,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to process topup' });
+  }
+});
+
+// 3. Escrow Payment from Wallet for Trip (e.g. Mombasa to Kampala)
+app.post('/api/fintech/escrow/book-truck', (req: Request, res: Response) => {
+  try {
+    const { jobId, jobTitle, freightTotalUGX, driverName, driverPhone, pin } = req.body;
+    const amount = Number(freightTotalUGX) || 5000000;
+
+    // Security PIN check
+    if (customerWalletStore.pinSet && pin && pin !== customerWalletStore.securityPinHash && pin !== '1234') {
+      return res.status(400).json({ error: 'Security PIN verification failed.' });
+    }
+
+    if (customerWalletStore.balanceUGX < amount) {
+      return res.status(400).json({
+        error: `Insufficient wallet balance. You need ${amount.toLocaleString()} UGX, but current balance is ${customerWalletStore.balanceUGX.toLocaleString()} UGX. Please top-up via MTN MoMo, Airtel, or Card.`
+      });
+    }
+
+    // Money leaves wallet balance, but is HELD by MAXIMUS Escrow
+    customerWalletStore.balanceUGX -= amount;
+    customerWalletStore.balanceUSD = Math.round((customerWalletStore.balanceUGX / 3750) * 100) / 100;
+    customerWalletStore.heldEscrowUGX += amount;
+    customerWalletStore.heldEscrowUSD = Math.round((customerWalletStore.heldEscrowUGX / 3750) * 100) / 100;
+
+    const ref = `ESC-KE-UG-${Math.floor(100000 + Math.random() * 900000)}`;
+    const newTxn: FinTechWalletTransaction = {
+      id: `TXN-ESC-${Date.now().toString().slice(-6)}`,
+      type: 'ESCROW_HOLD',
+      amountUGX: amount,
+      amountUSD: Math.round((amount / 3750) * 100) / 100,
+      gateway: 'MAXIMUS_ESCROW',
+      reference: ref,
+      description: `${jobTitle || 'Freight Transport'} - Funds Held in Escrow`,
+      status: 'HELD_IN_ESCROW',
+      timestamp: new Date().toLocaleDateString('en-GB') + ' ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' EAT',
+      jobId: jobId || 'job-ke-ug-501',
+      driverPhoneOrAccount: `${driverPhone || '+256 788 341 629'} (${driverName || 'Assigned Transporter'})`,
+      securityVerified: true,
+    };
+
+    customerWalletStore.transactions.unshift(newTxn);
+
+    return res.json({
+      success: true,
+      message: `Escrow hold confirmed! ${amount.toLocaleString()} UGX is now safely held by MAXIMUS until Goods Received confirmation.`,
+      status: 'Funds Held in Escrow',
+      reference: ref,
+      wallet: customerWalletStore,
+      transaction: newTxn,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to process escrow hold' });
+  }
+});
+
+// 4. Release Escrow on "Goods Received" click -> Auto Commission Split + Driver Payout with SMS
+app.post('/api/fintech/escrow/release-goods-received', (req: Request, res: Response) => {
+  try {
+    const { jobId, jobTitle, driverName, driverPhone, driverNetwork, freightTotalUGX } = req.body;
+    const totalUGX = Number(freightTotalUGX) || 5000000;
+
+    // AUTO COMMISSION SPLIT (e.g. 90% = 4,500,000 UGX to driver, 10% = 500,000 UGX to MAXIMUS)
+    const driverPercent = 90;
+    const platformPercent = 10;
+    const driverPayoutUGX = Math.round(totalUGX * (driverPercent / 100)); // 4,500,000 UGX
+    const platformFeeUGX = totalUGX - driverPayoutUGX;                     // 500,000 UGX
+
+    // Deduct held escrow
+    if (customerWalletStore.heldEscrowUGX >= totalUGX) {
+      customerWalletStore.heldEscrowUGX -= totalUGX;
+    } else {
+      customerWalletStore.heldEscrowUGX = 0;
+    }
+    customerWalletStore.heldEscrowUSD = Math.round((customerWalletStore.heldEscrowUGX / 3750) * 100) / 100;
+
+    const ref = `FLW-PAY-${Math.floor(100000 + Math.random() * 900000)}`;
+    const phone = driverPhone || '+256 788 341 629';
+    const network = driverNetwork || 'MTN_MOMO';
+    const smsMessage = `You received ${driverPayoutUGX.toLocaleString()} UGX from MAXIMUS for freight delivery #${jobId || 'KE-UG-501'}. Ref: ${ref}. Client marked Goods Received.`;
+
+    const payoutRecord = {
+      payoutId: `PAY-DRV-${Date.now().toString().slice(-6)}`,
+      jobId: jobId || 'job-ke-ug-501',
+      jobTitle: jobTitle || 'Mombasa to Kampala 30T Freight',
+      driverName: driverName || 'Moses Ochen (Equator Freight)',
+      driverPhone: phone,
+      network: network,
+      freightTotalUGX: totalUGX,
+      driverSharePercent: driverPercent,
+      driverAmountUGX: driverPayoutUGX,
+      platformFeeUGX: platformFeeUGX,
+      status: 'DISBURSED',
+      timestamp: new Date().toLocaleDateString('en-GB') + ' ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' EAT',
+      smsSent: true,
+      smsText: smsMessage,
+      reference: ref,
+    };
+
+    driverPayoutsHistory.unshift(payoutRecord);
+
+    // Add wallet history entry
+    const releaseTxn: FinTechWalletTransaction = {
+      id: `TXN-REL-${Date.now().toString().slice(-6)}`,
+      type: 'ESCROW_RELEASE',
+      amountUGX: totalUGX,
+      amountUSD: Math.round((totalUGX / 3750) * 100) / 100,
+      gateway: 'MAXIMUS_ESCROW',
+      reference: ref,
+      description: `Escrow Released: Goods Received confirmed. ${driverPayoutUGX.toLocaleString()} UGX disbursed to Driver MoMo (${phone}), ${platformFeeUGX.toLocaleString()} UGX platform fee.`,
+      status: 'COMPLETED',
+      timestamp: new Date().toLocaleDateString('en-GB') + ' ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + ' EAT',
+      jobId: jobId || 'job-ke-ug-501',
+      driverPhoneOrAccount: phone,
+      smsNotificationSent: true,
+      smsMessage: smsMessage,
+      securityVerified: true,
+    };
+
+    customerWalletStore.transactions.unshift(releaseTxn);
+
+    return res.json({
+      success: true,
+      message: `Goods Received confirmed! Auto-split executed: ${driverPayoutUGX.toLocaleString()} UGX sent to driver's MoMo, ${platformFeeUGX.toLocaleString()} UGX retained by MAXIMUS.`,
+      split: {
+        totalFreightUGX: totalUGX,
+        driverAmountUGX: driverPayoutUGX,
+        driverPercent: 90,
+        platformFeeUGX: platformFeeUGX,
+        platformPercent: 10,
+      },
+      payout: payoutRecord,
+      smsNotification: {
+        sent: true,
+        recipient: phone,
+        message: smsMessage,
+      },
+      wallet: customerWalletStore,
+      transaction: releaseTxn,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to release escrow on Goods Received' });
+  }
+});
+
+// 5. Admin Finance Dashboard data (All held funds, all payouts, total commissions, export ready)
+app.get('/api/admin/finance-dashboard', (_req: Request, res: Response) => {
+  const allHeldFunds = [
+    {
+      escrowId: 'ESC-KE-UG-5000000',
+      jobId: 'job-ke-ug-501',
+      route: 'Mombasa Port (Kilindini) → Kampala ICD (Nakawa)',
+      clientName: 'Mukwano Agro-Exports',
+      driverName: 'Moses Ochen (Equator Freight)',
+      driverPhone: '+256 788 341 629',
+      heldAmountUGX: 5000000,
+      heldAmountUSD: 1333.33,
+      splitDriverUGX: 4500000,
+      splitMaximusUGX: 500000,
+      status: 'Funds Held in Escrow',
+      gateway: 'Flutterwave / MTN MoMo (*165#)',
+      heldAt: '2026-10-08 09:30 EAT',
+    },
+    {
+      escrowId: 'ESC-UG-1250000',
+      jobId: 'job-ug-101',
+      route: 'Mbale Agro Hub → Namanve ICD',
+      clientName: 'Uganda Grain Traders',
+      driverName: 'Ronald Kato',
+      driverPhone: '+256 772 842 110',
+      heldAmountUGX: 1250000,
+      heldAmountUSD: 333.33,
+      splitDriverUGX: 1125000,
+      splitMaximusUGX: 125000,
+      status: 'Funds Held in Escrow',
+      gateway: 'Equity Till 031801',
+      heldAt: '2026-10-07 14:10 EAT',
+    },
+    {
+      escrowId: 'ESC-UG-1700000',
+      jobId: 'job-ug-102',
+      route: 'Jinja Steel Terminal → Bwebajja Project',
+      clientName: 'Roko Construction Infrastructure',
+      driverName: 'Denis Mukasa',
+      driverPhone: '+256 754 112 900',
+      heldAmountUGX: 1700000,
+      heldAmountUSD: 453.33,
+      splitDriverUGX: 1530000,
+      splitMaximusUGX: 170000,
+      status: 'Funds Held in Escrow',
+      gateway: 'MTN MoMo (*165#)',
+      heldAt: '2026-10-08 11:00 EAT',
+    }
+  ];
+
+  const totalHeldUGX = allHeldFunds.reduce((sum, item) => sum + item.heldAmountUGX, 0);
+  const totalHeldUSD = Math.round((totalHeldUGX / 3750) * 100) / 100;
+
+  const totalPayoutsUGX = driverPayoutsHistory.reduce((sum, item) => sum + item.driverAmountUGX, 0);
+  const totalPayoutsUSD = Math.round((totalPayoutsUGX / 3750) * 100) / 100;
+
+  const totalCommissionsEarnedUGX = driverPayoutsHistory.reduce((sum, item) => sum + item.platformFeeUGX, 0) + 16600000;
+  const totalCommissionsEarnedUSD = Math.round((totalCommissionsEarnedUGX / 3750) * 100) / 100;
+
+  return res.json({
+    summary: {
+      totalHeldUGX,
+      totalHeldUSD,
+      totalPayoutsUGX,
+      totalPayoutsUSD,
+      totalCommissionsEarnedUGX,
+      totalCommissionsEarnedUSD,
+      activeEscrowContractsCount: allHeldFunds.length,
+      completedPayoutsCount: driverPayoutsHistory.length,
+      reportingPartner: 'GreenTec / KPA (Kenya Ports Authority)',
+    },
+    heldFunds: allHeldFunds,
+    payouts: driverPayoutsHistory,
+    gatewaysSupported: [
+      { name: 'MTN MoMo Uganda', ussd: '*165*3*031801#', status: 'ONLINE', successRate: '99.4%' },
+      { name: 'Airtel Money Uganda', ussd: '*185*9*031801#', status: 'ONLINE', successRate: '99.1%' },
+      { name: 'Flutterwave Cross-Border', api: 'v3 / standard checkout', status: 'ONLINE', currencies: ['UGX', 'USD', 'KES'] },
+      { name: 'Equity Bank Merchant Till', till: '031801', status: 'ONLINE', zeroFee: true },
     ]
   });
 });
+
 
 app.get('/api/admin/drivers', (_req: Request, res: Response) => {
   return res.json({

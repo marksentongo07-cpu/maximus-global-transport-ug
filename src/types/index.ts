@@ -396,3 +396,37 @@ export interface ProfitAccountsPayload {
   };
   disbursements: ProfitDisbursementItem[];
 }
+
+export type FinTechGateway = 'MTN_MOMO' | 'AIRTEL_MONEY' | 'FLUTTERWAVE' | 'EQUITY_TILL';
+
+export interface WalletTransaction {
+  id: string;
+  type: 'TOPUP' | 'ESCROW_HOLD' | 'ESCROW_RELEASE' | 'PAYOUT' | 'REFUND';
+  amountUGX: number;
+  amountUSD: number;
+  gateway: FinTechGateway | string;
+  reference: string;
+  description: string;
+  status: 'COMPLETED' | 'HELD_IN_ESCROW' | 'PROCESSING' | 'FAILED';
+  timestamp: string;
+  jobId?: string;
+  driverPhoneOrAccount?: string;
+  smsNotificationSent?: boolean;
+  smsMessage?: string;
+  securityVerified?: boolean; // OTP & PIN verified
+  receiptUrl?: string;
+}
+
+export interface CustomerWallet {
+  walletId: string;
+  userId: string;
+  userName: string;
+  balanceUGX: number;
+  balanceUSD: number;
+  heldEscrowUGX: number;
+  heldEscrowUSD: number;
+  currencyDefault: 'UGX' | 'USD';
+  phone: string;
+  pinSet: boolean;
+  transactions: WalletTransaction[];
+}

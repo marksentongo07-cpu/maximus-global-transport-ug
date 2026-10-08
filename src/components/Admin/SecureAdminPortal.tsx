@@ -40,6 +40,7 @@ import { fetchPlatformSettings, savePlatformSettings, PlatformSettings } from '.
 import { REAL_SERVICE_PROVIDERS, ServiceProviderItem } from '../../data/serviceProvidersData';
 import { BusinessMovementGraphs } from './BusinessMovementGraphs';
 import { ProfitDistributionSection } from './ProfitDistributionSection';
+import { AdminFinanceDashboard } from './AdminFinanceDashboard';
 import { Logo } from '../Logo';
 
 interface SecureAdminPortalProps {
@@ -1014,6 +1015,9 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
               accountData={accountData}
               onRefreshData={fetchProtectedAccounts}
             />
+
+            {/* FinTech Module: Admin Finance Dashboard (Held Escrow Funds, Payouts, Commissions, KPA/GreenTec Excel Export) */}
+            <AdminFinanceDashboard currency={currency} />
 
             {/* Banking Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

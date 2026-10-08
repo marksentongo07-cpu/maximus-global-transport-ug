@@ -18,7 +18,8 @@ import {
   Check,
   Package,
   Building2,
-  Lock
+  Lock,
+  Wallet
 } from 'lucide-react';
 import { UserRole, Currency, Language } from '../types';
 import { formatMoney } from '../services/currency';
@@ -44,6 +45,7 @@ interface NavbarProps {
   onOpenAdminAccess?: () => void;
   onOpenAdminSecure?: () => void;
   onOpenBrandInsignia?: () => void;
+  onOpenWallet?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -65,6 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAdminAccess,
   onOpenAdminSecure,
   onOpenBrandInsignia,
+  onOpenWallet,
 }) => {
   // Check if ?admin=true is present in URL
   const [showAdminLock, setShowAdminLock] = useState<boolean>(false);
@@ -340,6 +343,28 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Zone 3: Actions & Controls - reduced orange, slate-700 bg with white text */}
         <div className="flex items-center gap-2 flex-wrap justify-end">
+
+          {/* FinTech Customer Wallet Button (Navy #0A1F44 + Gold #C5A059) */}
+          {onOpenWallet && (
+            <button
+              onClick={onOpenWallet}
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#0A1F44] to-[#122A5A] hover:from-[#0F2D6B] hover:to-[#173775] text-[#FFEAA8] border-2 border-[#C5A059]/60 shadow-lg shadow-black/40 text-xs font-black flex items-center gap-2 transition-all cursor-pointer group scale-[1.01] hover:scale-105"
+              title="Open MAXIMUS FinTech Wallet (Chipper-Style Escrow & MoMo/Airtel Balances)"
+            >
+              <div className="p-1 rounded-lg bg-[#C5A059]/20 text-[#C5A059] group-hover:scale-110 transition-transform">
+                <Wallet className="w-4 h-4 text-[#C5A059]" />
+              </div>
+              <div className="text-left hidden sm:block">
+                <div className="text-[11px] font-black text-white leading-tight flex items-center gap-1">
+                  <span>Wallet</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                </div>
+                <div className="text-[9px] text-[#C5A059] leading-none font-mono">
+                  MoMo · Escrow
+                </div>
+              </div>
+            </button>
+          )}
           
           {/* Offline Mode Switcher */}
           <button

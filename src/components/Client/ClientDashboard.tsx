@@ -38,6 +38,7 @@ interface ClientDashboardProps {
   onOpenDispute: (job: Job) => void;
   onRateTransporter: (jobId: string, rating: number, comment: string) => void;
   onSwitchToTransporter?: () => void;
+  onOpenWallet?: () => void;
 }
 
 export const ClientDashboard: React.FC<ClientDashboardProps> = ({
@@ -52,6 +53,7 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
   onOpenDispute,
   onRateTransporter,
   onSwitchToTransporter,
+  onOpenWallet,
 }) => {
   const [filterTab, setFilterTab] = useState<'all' | 'active' | 'open' | 'delivered'>('all');
   const [callingTransporter, setCallingTransporter] = useState<string | null>(null);
@@ -176,13 +178,25 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
           </div>
         </div>
 
-        <button
-          onClick={() => setShowPaymentModal(true)}
-          className="px-4 py-2.5 bg-[#C9A86A] hover:bg-[#d6b77c] text-[#0A1931] font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 self-start md:self-center cursor-pointer shrink-0"
-        >
-          <Wallet className="w-4 h-4 text-[#0A1931]" />
-          <span>Manage Payment Methods</span>
-        </button>
+        <div className="flex items-center gap-2 self-start md:self-center flex-wrap">
+          {onOpenWallet && (
+            <button
+              onClick={onOpenWallet}
+              className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <Wallet className="w-4 h-4 text-slate-950" />
+              <span>Open Customer Wallet (UGX/USD)</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => setShowPaymentModal(true)}
+            className="px-4 py-2.5 bg-[#C9A86A] hover:bg-[#d6b77c] text-[#0A1931] font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+          >
+            <CreditCard className="w-4 h-4 text-[#0A1931]" />
+            <span>Payment Channels</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter Tabs & Header */}
@@ -447,14 +461,21 @@ export const ClientDashboard: React.FC<ClientDashboardProps> = ({
                     </button>
                   )}
 
-                  {/* Confirm POD */}
+                  {/* Confirm POD / Goods Received */}
                   {job.status === 'in_transit' && (
                     <button
-                      onClick={() => onOpenPOD(job)}
-                      className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5"
+                      onClick={() => {
+                        if (onOpenWallet) {
+                          onOpenWallet();
+                        } else {
+                          onOpenPOD(job);
+                        }
+                      }}
+                      className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+                      title="Confirm Goods Received and trigger automated 90/10 commission split & driver payout"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5 text-black" />
-                      <span>{t('signPodReleaseEscrow', language)}</span>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-slate-950" />
+                      <span>Goods Received (Release 90% MoMo Payout)</span>
                     </button>
                   )}
 
