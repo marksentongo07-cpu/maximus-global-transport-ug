@@ -32,7 +32,9 @@ import {
   Plane,
   Anchor,
   Wrench,
-  Sparkles
+  Sparkles,
+  PlusCircle,
+  X
 } from 'lucide-react';
 import { Job, Transporter, EscrowTransaction, Dispute, Currency, Language } from '../../types';
 import { formatMoney } from '../../services/currency';
@@ -144,6 +146,40 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
     }
     setSuccessNotice('Super Admin Vault has been locked.');
   };
+
+  // -------------------------------------------------------------
+  // ADMIN ON-BEHALF OPERATIONS STATE (DRIVER, CLIENT, BIDDING)
+  // -------------------------------------------------------------
+  const [showRegisterDriverOnBehalf, setShowRegisterDriverOnBehalf] = useState(false);
+  const [showPostCargoOnBehalf, setShowPostCargoOnBehalf] = useState(false);
+  const [showBidOnBehalf, setShowBidOnBehalf] = useState(false);
+
+  // Driver on behalf fields
+  const [obDriverName, setObDriverName] = useState('');
+  const [obDriverPhone, setObDriverPhone] = useState('');
+  const [obDriverPlate, setObDriverPlate] = useState('');
+  const [obDriverVehicleType, setObDriverVehicleType] = useState('Fuso 7T Box Body');
+  const [obDriverCapacityTons, setObDriverCapacityTons] = useState(7);
+  const [obDriverMomoNet, setObDriverMomoNet] = useState<'MTN' | 'AIRTEL'>('MTN');
+  const [obDriverNotes, setObDriverNotes] = useState('Driver registered via phone dispatch');
+
+  // Cargo on behalf fields
+  const [obClientName, setObClientName] = useState('');
+  const [obClientPhone, setObClientPhone] = useState('');
+  const [obCargoTitle, setObCargoTitle] = useState('');
+  const [obCargoPickup, setObCargoPickup] = useState('Jinja Industrial Area');
+  const [obCargoDrop, setObCargoDrop] = useState('Namanve ICD, Kampala');
+  const [obCargoWeight, setObCargoWeight] = useState(15);
+  const [obCargoVehicle, setObCargoVehicle] = useState('Fuso 7T');
+  const [obCargoBudget, setObCargoBudget] = useState('1800000');
+  const [obCargoCrossBorder, setObCargoCrossBorder] = useState(false);
+
+  // Bid on behalf fields
+  const [obBidCargoId, setObBidCargoId] = useState('');
+  const [obBidDriverName, setObBidDriverName] = useState('Moses Ochen (Assisted by Admin)');
+  const [obBidVehicle, setObBidVehicle] = useState('Fuso 7T Box Body');
+  const [obBidAmount, setObBidAmount] = useState('1700000');
+  const [obBidNote, setObBidNote] = useState('Assisted by Super Admin - Driver available for immediate loading');
 
   // Verify server session via /api/auth/me
   useEffect(() => {
@@ -463,6 +499,113 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
     }
   };
 
+  // -------------------------------------------------------------
+  // ADMIN ON-BEHALF EXECUTIONS (API CALLS + LOCAL SYNC)
+  // -------------------------------------------------------------
+  const handleExecuteRegisterDriverOnBehalf = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!obDriverName.trim() || !obDriverPhone.trim() || !obDriverPlate.trim()) {
+      setErrorMessage('Please fill in Driver Name, Phone, and Plate number.');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/register-driver-on-behalf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transporterName: obDriverName.trim(),
+          phone: obDriverPhone.trim(),
+          numberPlate: obDriverPlate.trim().toUpperCase(),
+          vehicleType: obDriverVehicleType,
+          capacityTons: obDriverCapacityTons,
+          momoNetwork: obDriverMomoNet,
+          momoNumber: obDriverPhone.trim(),
+          notes: obDriverNotes,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSuccessNotice(`✅ Driver "${obDriverName}" successfully registered & approved by Super Admin.`);
+        setShowRegisterDriverOnBehalf(false);
+        setObDriverName('');
+        setObDriverPhone('');
+        setObDriverPlate('');
+        fetchFleetKyc();
+      } else {
+        setErrorMessage('Failed to register driver on behalf.');
+      }
+    } catch (err) {
+      setErrorMessage('Error communicating with admin server.');
+    }
+  };
+
+  const handleExecutePostCargoOnBehalf = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!obClientName.trim() || !obCargoTitle.trim()) {
+      setErrorMessage('Please provide Client Name and Cargo Title.');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/post-cargo-on-behalf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: obClientName.trim(),
+          clientPhone: obClientPhone.trim(),
+          title: obCargoTitle.trim(),
+          pickupLocation: obCargoPickup.trim(),
+          dropLocation: obCargoDrop.trim(),
+          weightTons: obCargoWeight,
+          desiredVehicleType: obCargoVehicle,
+          clientBudgetUGX: parseInt(obCargoBudget.replace(/[^0-9]/g, ''), 10) || 1800000,
+          isInternational: obCargoCrossBorder,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSuccessNotice(`✅ Cargo "${obCargoTitle}" posted on behalf of ${obClientName}! Open for carrier bidding.`);
+        setShowPostCargoOnBehalf(false);
+        setObClientName('');
+        setObCargoTitle('');
+        fetchLiveBids();
+      } else {
+        setErrorMessage('Failed to post cargo on behalf.');
+      }
+    } catch (err) {
+      setErrorMessage('Error communicating with admin server.');
+    }
+  };
+
+  const handleExecuteBidOnBehalf = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!obBidCargoId || !obBidAmount) {
+      setErrorMessage('Please select a cargo shipment and enter bid amount.');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/bid-on-behalf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cargoId: obBidCargoId,
+          driverName: obBidDriverName.trim(),
+          vehicleOffered: obBidVehicle,
+          bidAmountUGX: parseInt(obBidAmount.replace(/[^0-9]/g, ''), 10) || 1700000,
+          pitchNote: obBidNote,
+        }),
+      });
+      if (res.ok) {
+        setSuccessNotice(`✅ Bid placed successfully on behalf of ${obBidDriverName} for ${obBidCargoId}!`);
+        setShowBidOnBehalf(false);
+        fetchLiveBids();
+      } else {
+        setErrorMessage('Failed to place bid on behalf.');
+      }
+    } catch (err) {
+      setErrorMessage('Error communicating with admin server.');
+    }
+  };
+
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
     const s = secs % 60;
@@ -735,6 +878,51 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
             >
               <LogOut className="w-4 h-4 text-red-400" />
               <span>Lock Admin</span>
+            </button>
+          </div>
+        </div>
+
+        {/* ADMIN ON-BEHALF OPERATIONS STRIP */}
+        <div className="max-w-7xl mx-auto mt-2 pt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold text-amber-400 flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Admin On-Behalf Operations:</span>
+            </span>
+            <span className="text-[10px] text-slate-400 hidden sm:inline">
+              (Register driver/client or bid when users are offline or unable)
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowRegisterDriverOnBehalf(true)}
+              className="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition-colors"
+            >
+              <Truck className="w-3.5 h-3.5" />
+              <span>Register Driver on Behalf</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowPostCargoOnBehalf(true)}
+              className="px-3 py-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition-colors"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Post Cargo on Behalf</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (liveBids.length > 0) setObBidCargoId(liveBids[0].cargoId);
+                setShowBidOnBehalf(true);
+              }}
+              className="px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition-colors"
+            >
+              <Coins className="w-3.5 h-3.5" />
+              <span>Bid on Behalf of Driver</span>
             </button>
           </div>
         </div>
@@ -1567,6 +1755,397 @@ export const SecureAdminPortal: React.FC<SecureAdminPortalProps> = ({
                   <span>Lock Admin &amp; Clear Cookie</span>
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* MODAL: ADMIN REGISTER DRIVER ON BEHALF */}
+        {/* ========================================================================= */}
+        {showRegisterDriverOnBehalf && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-sm">
+            <div className="relative w-full max-w-lg bg-slate-900 border border-amber-500/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+              <div className="p-4 bg-gradient-to-r from-[#0B192C] to-slate-900 border-b border-slate-800 flex items-center justify-between">
+                <div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    Admin Delegated Authority
+                  </span>
+                  <h3 className="text-base font-black text-white mt-1">
+                    Register Driver on Behalf
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    For drivers calling in from the road or unable to self-register
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterDriverOnBehalf(false)}
+                  className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleExecuteRegisterDriverOnBehalf} className="p-5 space-y-3.5 overflow-y-auto text-xs">
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">Driver Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={obDriverName}
+                    onChange={(e) => setObDriverName(e.target.value)}
+                    placeholder="e.g. Ronald Kato / Denis Mukasa"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Phone / WhatsApp *</label>
+                    <input
+                      type="text"
+                      required
+                      value={obDriverPhone}
+                      onChange={(e) => setObDriverPhone(e.target.value)}
+                      placeholder="+256 772 100 200"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Truck Number Plate *</label>
+                    <input
+                      type="text"
+                      required
+                      value={obDriverPlate}
+                      onChange={(e) => setObDriverPlate(e.target.value)}
+                      placeholder="UBD 441L / KDA 120P"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono uppercase"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Vehicle Type</label>
+                    <input
+                      type="text"
+                      value={obDriverVehicleType}
+                      onChange={(e) => setObDriverVehicleType(e.target.value)}
+                      placeholder="e.g. Fuso 7T / Semi-Trailer 28T"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Capacity (Tons)</label>
+                    <input
+                      type="number"
+                      value={obDriverCapacityTons}
+                      onChange={(e) => setObDriverCapacityTons(Number(e.target.value))}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">MoMo Payout Network</label>
+                    <select
+                      value={obDriverMomoNet}
+                      onChange={(e) => setObDriverMomoNet(e.target.value as any)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    >
+                      <option value="MTN">MTN Mobile Money (*165#)</option>
+                      <option value="AIRTEL">Airtel Money (*185#)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Verification Status</label>
+                    <div className="p-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 font-bold text-center">
+                      Auto-Approved by Admin
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">Notes / Registration Context</label>
+                  <textarea
+                    rows={2}
+                    value={obDriverNotes}
+                    onChange={(e) => setObDriverNotes(e.target.value)}
+                    placeholder="e.g. Driver verified on Tororo-Malaba corridor via phone call"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white"
+                  />
+                </div>
+
+                <div className="pt-2 flex justify-end gap-2 border-t border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setShowRegisterDriverOnBehalf(false)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl"
+                  >
+                    Register Driver on Behalf
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* MODAL: ADMIN POST CARGO ON BEHALF OF CLIENT */}
+        {/* ========================================================================= */}
+        {showPostCargoOnBehalf && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-sm">
+            <div className="relative w-full max-w-lg bg-slate-900 border border-cyan-500/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+              <div className="p-4 bg-gradient-to-r from-[#0B192C] to-slate-900 border-b border-slate-800 flex items-center justify-between">
+                <div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                    Admin Delegated Authority
+                  </span>
+                  <h3 className="text-base font-black text-white mt-1">
+                    Post Cargo on Behalf of Client
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Assisting shippers who phoned in or need assisted booking
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPostCargoOnBehalf(false)}
+                  className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleExecutePostCargoOnBehalf} className="p-5 space-y-3.5 overflow-y-auto text-xs">
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Client Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={obClientName}
+                      onChange={(e) => setObClientName(e.target.value)}
+                      placeholder="e.g. Mukwano Agro / Uganda Grain"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Client Phone</label>
+                    <input
+                      type="text"
+                      value={obClientPhone}
+                      onChange={(e) => setObClientPhone(e.target.value)}
+                      placeholder="+256 700 112 233"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">Cargo Description / Title *</label>
+                  <input
+                    type="text"
+                    required
+                    value={obCargoTitle}
+                    onChange={(e) => setObCargoTitle(e.target.value)}
+                    placeholder="e.g. 25T Steel Billets / 30T Maize Grain"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Pickup Location</label>
+                    <input
+                      type="text"
+                      value={obCargoPickup}
+                      onChange={(e) => setObCargoPickup(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Drop Location</label>
+                    <input
+                      type="text"
+                      value={obCargoDrop}
+                      onChange={(e) => setObCargoDrop(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Weight (Tons)</label>
+                    <input
+                      type="number"
+                      value={obCargoWeight}
+                      onChange={(e) => setObCargoWeight(Number(e.target.value))}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Client Budget (UGX)</label>
+                    <input
+                      type="text"
+                      value={obCargoBudget}
+                      onChange={(e) => setObCargoBudget(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-1">
+                  <label className="flex items-center gap-2 text-slate-200 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={obCargoCrossBorder}
+                      onChange={(e) => setObCargoCrossBorder(e.target.checked)}
+                      className="accent-cyan-500 rounded"
+                    />
+                    <span>Cross-Border Transit (Mombasa / Dar / Malaba / Kampala)</span>
+                  </label>
+                </div>
+
+                <div className="pt-2 flex justify-end gap-2 border-t border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setShowPostCargoOnBehalf(false)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl"
+                  >
+                    Post Cargo on Behalf
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* MODAL: ADMIN BID ON BEHALF OF DRIVER */}
+        {/* ========================================================================= */}
+        {showBidOnBehalf && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-sm">
+            <div className="relative w-full max-w-lg bg-slate-900 border border-emerald-500/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+              <div className="p-4 bg-gradient-to-r from-[#0B192C] to-slate-900 border-b border-slate-800 flex items-center justify-between">
+                <div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    Admin Delegated Authority
+                  </span>
+                  <h3 className="text-base font-black text-white mt-1">
+                    Bid on Behalf of Driver
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Submit competitive rate for driver who is driving or without mobile data
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowBidOnBehalf(false)}
+                  className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleExecuteBidOnBehalf} className="p-5 space-y-3.5 overflow-y-auto text-xs">
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">Select Target Cargo Shipment *</label>
+                  <select
+                    value={obBidCargoId}
+                    onChange={(e) => setObBidCargoId(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                  >
+                    <option value="">-- Choose Cargo Shipment --</option>
+                    {liveBids.map(b => (
+                      <option key={b.cargoId} value={b.cargoId}>
+                        {b.cargoId} · {b.client} ({b.pickupCountry} ➔ {b.dropLocation})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Driver Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={obBidDriverName}
+                      onChange={(e) => setObBidDriverName(e.target.value)}
+                      placeholder="e.g. Moses Ochen"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-300 mb-1">Vehicle Offered</label>
+                    <input
+                      type="text"
+                      value={obBidVehicle}
+                      onChange={(e) => setObBidVehicle(e.target.value)}
+                      placeholder="e.g. Fuso 7T / Semi-Trailer 28T"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">Offered Bid Price (UGX) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={obBidAmount}
+                    onChange={(e) => setObBidAmount(e.target.value)}
+                    placeholder="e.g. 1,700,000"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono font-bold text-sm text-emerald-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-300 mb-1">Pitch Note / Terms</label>
+                  <textarea
+                    rows={2}
+                    value={obBidNote}
+                    onChange={(e) => setObBidNote(e.target.value)}
+                    placeholder="e.g. Ready for loading within 1 hour. Clean dry trailer."
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white"
+                  />
+                </div>
+
+                <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-[11px] text-emerald-300">
+                  🔒 <strong>Confidential:</strong> This bid and counter-offers will remain strictly secret to the shipper, driver, and Super Admin Mark Sentongo.
+                </div>
+
+                <div className="pt-2 flex justify-end gap-2 border-t border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setShowBidOnBehalf(false)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow"
+                  >
+                    Submit Bid on Behalf
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

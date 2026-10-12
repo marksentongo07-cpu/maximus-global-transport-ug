@@ -161,11 +161,13 @@ export interface JobOffer {
   status: 'pending' | 'accepted' | 'declined' | 'countered';
   messages: {
     id: string;
-    senderRole: 'client' | 'transporter';
+    senderRole: 'client' | 'transporter' | 'admin';
     senderName: string;
     message: string;
     timestamp: string;
     proposedPriceUGX?: number;
+    onBehalfOf?: 'driver' | 'client';
+    isConfidentialToPartiesAndAdmin?: boolean;
   }[];
   createdAt: string;
 }

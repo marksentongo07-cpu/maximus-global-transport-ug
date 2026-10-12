@@ -923,6 +923,12 @@ export default function App() {
             currency={currency}
             language={language}
             onSelectHaulageCore={() => handleTabChange('dashboard')}
+            jobs={jobs}
+            transporters={transporters}
+            onOpenNegotiation={(job) => setActiveNegotiationJob(job)}
+            onAddJob={(newJob) => setJobs(prev => [newJob, ...prev])}
+            onAddTransporter={(newTrans) => setTransporters(prev => [newTrans, ...prev])}
+            isAdmin={currentRole === 'admin' || isServerSuperAdmin}
           />
         )}
 
@@ -1012,6 +1018,7 @@ export default function App() {
           currency={currency}
           language={language}
           historicalJobs={jobs}
+          isAdminMode={currentRole === 'admin' || isServerSuperAdmin}
           onClose={() => setActiveNegotiationJob(null)}
           onUpdateJob={handleUpdateJob}
           onOpenEscrow={(jobToFund) => {

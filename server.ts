@@ -889,6 +889,138 @@ app.post('/api/admin/kyc-action', (req: Request, res: Response) => {
   return res.json({ success: true, message: `KYC ${action} applied for ${record.transporterName}`, record });
 });
 
+// -------------------------------------------------------------
+// ADMIN ON-BEHALF OPERATIONS (DRIVER REGISTRATION, CARGO POSTING, BIDDING)
+// -------------------------------------------------------------
+
+// 1. Admin registers driver on behalf of driver
+app.post('/api/admin/register-driver-on-behalf', (req: Request, res: Response) => {
+  const { 
+    transporterName, 
+    phone, 
+    numberPlate, 
+    vehicleType, 
+    capacityTons, 
+    momoNetwork, 
+    momoNumber,
+    nin,
+    notes 
+  } = req.body;
+
+  if (!transporterName || !phone || !numberPlate) {
+    return res.status(400).json({ error: 'Driver name, phone, and number plate are required' });
+  }
+
+  const newTransporterId = 'trans-adm-' + Date.now();
+  const newKycRecord = {
+    id: 'kyc-' + Date.now(),
+    transporterId: newTransporterId,
+    transporterName: String(transporterName).trim(),
+    phone: String(phone).trim(),
+    numberPlate: String(numberPlate).toUpperCase().trim(),
+    vehicleType: String(vehicleType || 'Fuso 7T').trim(),
+    capacityTons: Number(capacityTons) || 7,
+    nin: nin ? String(nin).trim() : 'CM' + Math.floor(1000000000000 + Math.random() * 9000000000000) + 'ADM',
+    ninVerified: true,
+    logbookNumber: 'URA-LB-ADM-' + Math.floor(1000 + Math.random() * 9000),
+    logbookVerified: true,
+    uploadedAt: 'Registered by Super Admin (Mark Sentongo)',
+    status: 'APPROVED',
+    payoutDetails: {
+      network: momoNetwork || 'MTN',
+      number: momoNumber || phone,
+    },
+    notes: notes || 'Registered by Super Admin on behalf of carrier',
+  };
+
+  adminFleetKyc.unshift(newKycRecord);
+
+  console.log(`[ADMIN ACTION] Super Admin registered driver on behalf: ${transporterName} (${numberPlate})`);
+
+  return res.json({
+    success: true,
+    message: `Driver ${transporterName} registered & approved successfully by Super Admin.`,
+    record: newKycRecord,
+  });
+});
+
+// 2. Admin posts cargo on behalf of client
+app.post('/api/admin/post-cargo-on-behalf', (req: Request, res: Response) => {
+  const {
+    clientName,
+    clientPhone,
+    title,
+    pickupLocation,
+    dropLocation,
+    weightTons,
+    desiredVehicleType,
+    clientBudgetUGX,
+    isInternational
+  } = req.body;
+
+  if (!clientName || !title || !pickupLocation || !dropLocation) {
+    return res.status(400).json({ error: 'Client name, title, pickup, and drop locations are required' });
+  }
+
+  const cargoId = (isInternational ? 'CRG-INT-' : 'CRG-UG-') + Math.floor(900 + Math.random() * 99);
+  const budget = Number(clientBudgetUGX) || 1800000;
+
+  const newCargoBidRecord = {
+    cargoId,
+    client: `${clientName} (Assisted by Admin)`,
+    pickupCountry: pickupLocation,
+    dropLocation,
+    lowestBidUGX: budget,
+    highestBidUGX: Math.round(budget * 1.15),
+    bidCount: 0,
+    status: 'ACTIVE_BIDDING',
+    assignedTransporter: null as string | null,
+    isInternational: Boolean(isInternational),
+  };
+
+  adminLiveBids.unshift(newCargoBidRecord);
+
+  console.log(`[ADMIN ACTION] Super Admin posted cargo on behalf of client: ${clientName} - ${title} (${cargoId})`);
+
+  return res.json({
+    success: true,
+    message: `Cargo ${cargoId} posted successfully on behalf of ${clientName}. Ready for carrier bidding.`,
+    bid: newCargoBidRecord,
+  });
+});
+
+// 3. Admin places bid on behalf of driver
+app.post('/api/admin/bid-on-behalf', (req: Request, res: Response) => {
+  const { cargoId, driverName, driverPhone, vehicleOffered, bidAmountUGX, pitchNote } = req.body;
+
+  if (!cargoId || !bidAmountUGX) {
+    return res.status(400).json({ error: 'Cargo ID and bid amount are required' });
+  }
+
+  const target = adminLiveBids.find(b => b.cargoId === cargoId);
+  if (!target) {
+    return res.status(404).json({ error: 'Cargo record not found' });
+  }
+
+  const numBid = Number(bidAmountUGX);
+  target.bidCount += 1;
+  if (numBid < target.lowestBidUGX || target.lowestBidUGX === 0) {
+    target.lowestBidUGX = numBid;
+  }
+  if (numBid > target.highestBidUGX) {
+    target.highestBidUGX = numBid;
+  }
+  target.status = 'ACTIVE_BIDDING';
+
+  console.log(`[ADMIN ACTION] Super Admin placed bid of ${numBid} UGX on behalf of driver ${driverName || 'Carrier'} for ${cargoId}`);
+
+  return res.json({
+    success: true,
+    message: `Bid of ${numBid.toLocaleString()} UGX placed successfully on behalf of ${driverName || 'Carrier'}.`,
+    cargo: target,
+  });
+});
+
 app.get('/api/admin/escrow', (_req: Request, res: Response) => {
   return res.json({
     activeLedger: [

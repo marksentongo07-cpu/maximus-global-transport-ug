@@ -13,6 +13,16 @@ export interface ServiceProviderItem {
   notes?: string;
   logoInitial: string;
   colorScheme?: string;
+  // Global & In-App Linked Capabilities
+  linkedNeeds?: {
+    seekingClients?: boolean;
+    seekingTrucks?: boolean;
+    seekingCustomsClearance?: boolean;
+    seekingCargoConsignments?: boolean;
+    description?: string;
+  };
+  matchedTruckTypes?: string[];
+  matchedCorridors?: string[];
 }
 
 export const REAL_SERVICE_PROVIDERS: ServiceProviderItem[] = [
@@ -317,6 +327,31 @@ export const REAL_SERVICE_PROVIDERS: ServiceProviderItem[] = [
   // ----------------------------------------------------
   // CLEARING AGENTS (UCIFA members & URA list)
   // ----------------------------------------------------
+  {
+    id: 'clr-overseas-001',
+    name: 'Overseas Freight Forwarders Limited',
+    category: 'clearing_agents',
+    categoryLabel: 'Customs Clearing & Freight Forwarders',
+    profession: 'Licensed Customs Clearing, Port Transit & Cross-Border Freight Forwarding',
+    location: 'Plot 14/18 Nakawa Industrial Area, Near URA Customs Tower & Namanve Corridor, Kampala',
+    phone: '+256 701 982345',
+    phoneRaw: '+256701982345',
+    email: 'operations@overseasfreight.ug',
+    website: 'https://overseasfreight.ug',
+    verified: true,
+    notes: 'Premium customs clearing house. Active in linking with shippers, international consignments, 20ft/40ft container flatbeds, and Fuso trucks across Mombasa, Malaba, Entebbe, and Kampala corridors.',
+    logoInitial: 'OFF',
+    colorScheme: 'from-amber-500 via-[#C9A86A] to-blue-900',
+    linkedNeeds: {
+      seekingClients: true,
+      seekingTrucks: true,
+      seekingCustomsClearance: false,
+      seekingCargoConsignments: true,
+      description: 'Actively looking for clients with import/export cargo, container haulage trucks (20ft/40ft/lowbed), and regional shippers needing customs clearance.',
+    },
+    matchedTruckTypes: ['Semi-Trailer 20ft', 'Semi-Trailer 40ft', 'Fuso 7T', 'Flatbed Trailer', 'Lowbed Loader'],
+    matchedCorridors: ['Mombasa Port ➔ Kampala', 'Dar es Salaam ➔ Kampala', 'Malaba Border ➔ Namanve ICD', 'Entebbe Airport Cargo'],
+  },
   {
     id: 'clr-001',
     name: 'UCIFA Association HQ',

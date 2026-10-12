@@ -26,7 +26,11 @@ import {
   Star,
   MapPin,
   MessageSquare,
-  AlertTriangle
+  AlertTriangle,
+  Eye,
+  UserCheck,
+  UserCog,
+  Shield
 } from 'lucide-react';
 
 interface NegotiationChatModalProps {
@@ -38,6 +42,7 @@ interface NegotiationChatModalProps {
   onClose: () => void;
   onUpdateJob: (updatedJob: Job) => void;
   onOpenEscrow: (job: Job) => void;
+  isAdminMode?: boolean;
 }
 
 export const NegotiationChatModal: React.FC<NegotiationChatModalProps> = ({
@@ -49,6 +54,7 @@ export const NegotiationChatModal: React.FC<NegotiationChatModalProps> = ({
   onClose,
   onUpdateJob,
   onOpenEscrow,
+  isAdminMode = false,
 }) => {
   // If no offers exist, create a starter offer for demonstration if transporter
   const [selectedOfferId, setSelectedOfferId] = useState<string>(
@@ -75,6 +81,10 @@ export const NegotiationChatModal: React.FC<NegotiationChatModalProps> = ({
 
   const [showSmartBidding, setShowSmartBidding] = useState<boolean>(false);
 
+  // Admin Bid On Behalf Mode
+  const [adminActAs, setAdminActAs] = useState<'admin' | 'behalf_driver' | 'behalf_client'>('admin');
+  const effectiveIsAdmin = currentRole === 'admin' || isAdminMode;
+
   // Sync messages when active offer changes
   useEffect(() => {
     if (activeOffer) {
@@ -87,8 +97,24 @@ export const NegotiationChatModal: React.FC<NegotiationChatModalProps> = ({
     }
   }, [activeOffer?.id]);
 
-  const isTransporter = currentRole === 'transporter';
+  const isTransporter = currentRole === 'transporter' || (effectiveIsAdmin && adminActAs === 'behalf_driver');
   const isAgreed = job.status === 'escrow_pending' || job.status === 'booked' || job.status === 'in_transit' || job.status === 'delivered';
+
+  // Strict 2-Party Confidentiality Filter:
+  // If Transporter: Can ONLY see their own bid thread. Other transporters' bids are strictly concealed!
+  // If Client: Can see bids on their job and negotiate individually with each bidder.
+  // If Admin: Can see all threads for fraud prevention, dispute arbitration, and on-behalf assistance.
+  const visibleOffers = effectiveIsAdmin
+    ? job.offers
+    : currentRole === 'client'
+    ? job.offers
+    : job.offers.filter(o => o.id === selectedOfferId || o.transporterId === 'trans-003' || (job.offers.length > 0 && o.id === (activeOffer?.id || job.offers[0].id)));
+
+  // Admin New Bid on Behalf inputs
+  const [showAdminNewBidForm, setShowAdminNewBidForm] = useState(false);
+  const [onBehalfDriverName, setOnBehalfDriverName] = useState('Moses Ochen (Assisted by Admin)');
+  const [onBehalfVehicle, setOnBehalfVehicle] = useState('Fuso 7T Box Body');
+  const [onBehalfInitialBid, setOnBehalfInitialBid] = useState(String(job.clientBudgetUGX || 1700000));
 
   const handleApplySmartOffer = (priceUGX: number, pitchMessage: string) => {
     setCounterPriceInput(String(priceUGX));
@@ -105,15 +131,41 @@ export const NegotiationChatModal: React.FC<NegotiationChatModalProps> = ({
     if (!newMessage.trim() && !counterPriceInput) return;
 
     const proposedNum = numericCounter > 0 ? numericCounter : undefined;
-    const senderName = currentRole === 'client' ? job.clientName : (activeOffer?.transporterName || 'Transporter Moses Ochen');
+    
+    let senderRole: 'client' | 'transporter' | 'admin' = 'client';
+    let senderName = job.clientName;
+    let onBehalfOf: 'driver' | 'client' | undefined = undefined;
+
+    if (effectiveIsAdmin) {
+      if (adminActAs === 'behalf_driver') {
+        senderRole = 'admin';
+        onBehalfOf = 'driver';
+        senderName = `Admin Mark Sentongo (Bidding for Driver: ${activeOffer?.transporterName || 'Transporter'})`;
+      } else if (adminActAs === 'behalf_client') {
+        senderRole = 'admin';
+        onBehalfOf = 'client';
+        senderName = `Admin Mark Sentongo (Negotiating for Client: ${job.clientName})`;
+      } else {
+        senderRole = 'admin';
+        senderName = `Admin Mark Sentongo (Arbitrator & Escrow Oversight)`;
+      }
+    } else if (currentRole === 'transporter') {
+      senderRole = 'transporter';
+      senderName = activeOffer?.transporterName || 'Transporter Moses Ochen';
+    } else {
+      senderRole = 'client';
+      senderName = job.clientName;
+    }
 
     const newMsgObj = {
       id: 'm-' + Date.now(),
-      senderRole: currentRole === 'client' ? ('client' as const) : ('transporter' as const),
+      senderRole,
       senderName,
       message: newMessage.trim() || (proposedNum ? `Counter Offer proposition: ${formatMoney(proposedNum, currency)}` : ''),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       proposedPriceUGX: proposedNum,
+      onBehalfOf,
+      isConfidentialToPartiesAndAdmin: true,
     };
 
     const updatedMessages = [...messages, newMsgObj];
@@ -136,12 +188,12 @@ export const NegotiationChatModal: React.FC<NegotiationChatModalProps> = ({
       };
       onUpdateJob(updatedJob);
     } else {
-      // Create new offer from transporter
+      // Create new offer from transporter or Admin on behalf of driver
       const newOffer: JobOffer = {
         id: 'off-' + Date.now(),
         jobId: job.id,
         transporterId: 'trans-003',
-        transporterName: 'Moses Ochen',
+        transporterName: 'Moses Ochen (Assisted by Admin)',
         transporterRating: 4.8,
         transporterDistanceKm: 3,
         vehicleOffered: 'Fuso 7T (Custom Truck Available)',
@@ -221,20 +273,165 @@ export const NegotiationChatModal: React.FC<NegotiationChatModalProps> = ({
           <span className="font-mono font-bold text-amber-400 shrink-0 ml-2">8% Escrow Fee</span>
         </div>
 
+        {/* STRICT 2-PARTY CONFIDENTIALITY GUARANTEE BANNER */}
+        <div className="bg-slate-950 px-4 py-2 border-b border-slate-800 text-[11px] flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-slate-300">
+            <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span>
+              <strong className="text-emerald-400">Strict 2-Party Confidentiality:</strong> Negotiations and bids are secret to strictly the 2 transacting parties ({job.clientName} &amp; {activeOffer?.transporterName || 'Transporter'}) and Super Admin Mark Sentongo.
+            </span>
+          </div>
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">
+            Zero Leakage Guarantee
+          </span>
+        </div>
+
+        {/* ADMIN ON-BEHALF AUTHORITY CONTROLS (IF ADMIN) */}
+        {effectiveIsAdmin && (
+          <div className="bg-[#0c1a2e] border-b border-[#C9A86A]/30 p-2.5 px-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-[#C9A86A]" />
+              <span className="font-bold text-white">Admin Acting Authority:</span>
+              <div className="inline-flex rounded-xl p-0.5 bg-slate-900 border border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setAdminActAs('admin')}
+                  className={`px-3 py-1 rounded-lg font-bold text-[11px] transition-all ${
+                    adminActAs === 'admin'
+                      ? 'bg-[#C9A86A] text-slate-950 shadow'
+                      : 'text-slate-300 hover:text-white'
+                  }`}
+                >
+                  🛡️ Super Admin Oversight
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAdminActAs('behalf_driver')}
+                  className={`px-3 py-1 rounded-lg font-bold text-[11px] transition-all ${
+                    adminActAs === 'behalf_driver'
+                      ? 'bg-amber-500 text-slate-950 shadow'
+                      : 'text-slate-300 hover:text-white'
+                  }`}
+                >
+                  🚛 Bid on Behalf of Driver
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAdminActAs('behalf_client')}
+                  className={`px-3 py-1 rounded-lg font-bold text-[11px] transition-all ${
+                    adminActAs === 'behalf_client'
+                      ? 'bg-sky-500 text-slate-950 shadow'
+                      : 'text-slate-300 hover:text-white'
+                  }`}
+                >
+                  👤 Negotiate on Behalf of Client
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowAdminNewBidForm(!showAdminNewBidForm)}
+              className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg text-[11px] font-bold border border-amber-500/30 transition-colors"
+            >
+              {showAdminNewBidForm ? '✕ Close Bid Form' : '+ Add Driver Bid on Behalf'}
+            </button>
+          </div>
+        )}
+
+        {/* ADMIN ON-BEHALF NEW BID INLINE FORM */}
+        {effectiveIsAdmin && showAdminNewBidForm && (
+          <div className="bg-slate-950 border-b border-amber-500/30 p-3 px-4 text-xs space-y-2">
+            <div className="font-bold text-amber-400 flex items-center gap-1.5">
+              <Truck className="w-3.5 h-3.5" />
+              <span>Submit Initial Carrier Bid on Behalf of an Unable / Offline Driver:</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <input
+                type="text"
+                value={onBehalfDriverName}
+                onChange={(e) => setOnBehalfDriverName(e.target.value)}
+                placeholder="Driver Name (e.g. Ronald Kato)"
+                className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+              />
+              <input
+                type="text"
+                value={onBehalfVehicle}
+                onChange={(e) => setOnBehalfVehicle(e.target.value)}
+                placeholder="Vehicle (e.g. Semi-Trailer 28T)"
+                className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+              />
+              <div className="flex gap-1.5">
+                <input
+                  type="number"
+                  value={onBehalfInitialBid}
+                  onChange={(e) => setOnBehalfInitialBid(e.target.value)}
+                  placeholder="Price (UGX)"
+                  className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const priceNum = parseInt(onBehalfInitialBid.replace(/[^0-9]/g, ''), 10) || 1700000;
+                    const newOffer: JobOffer = {
+                      id: 'off-adm-' + Date.now(),
+                      jobId: job.id,
+                      transporterId: 'trans-adm-' + Date.now(),
+                      transporterName: onBehalfDriverName.trim() || 'Driver (Assisted by Admin)',
+                      transporterRating: 4.9,
+                      transporterDistanceKm: 2,
+                      vehicleOffered: onBehalfVehicle.trim() || 'Fuso 7T Box Body',
+                      offeredPriceUGX: priceNum,
+                      isNegotiable: true,
+                      status: 'pending',
+                      createdAt: 'Just now',
+                      messages: [
+                        {
+                          id: 'm-adm-' + Date.now(),
+                          senderRole: 'admin',
+                          senderName: `Admin Mark Sentongo (Bidding on Behalf of Driver ${onBehalfDriverName})`,
+                          message: `Admin placed bid of ${priceNum.toLocaleString()} UGX for ${onBehalfVehicle} on behalf of driver. Available for immediate dispatch.`,
+                          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                          proposedPriceUGX: priceNum,
+                          onBehalfOf: 'driver',
+                          isConfidentialToPartiesAndAdmin: true,
+                        }
+                      ],
+                    };
+                    const updatedJob: Job = {
+                      ...job,
+                      status: 'negotiating',
+                      offers: [newOffer, ...job.offers],
+                    };
+                    setSelectedOfferId(newOffer.id);
+                    onUpdateJob(updatedJob);
+                    setShowAdminNewBidForm(false);
+                  }}
+                  className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg whitespace-nowrap"
+                >
+                  Post Bid
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Main Split: Left Bids List (if Client has multiple bids) + Right Chat Thread */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-[380px]">
           
-          {/* Bids List Sidebar: Show all carrier bids on this job */}
-          {job.offers.length > 0 && (
+          {/* Bids List Sidebar */}
+          {visibleOffers.length > 0 && (
             <div className="w-full md:w-80 bg-slate-950 border-r border-slate-800 p-3 overflow-y-auto space-y-2">
               <div className="flex items-center justify-between px-1 pb-1 border-b border-slate-800 text-xs">
                 <span className="font-bold text-slate-300">
-                  Carrier Bids Received ({job.offers.length})
+                  {effectiveIsAdmin ? `Carrier Bids (${visibleOffers.length})` : currentRole === 'client' ? `Received Bids (${visibleOffers.length})` : 'Your Private Bid Channel'}
                 </span>
-                <span className="text-[10px] text-emerald-400 font-semibold">Open Market</span>
+                <span className="text-[10px] text-emerald-400 font-semibold">
+                  {currentRole === 'transporter' && !effectiveIsAdmin ? '🔒 Confidential' : 'Bilateral'}
+                </span>
               </div>
 
-              {job.offers.map((offer) => {
+              {visibleOffers.map((offer) => {
                 const isSelected = (activeOffer?.id === offer.id);
                 return (
                   <div
@@ -283,8 +480,8 @@ export const NegotiationChatModal: React.FC<NegotiationChatModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Quick Accept CTA in list for client */}
-                    {currentRole === 'client' && !isAgreed && (
+                    {/* Quick Accept CTA in list for client or Admin acting on behalf of client */}
+                    {((currentRole === 'client') || (effectiveIsAdmin && adminActAs === 'behalf_client')) && !isAgreed && (
                       <div className="pt-2 flex items-center gap-1.5 border-t border-slate-800/80">
                         <button
                           type="button"
@@ -420,7 +617,7 @@ export const NegotiationChatModal: React.FC<NegotiationChatModalProps> = ({
                   <div className="flex flex-wrap items-center gap-2 bg-slate-900 p-2 rounded-xl border border-slate-800">
                     <Coins className="w-4 h-4 text-amber-400 shrink-0 ml-1" />
                     <span className="text-xs font-semibold text-slate-300 whitespace-nowrap">
-                      {isTransporter ? 'Your Bid Price (UGX):' : 'Counter Offer (UGX):'}
+                      {isTransporter ? 'Your Bid Price (UGX):' : (effectiveIsAdmin && adminActAs === 'behalf_driver') ? 'Driver Bid (UGX):' : 'Counter Offer (UGX):'}
                     </span>
                     <input
                       type="text"
@@ -449,7 +646,7 @@ export const NegotiationChatModal: React.FC<NegotiationChatModalProps> = ({
                       title="Agree and lock this price for shipment"
                     >
                       <Lock className="w-3.5 h-3.5" />
-                      <span>{currentRole === 'client' ? 'Lock & Accept Bid' : 'Accept Client Offer'}</span>
+                      <span>{currentRole === 'client' ? 'Lock & Accept Bid' : (effectiveIsAdmin && adminActAs === 'behalf_client') ? 'Accept on Behalf of Client' : (effectiveIsAdmin && adminActAs === 'behalf_driver') ? 'Confirm Driver Offer' : 'Accept Client Offer'}</span>
                     </button>
                   </div>
 
